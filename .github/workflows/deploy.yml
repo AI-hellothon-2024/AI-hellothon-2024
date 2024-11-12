@@ -18,6 +18,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Pull code on server
+      - name: Create .env file
         run: |
-          ssh -o StrictHostKeyChecking=no user@your-server "cd /home/elicer/AI-hellothon-2024-BE/ && git pull"
+          echo "ML_API_KEY=${{ secrets.ML_API_KEY }}" >> .env
+
+      - name: Pull code on server and upload .env
+        run: |
+          scp -o StrictHostKeyChecking=no .env user@your-server:/path/to/your/project/.env
+          ssh -o StrictHostKeyChecking=no user@your-server "cd /path/to/your/project && git pull"

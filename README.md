@@ -25,5 +25,5 @@
 Start the FastAPI server using Uvicorn:
 
 ```bash
-uvicorn app.main:app --reload --포트번호
+uvicorn app.main:app --reload --port 포트번호
 ```

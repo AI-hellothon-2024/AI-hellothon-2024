@@ -1,4 +1,4 @@
-#main.py 앱 진입점
+# main.py 앱 진입점
 from fastapi import FastAPI
 from app.api.endpoints import scenario
 

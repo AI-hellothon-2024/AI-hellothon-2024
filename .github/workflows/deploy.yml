@@ -1,6 +1,7 @@
-name: Deploy to Server
+name: Code deploy
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -10,22 +11,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Add SSH key
+      - name: Create SSH Key
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/deploy_key.pem
-          chmod 600 /tmp/deploy_key.pem
-          eval "$(ssh-agent -s)"
-          ssh-add /tmp/deploy_key.pem
-          ssh-keyscan -p 57447 -H 14.35.173.14 >> ~/.ssh/known_hosts
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/private-key.pem
+          chmod 600 ~/private-key.pem
+
+      - name: Create SSH directory
+        run: |
+          mkdir -p ~/.ssh
+
+      - name: Add known host
+        run: |
+          ssh-keyscan -p ${{ secrets.REMOTE_PORT }} ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
       - name: Create .env file
         run: |
-          echo "ML_API_KEY=${{ secrets.ML_API_KEY }}" >> .env
+          echo "ML_API_KEY=${{ secrets.ML_API_KEY }}" > .env
 
-      - name: Pull code on server and upload .env
+      - name: Copy files to remote server
+        env:
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+          REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
         run: |
-          scp -P 57447 -o StrictHostKeyChecking=no .env elicer@14.35.173.14:/path/to/your/project/.env
-          ssh -p 57447 -o StrictHostKeyChecking=no elicer@14.35.173.14 "cd /path/to/your/project && git pull"
+          scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no -r ./* $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET
+          scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no .env $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET/.env
+          echo "Copied files and .env to remote server"

@@ -5,5 +5,5 @@ out
 gen
 
 # scret file
-.env
+real.env
 *.env

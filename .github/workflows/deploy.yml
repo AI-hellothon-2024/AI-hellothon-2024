@@ -14,9 +14,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Add SSH key
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/deploy_key.pem
+          chmod 600 /tmp/deploy_key.pem
+          ssh-keyscan -p 57447 -H 14.35.173.14 >> ~/.ssh/known_hosts
+          eval "$(ssh-agent -s)"
+          ssh-add /tmp/deploy_key.pem
 
       - name: Create .env file
         run: |
@@ -24,5 +27,5 @@ jobs:
 
       - name: Pull code on server and upload .env
         run: |
-          scp -o StrictHostKeyChecking=no .env user@your-server:/path/to/your/project/.env
-          ssh -o StrictHostKeyChecking=no user@your-server "cd /path/to/your/project && git pull"
+          scp -P 57447 -o StrictHostKeyChecking=no .env elicer@14.35.173.14:/path/to/your/project/.env
+          ssh -p 57447 -o StrictHostKeyChecking=no elicer@14.35.173.14 "cd /path/to/your/project && git pull"

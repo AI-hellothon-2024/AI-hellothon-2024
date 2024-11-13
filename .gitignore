@@ -6,3 +6,4 @@ gen
 
 # scret file
 .env
+*.env

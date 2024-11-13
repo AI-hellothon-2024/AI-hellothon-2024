@@ -27,9 +27,9 @@ jobs:
         run: |
           ssh-keyscan -p ${{ secrets.REMOTE_PORT }} ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Create .env file
+      - name: Create real.env file
         run: |
-          echo "ML_API_KEY=${{ secrets.ML_API_KEY }}" > .env
+          echo "ML_API_KEY=${{ secrets.ML_API_KEY }}" > real.env
 
       - name: Copy project files to remote server
         env:
@@ -40,12 +40,12 @@ jobs:
         run: |
           scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no -r ./* $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET
 
-      - name: Copy .env file to remote server
+      - name: Copy real.env file to remote server
         env:
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
           REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
         run: |
-          scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no .env $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET/.env
+          scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no .env $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET/real.env
           echo "Copied .env file to remote server"

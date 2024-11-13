@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     ML_API_KEY: str = ''
 
     class Config:
-        env_file = '.env'
+        env_file = 'real.env'
         env_file_encoding = 'utf-8'
 
 

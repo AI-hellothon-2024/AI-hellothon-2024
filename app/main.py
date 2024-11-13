@@ -8,7 +8,7 @@ app.include_router(scenario.router, prefix="/scenario", tags=["scenario"])
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "2024-AI-hellothon"}
 
 
 @app.get("/hello/{name}")

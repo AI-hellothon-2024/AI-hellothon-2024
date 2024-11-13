@@ -31,7 +31,7 @@ jobs:
         run: |
           echo "ML_API_KEY=${{ secrets.ML_API_KEY }}" > .env
 
-      - name: Copy files to remote server
+      - name: Copy project files to remote server
         env:
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
@@ -39,5 +39,13 @@ jobs:
           REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
         run: |
           scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no -r ./* $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET
+
+      - name: Copy .env file to remote server
+        env:
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+          REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
+        run: |
           scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no .env $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET/.env
-          echo "Copied files and .env to remote server"
+          echo "Copied .env file to remote server"

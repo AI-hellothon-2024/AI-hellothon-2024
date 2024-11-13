@@ -9,8 +9,8 @@ app.include_router(scenario.router, prefix="/scenario", tags=["scenario"])
 
 @app.get("/")
 async def root():
-    return {"message": settings.ML_API_KEY }
-
+    # return {"message": settings.ML_API_KEY }
+    return {"message": "hello_thx_uuuuuuuuuuuuuuuuuuuu" }
 
 @app.get("/hello/{name}")
 async def say_hello(name: str):

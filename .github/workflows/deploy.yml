@@ -17,9 +17,9 @@ jobs:
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/deploy_key.pem
           chmod 600 /tmp/deploy_key.pem
-          ssh-keyscan -p 57447 -H 14.35.173.14 >> ~/.ssh/known_hosts
           eval "$(ssh-agent -s)"
           ssh-add /tmp/deploy_key.pem
+          ssh-keyscan -p 57447 -H 14.35.173.14 >> ~/.ssh/known_hosts
 
       - name: Create .env file
         run: |

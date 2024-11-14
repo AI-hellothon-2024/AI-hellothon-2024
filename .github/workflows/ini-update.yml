@@ -6,7 +6,7 @@ on:
     - cron: '0 0 1 * *'  # 매월 1일 0시에 실행
 
 jobs:
-  create_log_folder:
+  update_log_config:
     runs-on: ubuntu-latest
 
     steps:
@@ -14,6 +14,17 @@ jobs:
         run: echo "NEW_MONTH=$(date +%Y-%m)" >> $GITHUB_ENV
 
       - name: Update logging_config.ini file
+        env:
+          REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
+          NEW_MONTH: ${{ env.NEW_MONTH }}
         run: |
           sed -i "s|args=('.*')|args=('$REMOTE_TARGET/logs/$NEW_MONTH/server.log', 'midnight', 1, 0)|" logging_config.ini
+
+      - name: Upload updated logging_config.ini to remote server
+        env:
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+          REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
+        run: |
           scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no logging_config.ini $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET/logging_config.ini

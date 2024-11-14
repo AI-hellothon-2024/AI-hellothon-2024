@@ -73,9 +73,11 @@ jobs:
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+          REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
         run: |
-          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "
-            pkill -f 'uvicorn' || true
+          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST '
+            pkill -f "uvicorn" || true
             cd $REMOTE_TARGET
             nohup uvicorn app.main:app --host 0.0.0.0 --port 8100 --log-config logging_config.ini &
-          "
+          '
+

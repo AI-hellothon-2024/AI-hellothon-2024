@@ -69,11 +69,11 @@ jobs:
           scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no logging_config.ini $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET/logging_config.ini
           echo "Uploaded logging configuration to remote server"
 
-      - name: Restart Uvicorn server
-        env:
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
-          REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
-        run: |
-          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "cd $REMOTE_TARGET && ./start_uvicorn.sh"
+#      - name: Restart Uvicorn server
+#        env:
+#          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+#          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+#          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+#          REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
+#        run: |
+#          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "cd $REMOTE_TARGET && ./start_uvicorn.sh"

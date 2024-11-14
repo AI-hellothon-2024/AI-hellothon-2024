@@ -1,15 +1,16 @@
 # from sqlalchemy.orm import Session
 # from app.db.models import User
+from app.db.session import get_database
 from app.schemas.scenario_schema import ScenarioCreate
+from bson import ObjectId
 
-def create_scenario(scenario_request: ScenarioCreate):
-    # fake_hashed_password = user.password + "notreallyhashed"
-    # db_user = User(name=user.name, email=user.email, hashed_password=fake_hashed_password)
-    # db.add(db_user)
-    # db.commit()
-    # db.refresh(db_user)
+db = get_database()
+
+async def create_scenario(scenario_request: ScenarioCreate):
+    result = await db["scenario"].insert_one(scenario_request.dict(by_alias=True))
 
     #### Scenario 생성 로직 ####
-    scenario = ScenarioCreate(scenarioNum="testNum",scenarioDetail="테스트 시나리오 입니다?")
+    scenario = ScenarioCreate(scenarioNum=str(result.inserted_id),scenarioDetail="테스트 시나리오 입니다?")
 
     return scenario
+

@@ -1,11 +1,10 @@
 # DB 모델 정의
-# from sqlalchemy import Column, Integer, String
-# from app.db.session import Base
-#
-# class User(Base):
-#     __tablename__ = "users"
-#
-#     id = Column(Integer, primary_key=True, index=True)
-#     name = Column(String, index=True)
-#     email = Column(String, unique=True, index=True)
-#     hashed_password = Column(String)
+from pydantic import BaseModel, Field
+from typing import Optional
+from bson import ObjectId
+
+class Scenario(BaseModel):
+    id: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
+    name: str
+    description: str
+

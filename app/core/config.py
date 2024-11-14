@@ -3,8 +3,9 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = ''
-    ML_API_KEY: str = ''
+    # DATABASE_URL: str = ''
+    # ML_API_KEY: str = ''
+    # DATABASE_NAME: str = "database"
 
     class Config:
         env_file = 'real.env'

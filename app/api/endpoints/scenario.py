@@ -19,6 +19,6 @@ router = APIRouter()
 #     return create_user(db=db, user=user)
 
 @router.post("/", response_model=ScenarioCreate)
-def scenario_create(scenario_request: ScenarioCreate):
-    scenario = create_scenario(scenario_request=scenario_request)
+async def scenario_create(scenario_request: ScenarioCreate):
+    scenario = await create_scenario(scenario_request=scenario_request)
     return scenario

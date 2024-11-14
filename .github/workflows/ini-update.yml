@@ -1,6 +1,7 @@
 name: Update Monthly Log Folder
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 0 1 * *'  # 매월 1일 0시에 실행
 

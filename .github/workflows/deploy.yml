@@ -76,4 +76,4 @@ jobs:
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
           REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
         run: |
-          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "cd /home/$REMOTE_USER/ && ./start_uvicorn.sh"
+          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "./start_uvicorn.sh"

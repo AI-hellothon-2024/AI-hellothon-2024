@@ -21,7 +21,7 @@ jobs:
           REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
           NEW_MONTH: ${{ env.NEW_MONTH }}
         run: |
-          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "mkdir -p $REMOTE_TARGET/logs/$NEW_MONTH"
+          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "sudo mkdir -p $REMOTE_TARGET/logs/$NEW_MONTH"
 
       - name: Update logging_config.ini file
         run: |

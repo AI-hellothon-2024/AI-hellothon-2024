@@ -16,6 +16,11 @@ jobs:
       - name: Set Date for New Month
         run: echo "NEW_MONTH=$(date +%Y-%m)" >> $GITHUB_ENV
 
+      - name: Create SSH Key File
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/private-key.pem
+          chmod 600 ~/private-key.pem
+
       - name: Update logging_config.ini file
         env:
           REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}

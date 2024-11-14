@@ -50,14 +50,14 @@ jobs:
           scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no real.env $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET/real.env
           echo "Copied .env file to remote server"
 
-      - name: Create logs directory on remote server
-        env:
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
-          REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
-        run: |
-          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "sudo mkdir -p $REMOTE_TARGET/logs/\$(date +\"%Y-%m\")"
+#      - name: Create logs directory on remote server
+#        env:
+#          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+#          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+#          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+#          REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
+#        run: |
+#          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "sudo mkdir -p $REMOTE_TARGET/logs/\$(date +\"%Y-%m\")"
 
       - name: Upload logging configuration to remote server
         env:

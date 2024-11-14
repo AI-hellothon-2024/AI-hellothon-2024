@@ -21,8 +21,7 @@ jobs:
           REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
           NEW_MONTH: ${{ env.NEW_MONTH }}
         run: |
-          cd AI-hellothon-2024-BE  # 프로젝트 루트 디렉토리로 이동
-          sed -i "s|args=('.*')|args=('$REMOTE_TARGET/logs/$NEW_MONTH/server.log', 'midnight', 1, 0)|" logging_config.ini
+          sed -i "s|args=('.*')|args=('$REMOTE_TARGET/logs/$NEW_MONTH/server.log', 'midnight', 1, 0)|" ./logging_config.ini
 
       - name: Upload updated logging_config.ini to remote server
         env:
@@ -31,4 +30,4 @@ jobs:
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
           REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
         run: |
-          scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no AI-hellothon-2024-BE/logging_config.ini $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET/logging_config.ini
+          scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no ./logging_config.ini $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET/logging_config.ini

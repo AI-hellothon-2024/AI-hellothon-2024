@@ -55,8 +55,9 @@ jobs:
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+          PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
         run: |
-          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "sudo mkdir -p /home/$REMOTE_USER/AI-hellothon-2024-BE/logs/$(date +%Y-%m)"
+          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "sudo mkdir -p /home/$REMOTE_USER/$PROJECT_NAME/logs/$(date +%Y-%m)"
 
       - name: Upload logging configuration to remote server
         env:

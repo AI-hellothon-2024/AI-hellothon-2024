@@ -13,16 +13,6 @@ jobs:
       - name: Set Date for New Month
         run: echo "NEW_MONTH=$(date +%Y-%m)" >> $GITHUB_ENV
 
-      - name: Create new monthly log folder on remote server
-        env:
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
-          REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
-          NEW_MONTH: ${{ env.NEW_MONTH }}
-        run: |
-          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "sudo mkdir -p $REMOTE_TARGET/logs/$NEW_MONTH"
-
       - name: Update logging_config.ini file
         run: |
           sed -i "s|args=('.*')|args=('$REMOTE_TARGET/logs/$NEW_MONTH/server.log', 'midnight', 1, 0)|" logging_config.ini

@@ -7,7 +7,7 @@ gen
 # scret file
 real.env
 *.env
-/.venv
+BE/.venv
 
 # dependencies
 /node_modules

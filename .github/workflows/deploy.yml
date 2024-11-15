@@ -32,6 +32,7 @@ jobs:
           echo "ML_API_KEY=${{ secrets.ML_API_KEY }}" > real.env
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> real.env
           echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> real.env
+          echo "SAMPLE_IMAGE=${{ secrets.SAMPLE_IMAGE }}" >> real.env
 
       - name: Copy project files to remote server
         env:

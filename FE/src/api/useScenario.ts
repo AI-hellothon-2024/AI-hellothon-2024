@@ -64,7 +64,7 @@ export const useScenario = ({
   return useQuery<IScenario>({
     queryKey: ["posts", { userId }],
     queryFn: () => getScenario({ userId, username, job, situation }),
-    // select,
+    // select, // TODO
   });
 };
 export const prefetchScenario = ({

@@ -91,7 +91,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           name: FE
-          path: FE/out/
+          path: FE/out
 
   # Deployment job
   deploy:

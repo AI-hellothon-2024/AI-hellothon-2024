@@ -25,10 +25,10 @@ sampleImage = load_sample_image()
 
 async def create_scenario(request: ScenarioCreateRequest) -> ScenarioCreateResponse:
     scenario_data = request.dict()
-    scenario_data["senarioStep"] = "1"
-    scenario_data["senarioContent"] = "시나리오 첫번째 콘텐츠 예시입니다."
-    scenario_data["senarioImage"] = sampleImage
-    scenario_data["senarioId"] = str(ObjectId())
+    scenario_data["scenarioStep"] = "1"
+    scenario_data["scenarioContent"] = "시나리오 첫번째 콘텐츠 예시입니다."
+    scenario_data["scenarioImage"] = sampleImage
+    scenario_data["scenarioId"] = str(ObjectId())
     await db["scenarios"].insert_one(scenario_data)
     return ScenarioCreateResponse(**scenario_data)
 
@@ -37,10 +37,13 @@ async def save_answer(request: ScenarioAnswerRequest) -> ScenarioAnswerResponse:
     # Logic to save the answer and generate the next scenario
     next_scenario_data = {
         "userId": request.userId,
-        "senarioStep": "end",
-        "senarioContent": "시나리오 두번째 콘텐츠 예시입니다. (이게 마지막임)",
-        "senarioImage": sampleImage,
-        "senarioId": str(ObjectId())
+        "scenarioStep": "end",
+        "scenarios": [
+            {"scenarioContent": "시나리오 첫번째 콘텐츠 예시입니다.", "scenarioStep": "1", "answer": "Answer 1"},
+            {"scenarioContent": "시나리오 두번째 콘텐츠 예시입니다. (이게 마지막임)", "scenarioStep": "end", "answer": ""}
+        ],
+        "scenarioImage": sampleImage,
+        "scenarioId": str(ObjectId())
     }
     return ScenarioAnswerResponse(**next_scenario_data)
 
@@ -52,9 +55,9 @@ async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResult
         "userId": request.userId,
         "resultImage": sampleImage,
         "resultContent": "결과 내용 내용 내용 결과 내용 내용 내용 결과 내용 내용 내용 결과 내용 내용 내용 결과 내용 내용 내용 결과 내용 내용 내용",
-        "senarios": [
-            {"senarioContent": "시나리오 첫번째 콘텐츠 예시입니다.", "senarioStep": "1", "answer": "Answer 1"},
-            {"senarioContent": "시나리오 두번째 콘텐츠 예시입니다. (이게 마지막임)", "senarioStep": "end", "answer": ""}
+        "scenarios": [
+            {"scenarioContent": "시나리오 첫번째 콘텐츠 예시입니다.", "scenarioStep": "1", "answer": "Answer 1"},
+            {"scenarioContent": "시나리오 두번째 콘텐츠 예시입니다. (이게 마지막임)", "scenarioStep": "end", "answer": ""}
         ]
     }
     return ScenarioResultResponse(**result_data)

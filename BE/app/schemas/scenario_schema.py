@@ -13,29 +13,29 @@ class ScenarioCreateRequest(BaseModel):
 
 class ScenarioCreateResponse(BaseModel):
     userId: str
-    senarioStep: str
-    senarioContent: str
-    senarioImage: str
-    senarioId: str
+    scenarioStep: str
+    scenarioContent: str
+    scenarioImage: str
+    scenarioId: str
 
 
 class ScenarioAnswerRequest(BaseModel):
     userId: str
-    senarioId: str
+    scenarioIds: List[str]
     answer: str
 
 
 class ScenarioAnswerResponse(BaseModel):
     userId: str
-    senarioStep: str
-    senarioContent: str
-    senarioImage: str
-    senarioId: str
+    scenarioStep: str
+    scenarios: List[dict]
+    scenarioImage: str
+    scenarioId: str
 
 
 class ScenarioResultRequest(BaseModel):
     userId: str
-    senarioIds: List[str]
+    scenarioIds: List[str]
 
 
 class ScenarioResultResponse(BaseModel):
@@ -43,4 +43,4 @@ class ScenarioResultResponse(BaseModel):
     userId: str
     resultImage: str
     resultContent: str
-    senarios: List[dict]
+    scenarios: List[dict]

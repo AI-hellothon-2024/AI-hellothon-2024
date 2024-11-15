@@ -40,42 +40,12 @@ jobs:
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
           REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
         run: |
-          scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no -r ./* $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET
+          scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no -r ./BE/* $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET
 
       - name: Copy real.env file to remote server
         env:
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
-          REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
         run: |
-          scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no real.env $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET/real.env
-          echo "Copied .env file to remote server"
-
-#      - name: Create logs directory on remote server
-#        env:
-#          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-#          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-#          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
-#          REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
-#        run: |
-#          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "sudo mkdir -p $REMOTE_TARGET/logs/\$(date +\"%Y-%m\")"
-
-      - name: Upload logging configuration to remote server
-        env:
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
-          REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
-        run: |
-          scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no logging_config.ini $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET/logging_config.ini
-          echo "Uploaded logging configuration to remote server"
-
-#      - name: Restart Uvicorn server
-#        env:
-#          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-#          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-#          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
-#          REMOTE_TARGET: ${{ secrets.REMOTE_TARGET }}
-#        run: |
-#          ssh -i ~/private-key.pem -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "cd $REMOTE_TARGET && ./start_uvicorn.sh"
+          scp -P $REMOTE_PORT -i ~/private-key.pem -o StrictHostKeyChecking=no real.env $REMOTE_USER@$REMOTE_HOST:$REMOTE_TARGET

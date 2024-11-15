@@ -12,7 +12,7 @@ try:
     logger.info("Database connection established successfully. DB Name: %s", settings.DATABASE_NAME)
 except Exception as e:
     logger.error("Failed to connect to the database: %s", e)
-    raise e  # 연결 실패 시 애플리케이션을 중단시키기 위해 예외를 다시 발생
+    raise e
 
 
 def get_database():

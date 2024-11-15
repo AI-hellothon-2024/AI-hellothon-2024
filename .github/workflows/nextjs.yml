@@ -33,6 +33,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Detect package manager
         id: detect-package-manager
         run: |
@@ -56,6 +57,8 @@ jobs:
         with:
           node-version: "20"
           cache: ${{ steps.detect-package-manager.outputs.manager }}
+          cache-dependency-path: "./${{ env.working-directory }}"
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:

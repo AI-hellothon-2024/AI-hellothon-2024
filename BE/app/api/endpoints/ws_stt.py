@@ -5,6 +5,7 @@ from fastapi import APIRouter, WebSocket
 
 router = APIRouter()
 
+
 @router.websocket("/ws/stt/")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()

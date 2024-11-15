@@ -12,15 +12,18 @@ from app.services.scenario_service import (
 
 router = APIRouter()
 
+
 @router.post("/", response_model=ScenarioCreateResponse)
 async def create_scenario_endpoint(request: ScenarioCreateRequest):
     scenario = await create_scenario(request)
     return scenario
 
+
 @router.post("/answer", response_model=ScenarioAnswerResponse)
 async def answer_scenario_endpoint(request: ScenarioAnswerRequest):
     answer = await save_answer(request)
     return answer
+
 
 @router.post("/result", response_model=ScenarioResultResponse)
 async def result_scenario_endpoint(request: ScenarioResultRequest):

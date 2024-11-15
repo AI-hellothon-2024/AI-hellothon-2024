@@ -1,5 +1,5 @@
 # app/services/scenario_service.py
-
+import base64
 from app.db.session import get_database
 from app.schemas.scenario_schema import (
     ScenarioCreateRequest, ScenarioCreateResponse,
@@ -10,7 +10,15 @@ from bson import ObjectId
 from app.core.config import settings
 
 db = get_database()
-sampleImage = settings.SAMPLE_IMAGE
+
+
+def load_sample_image():
+    with open("app/sample-image.png", "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
+
+sampleImage = load_sample_image()
+
 
 async def create_scenario(request: ScenarioCreateRequest) -> ScenarioCreateResponse:
     scenario_data = request.dict()

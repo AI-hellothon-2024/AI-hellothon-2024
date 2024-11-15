@@ -24,7 +24,12 @@ const Situation = ({ context }: Props) => {
       ...data,
       ...context,
     });
-    router.push("/game");
+    const qs = new URLSearchParams({
+      ...data,
+      ...context,
+      userId: window.crypto.randomUUID(),
+    });
+    router.push(`/game/${1}?${qs}`);
   };
   return (
     <form

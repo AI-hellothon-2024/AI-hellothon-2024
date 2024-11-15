@@ -2,6 +2,7 @@
 import logging
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 from app.api.endpoints import scenario, ws_stt
 
 # Configure logging
@@ -9,6 +10,17 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="AI헬로우톤^ㅡ^", description="API Documentation", version="1.0.0")
+
+
+# Add CORS middleware to handle OPTIONS requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 허용할 Origin을 설정 (예: ["https://example.com"])
+    allow_methods=["*"],  # 허용할 HTTP 메서드 (GET, POST, OPTIONS 등)
+    allow_headers=["*"],  # 허용할 HTTP 헤더
+    allow_credentials=True,  # 쿠키나 인증 정보 전달 허용 여부
+)
+
 
 app.include_router(scenario.router, prefix="/scenario", tags=["scenario"])
 app.include_router(ws_stt.router, prefix="/ws", tags=["websocket"])

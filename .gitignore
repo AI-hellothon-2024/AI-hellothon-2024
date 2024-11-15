@@ -11,6 +11,7 @@ real.env
 # 로컬 환경파일
 BE/.venv
 __pycache__/
+*.pyc
 
 # dependencies
 /node_modules
@@ -46,5 +47,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-

@@ -1,4 +1,5 @@
 # app/services/scenario_service.py
+import logging
 import base64
 from app.db.session import get_database
 from app.schemas.scenario_schema import (
@@ -9,7 +10,9 @@ from app.schemas.scenario_schema import (
 from bson import ObjectId
 from app.core.config import settings
 
+
 db = get_database()
+logger = logging.getLogger(__name__)
 
 
 def load_sample_image():

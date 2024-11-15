@@ -1,8 +1,12 @@
 # app/main.py
-
+import logging
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from app.api.endpoints import scenario, ws_stt
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="AI헬로우톤^ㅡ^", description="API Documentation", version="1.0.0")
 

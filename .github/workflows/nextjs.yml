@@ -84,14 +84,16 @@ jobs:
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
         working-directory: ${{ env.working-directory }}
-      - name: Build with Next.js
-        run: ${{ steps.detect-package-manager.outputs.runner }} next build
+      - name: Build and export with Next.js
+        run: |
+          ${{ steps.detect-package-manager.outputs.runner }} next build
+          ${{ steps.detect-package-manager.outputs.runner }} next export
         working-directory: ${{ env.working-directory }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           name: FE
-          path: FE/out
+          path: ./FE/out
 
   # Deployment job
   deploy:

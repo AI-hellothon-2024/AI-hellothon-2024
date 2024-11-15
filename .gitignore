@@ -7,6 +7,7 @@ gen
 # scret file
 real.env
 *.env
+/.venv
 
 # dependencies
 /node_modules
@@ -42,3 +43,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+

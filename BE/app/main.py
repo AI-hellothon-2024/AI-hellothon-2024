@@ -1,16 +1,16 @@
-# main.py 앱 진입점
+# app/main.py
+
 from fastapi import FastAPI
-from app.api.endpoints import scenario
-from app.core.config import settings
+from app.api.endpoints import scenario, ws_stt
 
 app = FastAPI(title="AI헬로우톤^ㅡ^", description="API Documentation", version="1.0.0")
 
 app.include_router(scenario.router, prefix="/scenario", tags=["scenario"])
+app.include_router(ws_stt.router, prefix="/ws", tags=["websocket"])
 
 @app.get("/")
 async def root():
-    # return {"message": settings.ML_API_KEY }
-    return {"message": "hello_thx_uuuuuuuuuuuuuuuuuuuu" }
+    return {"message": "hello^ㅡ^thon"}
 
 @app.get("/hello/{name}")
 async def say_hello(name: str):

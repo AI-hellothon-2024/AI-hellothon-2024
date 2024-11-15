@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     ML_API_KEY: str
     DATABASE_NAME: str
+    SAMPLE_IMAGE: str
 
     class Config:
         env_file = 'real.env'

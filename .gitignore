@@ -7,7 +7,10 @@ gen
 # scret file
 real.env
 *.env
+
+# 로컬 환경파일
 BE/.venv
+__pycache__/
 
 # dependencies
 /node_modules

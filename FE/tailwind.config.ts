@@ -10,6 +10,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        dim: {
+          70: "rgb(0 0 0 / 0.5)",
+          50: "rgb(0 0 0 / 0.3)",
+          20: "rgb(0 0 0 / 0.2)",
+          DEFAULT: "black",
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

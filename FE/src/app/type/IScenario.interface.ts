@@ -1,8 +1,13 @@
 export interface IScenario {
   userId: string;
-  scenarioStep: `${number}`;
+  scenarioStep: `${number}` | "end";
   scenarioContent: string;
   scenarioImage: string;
   scenarioId: string;
-  scenarios: Omit<IScenario, "scenarios">[];
+  scenarios: {
+    scenarioId: string;
+    scenarioContent: string;
+    scenarioStep: `${number}`;
+    answer: string;
+  }[];
 }

@@ -29,19 +29,8 @@ const getScenario = async ({
   if (!res.ok) {
     throw new Error("Failed to fetch");
   }
-  const json = await res.json();
-  const scenario = {
-    userId: json.userId,
-    scenarioStep: json.scenarioStep,
-    scenarioContent: json.scenarioContent,
-    scenarioImage: json.scenarioImage,
-    scenarioId: json.scenarioId,
-  };
 
-  return {
-    ...scenario,
-    scenarios: [scenario],
-  };
+  return res.json();
 };
 export const useScenario = ({
   userId,
@@ -54,12 +43,11 @@ export const useScenario = ({
   username: string;
   job: keyof typeof JOBS;
   situation: keyof typeof SITUATIONS;
-  // select?: (data: IScenario[]) => IScenario[];
 }) => {
   return useQuery<IScenario>({
     queryKey: ["posts", { userId }],
     queryFn: () => getScenario({ userId, username, job, situation }),
-    // select, // TODO
+    refetchInterval: 0,
   });
 };
 export const prefetchScenario = ({

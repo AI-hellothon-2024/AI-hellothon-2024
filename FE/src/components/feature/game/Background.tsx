@@ -1,7 +1,8 @@
 "use client";
 import { ComponentProps } from "react";
 import { SITUATIONS, JOBS } from "@/lib/constants";
-import { useScenario } from "@/api/useScenario";
+import { useAtomValue } from "jotai";
+import { chatAtom } from "@/app/store/chatAtom";
 import { MotionDiv } from "@/components/motion";
 
 interface Props extends ComponentProps<"div"> {
@@ -10,20 +11,10 @@ interface Props extends ComponentProps<"div"> {
   job: keyof typeof JOBS;
   situation: keyof typeof SITUATIONS;
 }
-const Background = ({
-  className,
-  userId,
-  username,
-  job,
-  situation,
-  children,
-}: Props) => {
-  const { data } = useScenario({
-    userId,
-    username,
-    job,
-    situation,
-  });
+const Background = ({ className, children }: Props) => {
+  const data = useAtomValue(chatAtom)
+    .filter((chat) => chat.sender === "bot")
+    .at(-1);
   return (
     <MotionDiv
       className={className}

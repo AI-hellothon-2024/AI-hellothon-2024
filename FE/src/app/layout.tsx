@@ -25,7 +25,7 @@ export default function RootLayout({
     <html lang="ko" className={`${pretendard.variable}`}>
       <body className={`${pretendard.className} antialiased`}>
         <QueryProvider>
-          <main className="max-w-[600px] mx-auto h-dvh shadow-lg max-h-dvh flex flex-col">
+          <main className="max-w-[600px] mx-auto h-dvh shadow-lg max-h-dvh flex flex-col overflow-hidden">
             {children}
           </main>
         </QueryProvider>

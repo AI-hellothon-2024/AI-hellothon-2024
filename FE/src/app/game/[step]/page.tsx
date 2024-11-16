@@ -5,11 +5,11 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
+import { prefetchScenario } from "@/api/useScenario";
 import LeaveDrawer from "@/components/feature/game/LeaveDrawer";
-import { Input } from "@/components/ui/input";
 import Background from "@/components/feature/game/Background";
 import Chats from "@/components/feature/game/Chats";
-import { prefetchScenario } from "@/api/useScenario";
+import ChatInput from "@/components/feature/game/ChatInput";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => {
@@ -42,12 +42,12 @@ const Page = async ({
           <h1>{situationMapper[searchParams.situation]}</h1>
         </header>
         <Background
-          className="w-full bg-no-repeat bg-cover h-full bg-center grid grid-rows-2"
+          className="w-full bg-no-repeat bg-cover h-full bg-center grid grid-rows-2 flex-grow-0 min-h-0"
           {...searchParams}
         >
-          <div className="row-start-2 px-10 flex py-8 flex-col justify-end gap-8">
+          <div className="row-start-2 px-10 flex py-8 flex-col justify-end gap-8 max-h-full min-h-0">
             <Chats {...searchParams} />
-            <Input />
+            <ChatInput userId={searchParams.userId} />
           </div>
         </Background>
       </HydrationBoundary>

@@ -7,6 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class Settings(BaseSettings):
     DATABASE_URL: str
     ML_API_KEY: str
@@ -27,7 +28,6 @@ class Settings(BaseSettings):
 
     @property
     def CURRENT_DATETIME(self) -> datetime:
-        """현재 시간을 KST로 반환."""
         kst = pytz.timezone('Asia/Seoul')
         return datetime.now(kst)
 

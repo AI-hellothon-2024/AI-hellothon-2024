@@ -13,7 +13,7 @@ from app.services.scenario_service import (
 router = APIRouter()
 
 
-@router.post("/", response_model=ScenarioCreateResponse)
+@router.post("", response_model=ScenarioCreateResponse)
 async def create_scenario_endpoint(request: ScenarioCreateRequest, client_request: Request):
     try:
         scenario = await create_scenario(request, client_request)

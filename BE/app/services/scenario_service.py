@@ -10,11 +10,11 @@ from app.schemas.scenario_schema import (
 )
 from bson import ObjectId
 from app.core.config import settings
-
+from app.services.ai_service import llm_scenario_create, image_create
 
 db = get_database()
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -38,8 +38,9 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
     }
     await db["users"].insert_one(user_data)
 
-    llm_result = "시나리오 첫번째 콘텐츠 예시입니다."+str(ObjectId())[:30]
-    encode_image = load_sample_image()
+    # llm_scenario_create(job, situation, gender, scenario_id, scenario_step, user_id)
+    llm_result = llm_scenario_create(request.job, request.situation, request.gender, "", "1", request.userId)
+    encode_image = image_create(llm_result, request.gender)
 
     scenario_data = {
         "create_date": settings.CURRENT_DATETIME,

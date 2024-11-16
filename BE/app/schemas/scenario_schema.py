@@ -12,11 +12,11 @@ class ScenarioCreateRequest(BaseModel):
 
 
 class ScenarioCreateResponse(BaseModel):
+    scenarioId: str
     userId: str
     scenarioStep: str
     scenarioContent: str
     scenarioImage: str
-    scenarioId: str
 
 
 class ScenarioAnswerRequest(BaseModel):

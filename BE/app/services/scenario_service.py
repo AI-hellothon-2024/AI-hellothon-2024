@@ -1,6 +1,7 @@
 # app/services/scenario_service.py
 import logging
 import base64
+from fastapi import Request
 from app.db.session import get_database
 from app.schemas.scenario_schema import (
     ScenarioCreateRequest, ScenarioCreateResponse,
@@ -23,18 +24,46 @@ def load_sample_image():
 sampleImage = load_sample_image()
 
 
-async def create_scenario(request: ScenarioCreateRequest) -> ScenarioCreateResponse:
-    scenario_data = request.dict()
-    scenario_data["scenarioStep"] = "1"
-    scenario_data["scenarioContent"] = "시나리오 첫번째 콘텐츠 예시입니다."
-    scenario_data["scenarioImage"] = sampleImage
-    scenario_data["scenarioId"] = str(ObjectId())
+async def create_scenario(request: ScenarioCreateRequest, client_request: Request) -> ScenarioCreateResponse:
+    # 리퀘스트 JSON 데이터를 그대로 담고 컬럼 추가 예시
+    # scenario_data = request.dict()
+    # scenario_data["scenarioStep"] = "1"
+    user_data = {
+        "userId": request.userId,
+        "job": request.job,
+        "situation": request.situation,
+        "userName": request.userName,
+        "create_date": settings.CURRENT_DATETIME,
+        "ip_address": client_request.client.host
+    }
+
+    llm_result = "시나리오 첫번째 콘텐츠 예시입니다."
+
+    scenario_data = {
+        "create_date": settings.CURRENT_DATETIME,
+        "scenarioId": str(ObjectId()),
+        "userId": request.userId,
+        "ip_address": client_request.client.host,
+        "scenarioStep": "1",
+        "scenarioContent": llm_result,
+        "scenarioImage": sampleImage
+    }
+
+    response_data = {
+        "scenarioId": str(ObjectId()),
+        "userId": request.userId,
+        "scenarioStep": "1",
+        "scenarioContent": llm_result,
+        "scenarioImage": sampleImage
+    }
+
+    await db["users"].insert_one(user_data)
     await db["scenarios"].insert_one(scenario_data)
-    return ScenarioCreateResponse(**scenario_data)
+
+    return ScenarioCreateResponse(**response_data)
 
 
 async def save_answer(request: ScenarioAnswerRequest) -> ScenarioAnswerResponse:
-    # Logic to save the answer and generate the next scenario
     next_scenario_data = {
         "userId": request.userId,
         "scenarioStep": "end",

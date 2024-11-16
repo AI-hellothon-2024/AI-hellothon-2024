@@ -2,7 +2,6 @@ import logging
 from motor.motor_asyncio import AsyncIOMotorClient
 from app.core.config import settings
 
-# Logger 설정
 logger = logging.getLogger(__name__)
 
 try:

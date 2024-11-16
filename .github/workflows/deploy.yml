@@ -33,6 +33,8 @@ jobs:
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> real.env
           echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> real.env
           echo "SAMPLE_IMAGE=${{ secrets.SAMPLE_IMAGE }}" >> real.env
+          echo "DB_USER=${{ secrets.DB_USER }}" >> real.env
+          echo "DB_PW=${{ secrets.DB_PW }}" >> real.env
 
       - name: Copy project files to remote server
         env:

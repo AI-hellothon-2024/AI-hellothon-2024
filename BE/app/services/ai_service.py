@@ -52,11 +52,6 @@ def llm_scenario_create(job, situation, gender, scenario_id, scenario_step, user
         "authorization": f"Bearer {settings.ML_API_KEY}"
     }
 
-    try:
-        logger.info(f"Payload to be sent:\n{json.dumps(payload, indent=4, ensure_ascii=False)}")
-    except Exception as e:
-        logger.error(f"Error while logging payload: {str(e)}")
-
     response = requests.post(url, json=payload, headers=headers)
 
     if response.status_code == 200:

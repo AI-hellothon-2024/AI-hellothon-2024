@@ -24,9 +24,6 @@ def log_data_without_image(data: dict, context: str = "General"):
 
 
 def load_sample_image():
-    """
-    Load a sample image and encode it in base64.
-    """
     with open("app/sample-image.png", "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
 
@@ -88,7 +85,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         logger.error("[save_answer] Answer scenario data not found in database.")
         raise ValueError("answerScenarioId 조회 결과 없음")
 
-    logger.info(f"[save_answer] Answered scenario data: {answered_scenario_data}")
+    log_data_without_image(answered_scenario_data, context="save_answer Answered scenario data:")
 
     answer_data = {
         "create_date": settings.CURRENT_DATETIME,

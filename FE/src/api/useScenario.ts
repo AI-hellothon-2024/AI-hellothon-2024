@@ -30,22 +30,17 @@ const getScenario = async ({
     throw new Error("Failed to fetch");
   }
   const json = await res.json();
-
-  return {
+  const scenario = {
     userId: json.userId,
     scenarioStep: json.scenarioStep,
     scenarioContent: json.scenarioContent,
     scenarioImage: json.scenarioImage,
     scenarioId: json.scenarioId,
-    scenarios: [
-      {
-        userId: json.userId,
-        scenarioStep: json.scenarioStep,
-        scenarioContent: json.scenarioContent,
-        scenarioImage: json.scenarioImage,
-        scenarioId: json.scenarioId,
-      },
-    ],
+  };
+
+  return {
+    ...scenario,
+    scenarios: [scenario],
   };
 };
 export const useScenario = ({
@@ -64,7 +59,7 @@ export const useScenario = ({
   return useQuery<IScenario>({
     queryKey: ["posts", { userId }],
     queryFn: () => getScenario({ userId, username, job, situation }),
-    // select,
+    // select, // TODO
   });
 };
 export const prefetchScenario = ({

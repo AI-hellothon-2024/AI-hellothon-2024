@@ -13,14 +13,14 @@ from app.services.ai_service import llm_scenario_create, image_create
 
 db = get_database()
 
-# Set logging level to DEBUG
-logging.basicConfig(level=logging.DEBUG)
+# Set logging level tr.INFO
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 def log_data_without_image(data: dict, context: str = "General"):
     data_without_image = {key: value for key, value in data.items() if key != "scenarioImage"}
-    logger.debug(f"[{context}] Data (without encode_image): {data_without_image}")
+    logger.info(f"[{context}] Data (without encode_image): {data_without_image}")
 
 
 def load_sample_image():
@@ -32,7 +32,7 @@ def load_sample_image():
 
 
 async def create_scenario(request: ScenarioCreateRequest, client_request: Request) -> ScenarioCreateResponse:
-    logger.debug(f"Creating scenario for userId: {request.userId}")
+    logger.info(f"Creating scenario for userId: {request.userId}")
 
     user_data = {
         "userId": request.userId,
@@ -43,14 +43,14 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "create_date": settings.CURRENT_DATETIME,
         "ip_address": client_request.client.host
     }
-    logger.debug(f"[create_scenario] Inserting user data into database: {user_data}")
+    logger.info(f"[create_scenario] Inserting user data into database: {user_data}")
     await db["users"].insert_one(user_data)
 
-    logger.debug("[create_scenario] Calling LLM to generate scenario content...")
+    logger.info("[create_scenario] Calling LLM to generate scenario content...")
     llm_result = llm_scenario_create(request.job, request.situation, request.gender, "", "1", request.userId)
-    logger.debug(f"[create_scenario] LLM Result: {llm_result}")
+    logger.info(f"[create_scenario] LLM Result: {llm_result}")
 
-    logger.debug("[create_scenario] Generating scenario image...")
+    logger.info("[create_scenario] Generating scenario image...")
     encode_image = image_create(llm_result, request.gender)
 
     scenario_data = {
@@ -74,13 +74,13 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "scenarioImage": encode_image
     }
     log_data_without_image(response_data, context="create_scenario - Response Data")
-    logger.debug(f"[create_scenario] Scenario created successfully")
+    logger.info(f"[create_scenario] Scenario created successfully")
 
     return ScenarioCreateResponse(**response_data)
 
 
 async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -> ScenarioAnswerResponse:
-    logger.debug(
+    logger.info(
         f"[save_answer] Saving answer for userId: {request.userId}, answerScenarioId: {request.answerScenarioId}")
 
     answered_scenario_data = await db["scenarios"].find_one({"_id": ObjectId(request.answerScenarioId)})
@@ -88,7 +88,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         logger.error("[save_answer] Answer scenario data not found in database.")
         raise ValueError("answerScenarioId 조회 결과 없음")
 
-    logger.debug(f"[save_answer] Answered scenario data: {answered_scenario_data}")
+    logger.info(f"[save_answer] Answered scenario data: {answered_scenario_data}")
 
     answer_data = {
         "create_date": settings.CURRENT_DATETIME,
@@ -98,22 +98,22 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         "answeredScenarioId": request.answerScenarioId,
         "ip_address": client_request.client.host
     }
-    logger.debug(f"[save_answer] Inserting answer data into database: {answer_data}")
+    logger.info(f"[save_answer] Inserting answer data into database: {answer_data}")
     await db["answers"].insert_one(answer_data)
 
     answered_scenarios = []
 
     if int(answered_scenario_data["scenarioStep"]) > 1:
         object_ids = [ObjectId(scenario_id) for scenario_id in request.scenarioIds]
-        logger.debug(f"[save_answer] Retrieving previous scenarios with IDs: {object_ids}")
+        logger.info(f"[save_answer] Retrieving previous scenarios with IDs: {object_ids}")
 
         prev_scenarios_cursor = db["scenarios"].find({"_id": {"$in": object_ids}})
         prev_scenarios = await prev_scenarios_cursor.to_list(length=None)
-        logger.debug(f"[save_answer] Retrieved previous scenarios: {prev_scenarios}")
+        logger.info(f"[save_answer] Retrieved previous scenarios: {prev_scenarios}")
 
         for scenario in prev_scenarios:
             answer = await db["answers"].find_one({"answeredScenarioId": str(scenario["_id"])})
-            logger.debug(f"[save_answer] Retrieved answer for scenario: {scenario['_id']}, answer: {answer}")
+            logger.info(f"[save_answer] Retrieved answer for scenario: {scenario['_id']}, answer: {answer}")
             answered_scenarios.append({
                 "scenarioContent": scenario["scenarioContent"],
                 "scenarioStep": scenario.get("scenarioStep"),
@@ -135,7 +135,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         else:
             llm_result = f"시나리오 {next_step}번째 콘텐츠 예시입니다." + str(ObjectId())[:30]
 
-        logger.debug(f"[save_answer] Creating next scenario with step: {next_step}")
+        logger.info(f"[save_answer] Creating next scenario with step: {next_step}")
         encode_image = load_sample_image()
 
         scenario_data = {
@@ -183,13 +183,13 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         "scenarioImage": encode_image
     }
     log_data_without_image(next_scenario_data, context="save_answer - Final Response")
-    logger.debug("[save_answer] Answer saved successfully")
+    logger.info("[save_answer] Answer saved successfully")
 
     return ScenarioAnswerResponse(**next_scenario_data)
 
 
 async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResultResponse:
-    logger.debug(f"[get_scenario_results] Retrieving results for userId: {request.userId}")
+    logger.info(f"[get_scenario_results] Retrieving results for userId: {request.userId}")
 
     result_data = {
         "resultId": str(ObjectId()),
@@ -201,6 +201,6 @@ async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResult
             {"scenarioContent": "시나리오 두번째 콘텐츠 예시입니다. (이게 마지막임)", "scenarioStep": "end", "answer": ""}
         ]
     }
-    logger.debug(f"[get_scenario_results] Retrieved result data: {result_data}")
+    logger.info(f"[get_scenario_results] Retrieved result data: {result_data}")
 
     return ScenarioResultResponse(**result_data)

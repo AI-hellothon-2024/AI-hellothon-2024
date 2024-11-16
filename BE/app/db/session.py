@@ -16,5 +16,5 @@ except Exception as e:
 
 
 def get_database():
-    logger.debug("get_database() called")
+    logger.info("get_database() called")
     return database

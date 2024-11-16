@@ -9,6 +9,7 @@ class ScenarioCreateRequest(BaseModel):
     job: str
     situation: str
     userName: str
+    gender: str
 
 
 class ScenarioCreateResponse(BaseModel):

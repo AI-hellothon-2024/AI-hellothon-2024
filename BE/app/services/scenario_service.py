@@ -30,9 +30,11 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "job": request.job,
         "situation": request.situation,
         "userName": request.userName,
+        "gender": request.gender,
         "create_date": settings.CURRENT_DATETIME,
         "ip_address": client_request.client.host
     }
+    await db["users"].insert_one(user_data)
 
     llm_result = "시나리오 첫번째 콘텐츠 예시입니다."+str(ObjectId())[:30]
     encode_image = load_sample_image()
@@ -46,7 +48,6 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "scenarioImage": encode_image
     }
 
-    await db["users"].insert_one(user_data)
     insert_scenario = await db["scenarios"].insert_one(scenario_data)
     scenario_id = str(insert_scenario.inserted_id)
 

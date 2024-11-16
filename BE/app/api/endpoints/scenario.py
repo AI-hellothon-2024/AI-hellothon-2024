@@ -21,7 +21,7 @@ async def create_scenario_endpoint(request: ScenarioCreateRequest, client_reques
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"LLM 생성 오류: {str(e)}"
+            detail=f"AI콘텐츠 생성 오류: {str(e)}"
         )
     except Exception as e:
         raise HTTPException(
@@ -31,10 +31,20 @@ async def create_scenario_endpoint(request: ScenarioCreateRequest, client_reques
 
 
 @router.post("/answer", response_model=ScenarioAnswerResponse)
-async def answer_scenario_endpoint(request: ScenarioAnswerRequest):
-    answer = await save_answer(request)
-    return answer
-
+async def answer_scenario_endpoint(request: ScenarioAnswerRequest, client_request: Request):
+    try:
+        next_scenario = await save_answer(request, client_request)
+        return next_scenario
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"AI콘텐츠 생성 오류: {str(e)}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"DB 저장 오류: {str(e)}"
+        )
 
 @router.post("/result", response_model=ScenarioResultResponse)
 async def result_scenario_endpoint(request: ScenarioResultRequest):

@@ -22,15 +22,17 @@ class ScenarioCreateResponse(BaseModel):
 class ScenarioAnswerRequest(BaseModel):
     userId: str
     scenarioIds: List[str]
+    answerScenarioId: str
     answer: str
 
 
 class ScenarioAnswerResponse(BaseModel):
     userId: str
     scenarioStep: str
+    scenarioContent: str
+    scenarioId: str
     scenarios: List[dict]
     scenarioImage: str
-    scenarioId: str
 
 
 class ScenarioResultRequest(BaseModel):

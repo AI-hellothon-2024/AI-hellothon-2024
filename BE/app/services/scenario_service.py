@@ -13,6 +13,8 @@ from app.core.config import settings
 
 
 db = get_database()
+
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -90,19 +92,23 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
 
         # 조회된 이전 시나리오에 대응하는 응답 데이터를 조회
         for scenario in prev_scenarios:
-            answer = await db["answers"].find_one({"answeredScenarioId": scenario["scenarioId"]})
+            answer = await db["answers"].find_one({"answeredScenarioId": str(scenario["_id"])})
             answered_scenarios.append({
                 "scenarioContent": scenario["scenarioContent"],
                 "scenarioStep": scenario.get("scenarioStep"),
                 "answer": answer["answer"],
-                "scenarioId": scenario["scenarioId"]
+                "scenarioId": str(scenario["_id"])
             })
 
-        # 제일 높은 회차 찾기
-        max_step = max(int(scenario["scenarioStep"]) for scenario in prev_scenarios if scenario["scenarioStep"].isdigit())
+        answered_scenarios.append({
+            "scenarioContent": answered_scenario_data["scenarioContent"],
+            "scenarioStep": str(answered_scenario_data["scenarioStep"]),
+            "answer": request.answer,
+            "scenarioId": request.answerScenarioId
+        })
 
         # 다음 시나리오 생성
-        next_step = max_step + 1
+        next_step = int(answered_scenario_data["scenarioStep"]) + 1
         if next_step > 5:
             next_step = "end"
             llm_result = "시나리오 마지막 콘텐츠 예시입니다."+str(ObjectId())[:30]
@@ -115,7 +121,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             "create_date": settings.CURRENT_DATETIME,
             "userId": request.userId,
             "ip_address": client_request.client.host,
-            "scenarioStep": next_step,
+            "scenarioStep": str(next_step),
             "scenarioContent": llm_result,
             "scenarioImage": encode_image
         }
@@ -140,7 +146,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             "create_date": settings.CURRENT_DATETIME,
             "userId": request.userId,
             "ip_address": client_request.client.host,
-            "scenarioStep": next_step,
+            "scenarioStep": str(next_step),
             "scenarioContent": llm_result,
             "scenarioImage": encode_image
         }
@@ -153,7 +159,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         "scenarios": answered_scenarios, # 이전 시나리오들 [{ }]
         "scenarioId": next_scenario_id,
         "scenarioContent": llm_result,
-        "scenarioStep": next_step,
+        "scenarioStep": str(next_step),
         "scenarioImage": encode_image
     }
 

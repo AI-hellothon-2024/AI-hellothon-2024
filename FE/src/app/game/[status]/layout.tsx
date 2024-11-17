@@ -2,7 +2,7 @@ import { PropsWithChildren } from "react";
 
 interface Props extends PropsWithChildren {
   params: {
-    step: `${number}`;
+    status: "ongoing" | "finished";
   };
 }
 

@@ -2,23 +2,23 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import type { InfoForm } from "./Form";
 import { useForm, Controller } from "react-hook-form";
-import { SITUATIONS } from "@/lib/constants";
+import { GENDER } from "@/lib/constants";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { toSelectOptions } from "@/lib/utils";
 
 interface Props {
-  onNext: (job: keyof typeof SITUATIONS) => void;
+  onNext: (job: keyof typeof GENDER) => void;
 }
-const Situation = ({ onNext }: Props) => {
+const Gender = ({ onNext }: Props) => {
   const {
     control,
     formState: { isValid },
     handleSubmit,
-  } = useForm<Pick<InfoForm, "situation">>({
+  } = useForm<Pick<InfoForm, "gender">>({
     mode: "all",
   });
-  const onSubmit = (data: Pick<InfoForm, "situation">) => {
-    onNext(data.situation);
+  const onSubmit = (data: Pick<InfoForm, "gender">) => {
+    onNext(data.gender);
   };
   return (
     <form
@@ -27,13 +27,13 @@ const Situation = ({ onNext }: Props) => {
     >
       <div className="flex flex-col gap-12">
         <div className="text-2xl">
-          필요한 상황을
+          성별을
           <br />
           선택해주세요
         </div>
         <Controller
           control={control}
-          name="situation"
+          name="gender"
           rules={{ required: true }}
           render={({ field: { onChange, value } }) => (
             <ToggleGroup
@@ -44,13 +44,13 @@ const Situation = ({ onNext }: Props) => {
                 onChange(value);
               }}
             >
-              {toSelectOptions(SITUATIONS).map(({ value, name }) => (
+              {toSelectOptions(GENDER).map((gender) => (
                 <ToggleGroupItem
-                  key={value}
-                  value={value}
+                  key={gender.value}
+                  value={gender.value}
                   className="w-full rounded-full border border-[#D0D0D0] data-[state=on]:border-primary text-xl py-3 h-auto rounded-tr-none"
                 >
-                  {name}
+                  {gender.name}
                 </ToggleGroupItem>
               ))}
             </ToggleGroup>
@@ -68,4 +68,4 @@ const Situation = ({ onNext }: Props) => {
   );
 };
 
-export default Situation;
+export default Gender;

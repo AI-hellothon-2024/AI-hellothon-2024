@@ -1,5 +1,5 @@
 import React from "react";
-import { SITUATIONS, JOBS, GAME_STEPS } from "@/lib/constants";
+import { SITUATIONS, JOBS, GENDER } from "@/lib/constants";
 import {
   HydrationBoundary,
   QueryClient,
@@ -13,7 +13,7 @@ import ChatInput from "@/components/feature/game/ChatInput";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => {
-  return Object.keys(GAME_STEPS).map((step) => ({ step }));
+  return ["ongoing", "finished"];
 };
 const situationMapper: {
   [key in keyof typeof SITUATIONS]: string;
@@ -24,28 +24,38 @@ const situationMapper: {
 };
 const Page = async ({
   searchParams,
+  params: { status },
 }: {
+  params: {
+    status: "ongoing" | "finished";
+  };
   searchParams: {
     userId: string;
     username: string;
     job: keyof typeof JOBS;
     situation: keyof typeof SITUATIONS;
+    gender: keyof typeof GENDER;
   };
 }) => {
   const queryClient = new QueryClient();
-  await prefetchScenario({ ...searchParams, queryClient });
+  if (status === "ongoing") {
+    await prefetchScenario({ ...searchParams, queryClient });
+  }
   return (
     <>
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <header className="flex items-center">
-          <LeaveDrawer />
-          <h1>{situationMapper[searchParams.situation]}</h1>
-        </header>
-        <Background
-          className="w-full bg-no-repeat bg-cover h-full bg-center grid grid-rows-2 flex-grow-0 min-h-0"
-          {...searchParams}
-        >
-          <div className="row-start-2 px-10 flex py-8 flex-col justify-end gap-8 max-h-full min-h-0">
+        <Background className="w-full bg-no-repeat bg-cover h-full bg-center grid grid-rows-2 flex-grow-0 min-h-0 justify-start">
+          <header className="flex items-center sticky top-0 left-0 self-start h-16 bg-dim-70">
+            <LeaveDrawer />
+            <h1
+              className="absolute left-1/2
+            transform -translate-x-1/2 text-white text-lg font-bold
+            "
+            >
+              {situationMapper[searchParams.situation]}
+            </h1>
+          </header>
+          <div className="row-start-2 px-4 flex py-8 flex-col justify-end gap-8 max-h-full min-h-0 bg-gradient-to-b from-transparent to-[rgba(0,0,0,0.74)]">
             <Chats {...searchParams} />
             <ChatInput userId={searchParams.userId} />
           </div>

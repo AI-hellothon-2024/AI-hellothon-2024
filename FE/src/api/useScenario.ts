@@ -1,5 +1,5 @@
 import { useQuery, QueryClient } from "@tanstack/react-query";
-import { SITUATIONS, JOBS } from "@/lib/constants";
+import { SITUATIONS, JOBS, GENDER } from "@/lib/constants";
 import type { IScenario } from "@/app/type/IScenario.interface";
 
 const getScenario = async ({
@@ -7,11 +7,13 @@ const getScenario = async ({
   username,
   job,
   situation,
+  gender,
 }: {
   userId: string;
   username: string;
   job: keyof typeof JOBS;
   situation: keyof typeof SITUATIONS;
+  gender: keyof typeof GENDER;
 }): Promise<IScenario> => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/scenario`, {
     method: "POST",
@@ -23,6 +25,7 @@ const getScenario = async ({
       userName: username,
       job,
       situation,
+      gender,
     }),
   });
 
@@ -37,16 +40,18 @@ export const useScenario = ({
   username,
   job,
   situation,
+  gender,
 }: // select,
 {
   userId: string;
   username: string;
   job: keyof typeof JOBS;
   situation: keyof typeof SITUATIONS;
+  gender: keyof typeof GENDER;
 }) => {
   return useQuery<IScenario>({
     queryKey: ["posts", { userId }],
-    queryFn: () => getScenario({ userId, username, job, situation }),
+    queryFn: () => getScenario({ userId, username, job, situation, gender }),
     refetchInterval: 0,
   });
 };
@@ -55,16 +60,18 @@ export const prefetchScenario = ({
   username,
   job,
   situation,
+  gender,
   queryClient,
 }: {
   userId: string;
   username: string;
   job: keyof typeof JOBS;
   situation: keyof typeof SITUATIONS;
+  gender: keyof typeof GENDER;
   queryClient: QueryClient;
 }) => {
   return queryClient.prefetchQuery({
     queryKey: ["posts", { userId }],
-    queryFn: () => getScenario({ userId, username, job, situation }),
+    queryFn: () => getScenario({ userId, username, job, situation, gender }),
   });
 };

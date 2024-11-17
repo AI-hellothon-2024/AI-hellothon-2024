@@ -1,7 +1,8 @@
 "use client";
 
 import { ComponentProps, useEffect, useRef } from "react";
-import { SITUATIONS, JOBS } from "@/lib/constants";
+import { twMerge, twJoin } from "tailwind-merge";
+import { SITUATIONS, JOBS, GENDER } from "@/lib/constants";
 import { useScenario } from "@/api/useScenario";
 import { MotionDiv } from "@/components/motion";
 import { useAtom } from "jotai";
@@ -13,10 +14,11 @@ interface Props extends ComponentProps<"div"> {
   username: string;
   job: keyof typeof JOBS;
   situation: keyof typeof SITUATIONS;
+  gender: keyof typeof GENDER;
 }
-const Chats = ({ userId, username, job, situation }: Props) => {
+const Chats = ({ userId, username, job, situation, gender }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { data } = useScenario({ userId, username, job, situation });
+  const { data } = useScenario({ userId, username, job, situation, gender });
   const [chats, setChats] = useAtom(chatAtom);
 
   useEffect(() => {
@@ -28,6 +30,7 @@ const Chats = ({ userId, username, job, situation }: Props) => {
           message: data.scenarioContent,
           scenarioImage: data.scenarioImage,
           loading: false,
+          scenarioStep: data.scenarioStep,
         },
       ]);
     }
@@ -48,12 +51,22 @@ const Chats = ({ userId, username, job, situation }: Props) => {
         <>
           <MotionDiv
             key={chat.id}
-            className="bg-gray-100 text-gray-900 px-6 py-4 rounded w-full"
+            className={twMerge(
+              "p-6 w-full text-[#F8F8F8] rounded-b-2xl backdrop-blur-sm",
+              twJoin(
+                chat.sender === "bot"
+                  ? "bg-[rgba(0,0,0,0.8)] rounded-tr-2xl"
+                  : "bg-[rgba(31,31,31,0.7)] rounded-tl-2xl border border-primary box-border"
+              )
+            )}
             initial={{
               opacity: 0,
               y: -10,
             }}
             whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
+            viewport={{
+              once: true,
+            }}
           >
             {chat.loading ? <Loading /> : chat.message}
           </MotionDiv>

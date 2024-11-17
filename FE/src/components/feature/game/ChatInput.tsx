@@ -14,6 +14,7 @@ interface Props extends ComponentProps<"div"> {
 
 const ChatInput = ({ userId }: Props) => {
   const [chats, setChats] = useAtom(chatAtom);
+  const lastChat = chats.filter((chat) => chat.sender === "bot").at(-1);
   const {
     register,
     handleSubmit,
@@ -41,15 +42,16 @@ const ChatInput = ({ userId }: Props) => {
       {
         onSuccess(data) {
           reset();
-          const lastChat = data.scenarios[data.scenarios.length - 1];
           setTimeout(() => {
             setChats((prev) => [
               ...prev,
               {
                 id: data.scenarioId,
-                sender: "user",
-                message: lastChat.scenarioContent,
+                sender: "bot",
+                message: data.scenarioContent,
                 loading: true,
+                scenarioImage: data.scenarioImage,
+                scenarioStep: data.scenarioStep,
               },
             ]);
           }, 1000);
@@ -66,6 +68,14 @@ const ChatInput = ({ userId }: Props) => {
       }
     );
   };
+  if (lastChat?.scenarioStep === "end") {
+    return (
+      <Button className="rounded text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold">
+        {" "}
+        결과보기
+      </Button>
+    );
+  }
   return (
     <form
       className="flex justify-between gap-2"
@@ -76,8 +86,9 @@ const ChatInput = ({ userId }: Props) => {
           required: true,
         })}
         placeholder="답변을 입력해주세요."
+        className="backdrop-blur-sm rounded-full rounded-tr-none bg-[rgba(31,31,31,0.7)] py-3 h-auto"
       />
-      <Button type="submit" disabled={!isValid || isPending}>
+      <Button type="submit" disabled={!isValid || isPending} className="hidden">
         전송
       </Button>
     </form>

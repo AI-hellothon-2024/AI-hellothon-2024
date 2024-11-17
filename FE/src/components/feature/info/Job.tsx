@@ -25,8 +25,12 @@ const Job = ({ onNext }: Props) => {
       className="flex flex-col justify-between h-full"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="flex flex-col">
-        <div>직업을 선택해주세요</div>
+      <div className="flex flex-col gap-12">
+        <div className="text-2xl">
+          직업을
+          <br />
+          선택해주세요
+        </div>
         <Controller
           control={control}
           name="job"
@@ -34,7 +38,7 @@ const Job = ({ onNext }: Props) => {
           render={({ field: { onChange, value } }) => (
             <ToggleGroup
               type="single"
-              className="flex-col"
+              className="flex-col gap-2.5"
               value={value}
               onValueChange={(value) => {
                 onChange(value);
@@ -44,7 +48,7 @@ const Job = ({ onNext }: Props) => {
                 <ToggleGroupItem
                   key={job.value}
                   value={job.value}
-                  className="w-full rounded-full border"
+                  className="w-full rounded-full border border-[#D0D0D0] data-[state=on]:border-primary text-xl py-3 h-auto rounded-tr-none"
                 >
                   {job.name}
                 </ToggleGroupItem>
@@ -53,7 +57,11 @@ const Job = ({ onNext }: Props) => {
           )}
         />
       </div>
-      <Button type="submit" disabled={!isValid} className="rounded-full">
+      <Button
+        type="submit"
+        disabled={!isValid}
+        className="rounded text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold"
+      >
         다음
       </Button>
     </form>

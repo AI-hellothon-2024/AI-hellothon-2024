@@ -89,17 +89,17 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
         return f"LLM 생성 응답 요청 실패: {response.status_code} - {response.text}"
 
 
-async def image_create(content, gender):
+async def image_create(content, gender, before_image):
     url = "https://api-cloud-function.elice.io/0133c2f7-9f3f-44b6-a3d6-c24ba8ef4510/generate"
 
-    # 성별 텍스트 변환
-    gender_text = "남성" if gender == "F" else "여성"
+    before_image_url = f"https://zmxpjsmxtgzthtqs.tunnel-pt.elice.io/static/{before_image}"
 
     prompt = (
-        f"다음 대화를 보고 상황에 맞는 {gender_text} 이미지를 생성해줘.\n"
+        f"이전 이미지 URL: {before_image_url}\n"
+        f"위 URL을 참고한 뒤 *같은 인물*(중요)이여야 하고 아래 대화를 자세하게 분석해서 이미지를 생성해줘.\n"  
         f"대화: {content}\n"
         f"그림체는 일본 애니메이션 그림체로 그려줘.\n"
-        f"말풍선은 절대 그리지말고\n"
+        f"말풍선은 절대절대 그리지말고\n"
         f"대화에서 등장인물의 대사와 성격 묘사된 자세 등 세세하게 캐치해서 그려줘.\n"
     )
 

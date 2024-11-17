@@ -1,5 +1,6 @@
 import logging
 import base64
+import os
 import re
 from fastapi import Request, HTTPException
 from app.db.session import get_database
@@ -27,6 +28,16 @@ def log_data_without_image(data: dict, context: str = "General"):
 def load_sample_image():
     with open("app/sample-image.png", "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
+
+
+def save_image(encoded_image: str, scenario_id: str):
+    image_dir = os.path.join(os.getcwd(), "images")
+    os.makedirs(image_dir, exist_ok=True)
+
+    image_path = os.path.join(image_dir, f"{scenario_id}.png")
+    with open(image_path, "wb") as image_file:
+        image_file.write(base64.b64decode(encoded_image))
+    logger.info(f"[save_image] Image saved to {image_path}")
 
 
 async def create_scenario(request: ScenarioCreateRequest, client_request: Request) -> ScenarioCreateResponse:
@@ -74,7 +85,7 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
     logger.info(f"LLM 생성 대화: {llm_result if llm_result else '대화 시작 없음'}")
 
     logger.info("[create_scenario] Generating scenario image...")
-    encode_image = await image_create(content, request.gender)
+    encode_image = await image_create(content, request.gender, "")
 
     scenario_data = {
         "create_date": settings.CURRENT_DATETIME,
@@ -89,6 +100,8 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
 
     insert_scenario = await db["scenarios"].insert_one(scenario_data)
     scenario_id = str(insert_scenario.inserted_id)
+
+    save_image(encode_image, scenario_id)
 
     await db["users"].update_one({"_id": ObjectId(user_key)}, {"$set": {"first_scenario_id": scenario_id}})
 
@@ -113,6 +126,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
     before_setting = ""
     job = ""
     gender = ""
+    before_image = ""
 
     answered_scenario_data = await db["scenarios"].find_one({"_id": ObjectId(request.answerScenarioId)})
     if answered_scenario_data is None:
@@ -152,6 +166,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
                 user_data = await db["users"].find_one({"first_scenario_id": str(scenario["_id"])})
                 job = user_data.get("job", "")
                 gender = user_data.get("gender", "")
+                before_image = str(scenario["_id"])
 
         answered_scenarios.append({
             "scenarioContent": answered_scenario_data["scenarioContent"],
@@ -197,6 +212,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         user_data = await db["users"].find_one({"first_scenario_id": str(request.answerScenarioId)})
         job = user_data.get("job", "")
         gender = user_data.get("gender", "")
+        before_image = str(request.answerScenarioId)
 
         create_before_script = create_script(answered_scenarios)
 
@@ -217,7 +233,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             next_step = "end"
 
     logger.info("[create_scenario] Generating scenario image...")
-    encode_image = await image_create(content, gender)
+    encode_image = await image_create(content, gender, before_image)
 
     logger.info(f"[save_answer] Creating next scenario with step: {next_step}")
 

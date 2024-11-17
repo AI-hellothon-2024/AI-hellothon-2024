@@ -48,12 +48,12 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
         prompt = (
             f"나는 다음의 조건에 따라서 롤플레잉을 진행하고 싶다.\n"
             f"직업은 '{job}' 이며,  내 성별은 {gender}.\n"
-            f"상대의 설정값 : {before_settings}\n"
+            f"상대의 설정값 : {before_settings}\n 상황은 '{ situation_description }'이야"
             f"지난대화내용 : {before_scenario_content}\n"
-            f"위의 대화 내용을 파악하고 마지막 대화를 기반으로 다음 대화를 진행해줘.\n"
+            f"위의 대화 내용을 파악하고 마지막 대화를 기반으로 위에서 설정한 상황에 맞게 다음 대화를 진행해줘.\n"
             f"상대가 한마디하면 내 대답을 기다려야 한다. 채팅시뮬레이션 하듯이!\n"
             f"응답 형식을 정해줄께! 아래의 형식에 절대적으로 따라서 응답해줘\n"
-            f"만약 대화를 더이상 절대로 이끌어 나갈 수 없다고 판단되면 맨처음 응답 첫마디에 라고 말해줘.\n"
+            f"만약 대화를 더이상 절대로 이끌어 나갈 수 없다고 판단되면 맨처음 응답 첫마디에 end 라고 말해줘.\n"
             f"(임의로 정해진 상대의 설정값) setting::: 이부분에 상대의 설정값을 넣어줘(이전 설정과 같아야해)\n"
             f"(대화 시작) start::: \n 이부분에 상대의 대사를 넣어줘"
         )
@@ -99,6 +99,7 @@ async def image_create(content, gender):
         f"다음 대화를 보고 상황에 맞는 {gender_text} 이미지를 생성해줘.\n"
         f"대화: {content}\n"
         f"그림체는 일본 애니메이션 그림체로 그려줘.\n"
+        f"말풍선은 그리지말고 예전 그렸던 그대로 그려주고.\n"
         f"대화에서 등장인물의 대사와 성격 묘사된 자세 등 세세하게 캐치해서 그려줘.\n"
     )
 

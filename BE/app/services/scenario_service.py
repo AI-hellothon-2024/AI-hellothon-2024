@@ -99,8 +99,10 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "scenarioContent": llm_result,
         "scenarioImage": encode_image
     }
-    log_data_without_image(response_data, context="create_scenario - Response Data")
-    logger.info(f"[create_scenario] Scenario created successfully")
+    response_data_without_image = {
+        key: value for key, value in response_data.items() if key != "scenarioImage"
+    }
+    logger.info(f"[create_scenario - Response Data] Data (without encode_image): {response_data_without_image}")
 
     return ScenarioCreateResponse(**response_data)
 

@@ -23,6 +23,12 @@ app.add_middleware(
     allow_headers=["*"],  # 허용할 HTTP 헤더
     allow_credentials=True,  # 쿠키나 인증 정보 전달 허용 여부
 )
+# 디렉토리 경로
+images_directory = os.path.join(os.getcwd(), "images")
+
+# 디렉토리 생성
+if not os.path.exists(images_directory):
+    os.makedirs(images_directory)
 
 app.mount("/static", StaticFiles(directory=os.path.join(os.getcwd(), "images")), name="static")
 

@@ -1,7 +1,7 @@
 import requests
 import logging
-import json
 from app.core.config import settings
+from app.db.session import get_database
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -18,19 +18,28 @@ console_handler.setFormatter(formatter)
 if not logger.handlers:
     logger.addHandler(console_handler)
 
+db = get_database()
 
 async def llm_scenario_create(job, situation, gender, scenario_id, scenario_step, user_id):
     url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
+
+    selected_situation = await db["situations"].find_one({"name": situation})
+    if selected_situation:
+        situation_description = str(selected_situation.get("description", ""))
+    else:
+        situation_description = "일상 대화"  # 상황에 따라 기본값 설정
 
     # 프롬프트 생성
     prompt = (
         f"나는 다음의 조건에 따라서 롤플레잉을 진행하고 싶다.\n"
         f"직업은 '{job}' 이며, 내 성별은 {gender}, 직업에 따라 대화 환경을 결정해라.\n"
         f"상대는 성별은 내 성별의 반대 성별이며 성격은 랜덤으로 설정한다. 성격은 더러운 성격부터 좋은 성격까지 아무것도 가리지 않는다.\n"
-        f"상황은 '{situation}'이며 이에 따라 롤플레잉을 진행할 것이다.\n"
-        f"대화는 최종상황까지 천천히 빌드업 하는 걸로 한다.\n"
-        f"상대가 한마디하면 내가 대답을 기다린다. 채팅시뮬레이션 하듯이! 바로 대화부터 진행해 앞의 설명이나 기타 다른 건 필요없어.\n"
-        f"시작합니다, 성격설명 등등은 설정 설명은 전혀 필요없다."
+        f"상황은 '{ situation_description }'이며 이에 따라 롤플레잉을 진행할 것이다.\n"
+        f"매우 중요한 점은 대화는 최종상황까지 천천히 빌드업 하는 걸로 한다.\n"
+        f"상대가 한마디하면 내 대답을 기다려야 한다. 채팅시뮬레이션 하듯이!\n"
+        f"응답 형식을 정해줄께! 아래의 형식에 절대적으로 따라서 응답해줘\n"
+        f"(임의로 정해진 상대의 설정값) setting::: 이부분에 상대의 설정값을 넣어줘\n"
+        f"(대화 시작) start::: \n 이부분에 상대의 대사를 넣어줘"
     )
 
     payload = {
@@ -55,7 +64,9 @@ async def llm_scenario_create(job, situation, gender, scenario_id, scenario_step
         try:
             response_data = response.json()
             content = response_data.get("choices", [])[0].get("message", {}).get("content", "")
-            return content  # 문자열 형태로 반환
+            logger.info(f"LLM 생성 응답값: {content}")
+
+            return content
         except Exception as e:
             return f"LLM 생성 응답 처리 중 에러 발생: {str(e)}"
     else:

@@ -1,6 +1,7 @@
 import logging
 import base64
-from fastapi import Request
+import re
+from fastapi import Request, HTTPException
 from app.db.session import get_database
 from app.schemas.scenario_schema import (
     ScenarioCreateRequest, ScenarioCreateResponse,
@@ -44,11 +45,28 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
     await db["users"].insert_one(user_data)
 
     logger.info("[create_scenario] Calling LLM to generate scenario content...")
-    llm_result = await llm_scenario_create(request.job, request.situation, request.gender, "", "1", request.userId)
-    logger.info(f"[create_scenario] LLM Result: {llm_result}")
+    content = await llm_scenario_create(request.job, request.situation, request.gender, "", "1", request.userId)
+    logger.info(f"[create_scenario] LLM Result: {content}")
+
+    # scenarioContent와 settings 값 추출
+    llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)
+    setting_match = re.search(r"setting:::\s*(.*?)\n", content, re.DOTALL)
+
+    llm_result = llm_result_match.group(1) if llm_result_match else "대화 시작 없음"
+    setting = setting_match.group(1) if setting_match else "설정값 없음"
+
+    if not setting or not llm_result:
+        logger.error("[create_scenario] LLM 정확한 응답값 생성 실패")
+        raise HTTPException(
+            status_code=500,  # Internal Server Error
+            detail="LLM 정확한 응답값 생성에 실패했습니다. 다시 시도해주세요."
+        )
+
+    logger.info(f"LLM 생성 설정값: {setting if setting else '설정값 없음'}")
+    logger.info(f"LLM 생성 대화: {llm_result if llm_result else '대화 시작 없음'}")
 
     logger.info("[create_scenario] Generating scenario image...")
-    encode_image = await image_create(llm_result, request.gender)
+    encode_image = await image_create(content, request.gender)
 
     scenario_data = {
         "create_date": settings.CURRENT_DATETIME,
@@ -56,6 +74,7 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "ip_address": client_request.client.host,
         "scenarioStep": "1",
         "scenarioContent": llm_result,
+        "settings": setting,
         "scenarioImage": encode_image
     }
     log_data_without_image(scenario_data, context="create_scenario - Scenario Data")

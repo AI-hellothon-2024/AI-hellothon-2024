@@ -1,6 +1,9 @@
 # app/main.py
 import logging
+import os
+
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.endpoints import scenario, ws_stt
@@ -21,6 +24,7 @@ app.add_middleware(
     allow_credentials=True,  # 쿠키나 인증 정보 전달 허용 여부
 )
 
+app.mount("/static", StaticFiles(directory=os.path.join(os.getcwd(), "images")), name="static")
 
 app.include_router(scenario.router, prefix="/scenario", tags=["scenario"])
 app.include_router(ws_stt.router, prefix="/ws", tags=["websocket"])

@@ -185,12 +185,16 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             "scenarioId": request.answerScenarioId
         })
 
+        user_data = await db["users"].find_one({"first_scenario_id": str(request.answerScenarioId)})
+        job = user_data.get("job", "")
+        gender = user_data.get("gender", "")
+
         create_before_script = create_script(answered_scenarios)
 
         content = await llm_scenario_create(
-            answered_scenario_data.get("job", ""),
+            job,
             "",
-            answered_scenario_data.get("gender", ""),
+            gender,
             create_before_script,
             next_step,
             request.userId,

@@ -47,7 +47,14 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
     user_key = str(user_result.inserted_id)
 
     logger.info("[create_scenario] Calling LLM to generate scenario content...")
-    content = await llm_scenario_create(request.job, request.situation, request.gender, "", "1", request.userId, "")
+    content = await llm_scenario_create(
+        request.job,
+        request.situation,
+        request.gender,
+        "",
+        "1",
+        request.userId,
+        "")
     logger.info(f"[create_scenario] LLM Result: {content}")
 
     llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)
@@ -208,7 +215,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             next_step = "end"
 
     logger.info("[create_scenario] Generating scenario image...")
-    encode_image = await image_create(content, request.gender)
+    encode_image = await image_create(content, gender)
 
     logger.info(f"[save_answer] Creating next scenario with step: {next_step}")
 

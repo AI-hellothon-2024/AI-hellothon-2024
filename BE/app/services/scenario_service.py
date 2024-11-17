@@ -258,7 +258,12 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         "scenarioStep": str(next_step),
         "scenarioImage": encode_image
     }
-    log_data_without_image(next_scenario_data, context="save_answer - Final Response")
+
+    response_data_without_image = {
+        key: value for key, value in next_scenario_data.items() if key != "scenarioImage"
+    }
+    logger.info(f"[save_answer - Final Response] Data (without encode_image): {response_data_without_image}")
+
     logger.info("[save_answer] Answer saved successfully")
 
     return ScenarioAnswerResponse(**next_scenario_data)

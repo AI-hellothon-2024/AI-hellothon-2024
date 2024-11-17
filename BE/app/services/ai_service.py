@@ -20,7 +20,7 @@ if not logger.handlers:
 
 db = get_database()
 
-async def llm_scenario_create(job, situation, gender, scenario_id, scenario_step, user_id):
+async def llm_scenario_create(job, situation, gender, before_scenario_content, scenario_step, user_id, before_settings):
     url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
 
     selected_situation = await db["situations"].find_one({"name": situation})
@@ -29,18 +29,34 @@ async def llm_scenario_create(job, situation, gender, scenario_id, scenario_step
     else:
         situation_description = "일상 대화"  # 상황에 따라 기본값 설정
 
+
+
+    if (scenario_step == "1"):
     # 프롬프트 생성
-    prompt = (
-        f"나는 다음의 조건에 따라서 롤플레잉을 진행하고 싶다.\n"
-        f"직업은 '{job}' 이며, 내 성별은 {gender}, 직업에 따라 대화 환경을 결정해라.\n"
-        f"상대는 성별은 내 성별의 반대 성별이며 성격은 랜덤으로 설정한다. 성격은 더러운 성격부터 좋은 성격까지 아무것도 가리지 않는다.\n"
-        f"상황은 '{ situation_description }'이며 이에 따라 롤플레잉을 진행할 것이다.\n"
-        f"매우 중요한 점은 대화는 최종상황까지 천천히 빌드업 하는 걸로 한다.\n"
-        f"상대가 한마디하면 내 대답을 기다려야 한다. 채팅시뮬레이션 하듯이!\n"
-        f"응답 형식을 정해줄께! 아래의 형식에 절대적으로 따라서 응답해줘\n"
-        f"(임의로 정해진 상대의 설정값) setting::: 이부분에 상대의 설정값을 넣어줘\n"
-        f"(대화 시작) start::: \n 이부분에 상대의 대사를 넣어줘"
-    )
+        prompt = (
+            f"나는 다음의 조건에 따라서 롤플레잉을 진행하고 싶다.\n"
+            f"직업은 '{job}' 이며, 내 성별은 {gender}, 직업에 따라 대화 환경을 결정해라.\n"
+            f"상대는 성별은 내 성별의 반대 성별이며 성격은 랜덤으로 설정한다. 성격은 더러운 성격부터 좋은 성격까지 아무것도 가리지 않는다.\n"
+            f"상황은 '{ situation_description }'이며 이에 따라 대화를 주고받는 롤플레잉을 진행할 것이다.\n"
+            f"매우 중요한 점은 대화는 최종상황까지 천천히 빌드업 하는 걸로 한다.\n"
+            f"상대가 한마디하면 내 대답을 기다려야 한다. 채팅시뮬레이션 하듯이!\n"
+            f"응답 형식을 정해줄께! 아래의 형식에 절대적으로 따라서 응답해줘\n"
+            f"(임의로 정해진 상대의 설정값) setting::: 이부분에 상대의 설정값을 넣어줘\n"
+            f"(대화 시작) start::: \n 이부분에 상대의 대사를 넣어줘"
+        )
+    else:
+        prompt = (
+            f"나는 다음의 조건에 따라서 롤플레잉을 진행하고 싶다.\n"
+            f"직업은 '{job}' 이며,  내 성별은 {gender}.\n"
+            f"상대의 설정값 : {before_settings}\n"
+            f"지난대화내용 : {before_scenario_content}\n"
+            f"위의 대화 내용을 파악하고 마지막 대화를 기반으로 다음 대화를 진행해줘.\n"
+            f"상대가 한마디하면 내 대답을 기다려야 한다. 채팅시뮬레이션 하듯이!\n"
+            f"응답 형식을 정해줄께! 아래의 형식에 절대적으로 따라서 응답해줘\n"
+            f"만약 대화를 더이상 절대로 이끌어 나갈 수 없다고 판단되면 맨처음 응답 첫마디에 라고 말해줘.\n"
+            f"(임의로 정해진 상대의 설정값) setting::: 이부분에 상대의 설정값을 넣어줘(이전 설정과 같아야해)\n"
+            f"(대화 시작) start::: \n 이부분에 상대의 대사를 넣어줘"
+        )
 
     payload = {
         "model": "helpy-pro",

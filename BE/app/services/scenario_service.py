@@ -39,16 +39,17 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "userName": request.userName,
         "gender": request.gender,
         "create_date": settings.CURRENT_DATETIME,
-        "ip_address": client_request.client.host
+        "ip_address": client_request.client.host,
+        "first_scenario_id": "",
     }
     logger.info(f"[create_scenario] Inserting user data into database: {user_data}")
-    await db["users"].insert_one(user_data)
+    user_result = await db["users"].insert_one(user_data)
+    user_key = str(user_result.inserted_id)
 
     logger.info("[create_scenario] Calling LLM to generate scenario content...")
-    content = await llm_scenario_create(request.job, request.situation, request.gender, "", "1", request.userId)
+    content = await llm_scenario_create(request.job, request.situation, request.gender, "", "1", request.userId, "")
     logger.info(f"[create_scenario] LLM Result: {content}")
 
-    # scenarioContent와 settings 값 추출
     llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)
     setting_match = re.search(r"setting:::\s*(.*?)\n", content, re.DOTALL)
 
@@ -58,7 +59,7 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
     if not setting or not llm_result:
         logger.error("[create_scenario] LLM 정확한 응답값 생성 실패")
         raise HTTPException(
-            status_code=500,  # Internal Server Error
+            status_code=500,
             detail="LLM 정확한 응답값 생성에 실패했습니다. 다시 시도해주세요."
         )
 
@@ -82,6 +83,8 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
     insert_scenario = await db["scenarios"].insert_one(scenario_data)
     scenario_id = str(insert_scenario.inserted_id)
 
+    await db["users"].update_one({"_id": ObjectId(user_key)}, {"$set": {"first_scenario_id": scenario_id}})
+
     response_data = {
         "scenarioId": scenario_id,
         "userId": request.userId,
@@ -96,8 +99,11 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
 
 
 async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -> ScenarioAnswerResponse:
-    logger.info(
-        f"[save_answer] Saving answer for userId: {request.userId}, answerScenarioId: {request.answerScenarioId}")
+    logger.info(f"[save_answer] Saving answer for userId: {request.userId}, answerScenarioId: {request.answerScenarioId}")
+
+    before_setting = ""
+    job = ""
+    gender = ""
 
     answered_scenario_data = await db["scenarios"].find_one({"_id": ObjectId(request.answerScenarioId)})
     if answered_scenario_data is None:
@@ -119,13 +125,8 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
 
     answered_scenarios = []
 
-    if int(answered_scenario_data["scenarioStep"]) > 1:
-        object_ids = [ObjectId(scenario_id) for scenario_id in request.scenarioIds]
-        logger.info(f"[save_answer] Retrieving previous scenarios with IDs: {object_ids}")
-
-        prev_scenarios_cursor = db["scenarios"].find({"_id": {"$in": object_ids}})
-        prev_scenarios = await prev_scenarios_cursor.to_list(length=None)
-        logger.info(f"[save_answer] Retrieved previous scenarios: {prev_scenarios}")
+    async def process_previous_scenarios(prev_scenarios, answered_scenario_data):
+        nonlocal before_setting, job, gender
 
         for scenario in prev_scenarios:
             answer = await db["answers"].find_one({"answeredScenarioId": str(scenario["_id"])})
@@ -137,6 +138,12 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
                 "scenarioId": str(scenario["_id"])
             })
 
+            if scenario["scenarioStep"] == "1":
+                before_setting = scenario["settings"]
+                user_data = await db["users"].find_one({"first_scenario_id": str(scenario["_id"])})
+                job = user_data.get("job", "")
+                gender = user_data.get("gender", "")
+
         answered_scenarios.append({
             "scenarioContent": answered_scenario_data["scenarioContent"],
             "scenarioStep": str(answered_scenario_data["scenarioStep"]),
@@ -144,29 +151,32 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             "scenarioId": request.answerScenarioId
         })
 
+    if int(answered_scenario_data["scenarioStep"]) > 1:
+        object_ids = [ObjectId(scenario_id) for scenario_id in request.scenarioIds]
+        logger.info(f"[save_answer] Retrieving previous scenarios with IDs: {object_ids}")
+
+        prev_scenarios_cursor = db["scenarios"].find({"_id": {"$in": object_ids}})
+        prev_scenarios = await prev_scenarios_cursor.to_list(length=None)
+        logger.info(f"[save_answer] Retrieved previous scenarios: {prev_scenarios}")
+
+        await process_previous_scenarios(prev_scenarios, answered_scenario_data)
+
         next_step = int(answered_scenario_data["scenarioStep"]) + 1
-        if next_step > 5:
+
+        create_before_script = create_script(answered_scenarios)
+
+        content = await llm_scenario_create(
+            job, "", gender, create_before_script, next_step, request.userId, before_setting
+        )
+        logger.info(f"[create_scenario] LLM Result: {content}")
+
+        llm_result, setting, is_end_match = parse_llm_content(content)
+
+        if is_end_match == "end":
             next_step = "end"
-            llm_result = "시나리오 마지막 콘텐츠 예시입니다." + str(ObjectId())[:30]
-        else:
-            llm_result = f"시나리오 {next_step}번째 콘텐츠 예시입니다." + str(ObjectId())[:30]
-
-        logger.info(f"[save_answer] Creating next scenario with step: {next_step}")
-        encode_image = load_sample_image()
-
-        scenario_data = {
-            "create_date": settings.CURRENT_DATETIME,
-            "userId": request.userId,
-            "ip_address": client_request.client.host,
-            "scenarioStep": str(next_step),
-            "scenarioContent": llm_result,
-            "scenarioImage": encode_image
-        }
-        log_data_without_image(scenario_data, context="save_answer - Next Scenario Data")
-        next_scenario_insert = await db["scenarios"].insert_one(scenario_data)
-        next_scenario_id = str(next_scenario_insert.inserted_id)
 
     else:
+        # 첫번째 시나리오에 대한 응답
         next_step = "2"
         answered_scenarios.append({
             "scenarioContent": answered_scenario_data["scenarioContent"],
@@ -175,20 +185,41 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             "scenarioId": request.answerScenarioId
         })
 
-        llm_result = "시나리오 두번째 콘텐츠 예시입니다." + str(ObjectId())[:30]
-        encode_image = load_sample_image()
+        create_before_script = create_script(answered_scenarios)
 
-        scenario_data = {
-            "create_date": settings.CURRENT_DATETIME,
-            "userId": request.userId,
-            "ip_address": client_request.client.host,
-            "scenarioStep": str(next_step),
-            "scenarioContent": llm_result,
-            "scenarioImage": encode_image
-        }
-        log_data_without_image(scenario_data, context="save_answer - Second Scenario Data")
-        next_scenario_insert = await db["scenarios"].insert_one(scenario_data)
-        next_scenario_id = str(next_scenario_insert.inserted_id)
+        content = await llm_scenario_create(
+            answered_scenario_data.get("job", ""),
+            "",
+            answered_scenario_data.get("gender", ""),
+            create_before_script,
+            next_step,
+            request.userId,
+            answered_scenario_data.get("settings", "")
+        )
+        logger.info(f"[create_scenario] LLM Result: {content}")
+
+        llm_result, setting, is_end_match = parse_llm_content(content)
+
+        if is_end_match == "end":
+            next_step = "end"
+
+    logger.info("[create_scenario] Generating scenario image...")
+    encode_image = await image_create(content, request.gender)
+
+    logger.info(f"[save_answer] Creating next scenario with step: {next_step}")
+
+    # Save next scenario
+    scenario_data = {
+        "create_date": settings.CURRENT_DATETIME,
+        "userId": request.userId,
+        "ip_address": client_request.client.host,
+        "scenarioStep": str(next_step),
+        "scenarioContent": llm_result,
+        "scenarioImage": encode_image
+    }
+    log_data_without_image(scenario_data, context="save_answer - Next Scenario Data")
+    next_scenario_insert = await db["scenarios"].insert_one(scenario_data)
+    next_scenario_id = str(next_scenario_insert.inserted_id)
 
     next_scenario_data = {
         "userId": request.userId,
@@ -220,3 +251,44 @@ async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResult
     logger.info(f"[get_scenario_results] Retrieved result data: {result_data}")
 
     return ScenarioResultResponse(**result_data)
+
+
+def create_script(answered_scenarios):
+    sorted_scenarios = sorted(answered_scenarios,
+                              key=lambda x: int(x["scenarioStep"]) if x["scenarioStep"].isdigit() else float('inf'))
+
+    script_lines = []
+    for scenario in sorted_scenarios:
+        # 상대의 대사
+        content = scenario.get("scenarioContent", "").strip()
+        if content:
+            script_lines.append(f"상대: {content}")
+
+        # 사용자의 응답
+        answer = scenario.get("answer", "").strip()
+        if answer:
+            script_lines.append(f"나: {answer}")
+
+    # 최종 대본 반환
+    return "\n".join(script_lines)
+
+def parse_llm_content(content):
+    llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)
+    setting_match = re.search(r"setting:::\s*(.*?)\n", content, re.DOTALL)
+    is_end_match = re.search(r"\bend\b", content, re.IGNORECASE)
+
+    llm_result = llm_result_match.group(1) if llm_result_match else "대화 시작 없음"
+    setting = setting_match.group(1) if setting_match else "설정값 없음"
+    is_end_match = "end" if is_end_match else ""
+
+    if not setting or not llm_result:
+        logger.error("[create_scenario] LLM 정확한 응답값 생성 실패")
+        raise HTTPException(
+            status_code=500,
+            detail="LLM 정확한 응답값 생성에 실패했습니다. 다시 시도해주세요."
+        )
+
+    logger.info(f"LLM 생성 설정값: {setting if setting else '설정값 없음'}")
+    logger.info(f"LLM 생성 대화: {llm_result if llm_result else '대화 시작 없음'}")
+
+    return llm_result, setting, is_end_match

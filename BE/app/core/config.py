@@ -25,11 +25,10 @@ class Settings(BaseSettings):
         encoded_pw = quote_plus(self.DB_PW)
         self.DATABASE_URL = f"mongodb://{encoded_user}:{encoded_pw}@{self.DATABASE_URL}/{self.DATABASE_NAME}?authSource=admin"
 
-
     @property
-    def CURRENT_DATETIME(self) -> datetime:
+    def CURRENT_DATETIME(self) -> str:
         kst = pytz.timezone('Asia/Seoul')
-        return datetime.now(kst)
+        return datetime.now(kst).isoformat()
 
 
 settings = Settings()

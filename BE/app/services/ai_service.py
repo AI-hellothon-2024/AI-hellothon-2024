@@ -19,17 +19,14 @@ if not logger.handlers:
     logger.addHandler(console_handler)
 
 
-def llm_scenario_create(job, situation, gender, scenario_id, scenario_step, user_id):
+async def llm_scenario_create(job, situation, gender, scenario_id, scenario_step, user_id):
     url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
-
-    # 성별 텍스트 변환
-    gender_text = "남성" if gender == "F" else "여성"
 
     # 프롬프트 생성
     prompt = (
         f"나는 다음의 조건에 따라서 롤플레잉을 진행하고 싶다.\n"
-        f"직업은 '{job}' 이며, 직업에 따라 대화 환경을 결정해라.\n"
-        f"상대는 성별은 {gender_text}, 성격은 랜덤으로 설정한다. 성격은 더러운 성격부터 좋은 성격까지 아무것도 가리지 않는다.\n"
+        f"직업은 '{job}' 이며, 내 성별은 {gender}, 직업에 따라 대화 환경을 결정해라.\n"
+        f"상대는 성별은 내 성별의 반대 성별이며 성격은 랜덤으로 설정한다. 성격은 더러운 성격부터 좋은 성격까지 아무것도 가리지 않는다.\n"
         f"상황은 '{situation}'이며 이에 따라 롤플레잉을 진행할 것이다.\n"
         f"대화는 최종상황까지 천천히 빌드업 하는 걸로 한다.\n"
         f"상대가 한마디하면 내가 대답을 기다린다. 채팅시뮬레이션 하듯이! 바로 대화부터 진행해 앞의 설명이나 기타 다른 건 필요없어.\n"
@@ -65,7 +62,7 @@ def llm_scenario_create(job, situation, gender, scenario_id, scenario_step, user
         return f"LLM 생성 응답 요청 실패: {response.status_code} - {response.text}"
 
 
-def image_create(content, gender):
+async def image_create(content, gender):
     url = "https://api-cloud-function.elice.io/0133c2f7-9f3f-44b6-a3d6-c24ba8ef4510/generate"
 
     # 성별 텍스트 변환

@@ -44,11 +44,11 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
     await db["users"].insert_one(user_data)
 
     logger.info("[create_scenario] Calling LLM to generate scenario content...")
-    llm_result = llm_scenario_create(request.job, request.situation, request.gender, "", "1", request.userId)
+    llm_result = await llm_scenario_create(request.job, request.situation, request.gender, "", "1", request.userId)
     logger.info(f"[create_scenario] LLM Result: {llm_result}")
 
     logger.info("[create_scenario] Generating scenario image...")
-    encode_image = image_create(llm_result, request.gender)
+    encode_image = await image_create(llm_result, request.gender)
 
     scenario_data = {
         "create_date": settings.CURRENT_DATETIME,

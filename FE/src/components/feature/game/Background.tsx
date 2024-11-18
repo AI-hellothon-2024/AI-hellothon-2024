@@ -7,6 +7,7 @@ import { MotionDiv } from "@/components/motion";
 const Background = ({ className, children }: ComponentProps<"div">) => {
   const data = useAtomValue(chatAtom)
     .filter((chat) => chat.sender === "bot")
+    .filter((chat) => chat.scenarioImage)
     .at(-1);
   return (
     <MotionDiv

@@ -1,5 +1,6 @@
 import requests
 import logging
+import random
 from app.core.config import settings
 from app.db.session import get_database
 
@@ -22,56 +23,76 @@ db = get_database()
 
 async def llm_scenario_create(job, situation, gender, before_scenario_content, scenario_step, user_id, before_settings):
     url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
-
+    
+    # 상황
     selected_situation = await db["situations"].find_one({"name": situation})
     if selected_situation:
         situation_description = str(selected_situation.get("description", ""))
     else:
         situation_description = "직장 동료와 함께 퇴근하는 상황(어색함)"  # 상황에 따라 기본값 설정
 
+    # 성격
+    random_number = random.randint(1, 100)
+    choose_personalities = await db["personalities"].find_one({"number": random_number})
+    personalities = choose_personalities['trait']
+
+
     # 프롬프트 생성
     if scenario_step == "1":
         prompt = (
-            f"다음의 조건에 따라 대화를 시작합니다:\n"
-            f"- 내 직업: '{job}'\n"
-            f"- 내 성별: '{gender}'\n"
-            f"- 상황: '{situation_description}'\n"
-            f"- 상대방 성격과 역할: {before_settings if before_settings else '랜덤으로 설정'}\n"
-            f"대화는 자연스럽게 발전하며, 최종 상황에 도달하기 전에 천천히 빌드업합니다.\n"
-            f"상대방은 매번 한 마디씩 대화를 진행하며, 내 대답을 기다려야 합니다.\n"
-            f"응답 형식은 반드시 다음 형식을 따라야 합니다:\n"
-            f"  (임의로 정해진 상대의 설정값) setting::: 상대방의 성격과 역할을 명시\n"
-            f"  (대화 시작) start::: 상대방의 첫 대사\n"
-            f"**주의:** 금지 표현은 '(', ')'이며, 불필요한 헛소리는 피하세요.\n"
+            f"#Role\n"
+            f"- 직업: {job}\n"
+            f"- 성별: {gender}의 반대 성별\n"
+            f"- 역활: {situation_description}\n"
+            f"- 성격: {personalities}\n\n"
+            f"#Order\n"
+            f"1. 부여된 역활, 성격에 맞춰 user에게 먼저 대화를 건다.\n\n"
+            f"#Rule\n"
+            f"1. 너는 반드시 규칙을 지킴.\n"
+            f"2. 대화는 1번씩 주고 받는다.\n"
+            f"3. 대화 흐름에 안맞는 말은 하지 않는다.\n"
+            f"4. 설정된 성격에서 벗어나는 말은 하지 않는다.\n"
+            f"5. 10회 내외로 대화가 **자연스럽게** 끝나도록 한다.\n"
+            f"6. 대화 종료를 유도할때 마지막 답변의 step은 end 이다.\n"
+            f"7. 응답은 반드시 Result에 명시된 대로 응답해야한다.\n\n"
+            f"#Result\n"
+            f"step::: 대화의 회차를 명시\n"
+            f"setting::: 부여된 성격을 명시\n"
+            f"start::: 너의 대사\n"
         )
+        messages = [{"role": "system", "content": prompt}]
     else:
+        previous_conversation = [
+            {"role": entry["role"], "content": entry["content"]}
+            for entry in before_scenario_content
+        ]
         prompt = (
-            f"지금까지의 대화 흐름을 바탕으로 자연스러운 대화를 이어가세요:\n"
-            f"- 내 직업: '{job}'\n"
-            f"- 내 성별: '{gender}'\n"
-            f"- 상대방 성격과 역할: {before_settings}\n"
-            f"- 상황: '{situation_description}'\n"
-            f"지금까지의 대화 내용:\n"
-            f"{before_scenario_content}\n\n"
-            f"다음 조건에 따라 대화를 진행하세요:\n"
-            f"1. 현재 대화 흐름을 기반으로 자연스럽고 흥미롭게 전개합니다.\n"
-            f"2. 상대방의 설정값과 대화 흐름을 일관되게 유지합니다.\n"
-            f"3. 대화 종료를 유도해야 한다고 판단되면 첫 줄에 'end'를 추가하세요.\n\n"
-            f"응답 형식은 반드시 다음 형식을 따라야 합니다:\n"
-            f"  (임의로 정해진 상대의 설정값) setting::: 상대방의 성격과 역할\n"
-            f"  (대화 시작) start::: 상대방의 다음 대사\n"
-            f"**주의:** 금지 표현은 '(', ')'이며, 비논리적인 응답은 작성하지 마세요.\n"
+            f"#Role\n"
+            f"- 직업: {job}\n"
+            f"- 성별: {gender}의 반대 성별\n"
+            f"- 역활: {situation_description}\n"
+            f"- 성격: {before_settings}\n\n"
+            f"#Order\n"
+            f"1. 부여된 역활, 성격에 맞춰 user에게 먼저 대화를 건다.\n\n"
+            f"#Rule\n"
+            f"1. 너는 반드시 규칙을 지킴.\n"
+            f"2. 대화는 1번씩 주고 받는다.\n"
+            f"3. 대화 흐름에 안맞는 말은 하지 않는다.\n"
+            f"4. 설정된 성격에서 벗어나는 말은 하지 않는다.\n"
+            f"5. 10회 내외로 대화가 **자연스럽게** 끝나도록 한다.\n"
+            f"6. 대화 종료를 유도할때 마지막 답변의 step은 end 이다.\n"
+            f"7. 응답은 반드시 Result에 명시된 대로 응답해야한다.\n\n"
+            f"#Result\n"
+            f"step::: 대화의 회차를 명시\n"
+            f"setting::: 부여된 성격을 명시\n"
+            f"start::: 너의 대사\n"
         )
+        messages = [{"role": "system", "content": prompt}] + previous_conversation
 
     payload = {
         "model": "helpy-pro",
         "sess_id": user_id,
-        "messages": [
-            {
-                "role": "system",
-                "content": prompt
-            }
-        ]
+        "messages": messages,
     }
     headers = {
         "accept": "application/json",

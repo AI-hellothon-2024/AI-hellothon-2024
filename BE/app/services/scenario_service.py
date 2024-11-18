@@ -288,23 +288,24 @@ async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResult
 
 
 def create_script(answered_scenarios):
+    # answered_scenarios를 scenarioStep 기준으로 정렬
     sorted_scenarios = sorted(answered_scenarios,
                               key=lambda x: int(x["scenarioStep"]) if x["scenarioStep"].isdigit() else float('inf'))
 
-    script_lines = []
+    conversation = []
     for scenario in sorted_scenarios:
-        # 상대의 대사
+        # 상대의 대사 추가
         content = scenario.get("scenarioContent", "").strip()
         if content:
-            script_lines.append(f"상대: {content}")
+            conversation.append({"role": "assistant", "content": content})
 
-        # 사용자의 응답
+        # 사용자의 응답 추가
         answer = scenario.get("answer", "").strip()
         if answer:
-            script_lines.append(f"나: {answer}")
+            conversation.append({"role": "user", "content": answer})
 
-    # 최종 대본 반환
-    return "\n".join(script_lines)
+    return conversation
+
 
 def parse_llm_content(content):
     llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)

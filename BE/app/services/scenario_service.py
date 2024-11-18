@@ -153,6 +153,8 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
                 before_situation = user_data.get("situation", "")
                 before_image = str(scenario["_id"])
 
+                logger.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"+before_situation)
+
         answered_scenarios.append({
             "scenarioContent": answered_scenario_data["scenarioContent"],
             "scenarioStep": str(answered_scenario_data["scenarioStep"]),
@@ -171,6 +173,8 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         next_step = int(answered_scenario_data["scenarioStep"]) + 1
 
         create_before_script = create_script(answered_scenarios)
+
+        logger.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" + before_situation)
 
         content = await llm_scenario_create(
             job, before_situation, gender, create_before_script, next_step, request.userId, before_setting

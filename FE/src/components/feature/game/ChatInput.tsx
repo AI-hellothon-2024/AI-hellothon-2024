@@ -31,6 +31,29 @@ const ChatInput = ({ userId }: Props) => {
   });
 
   const onSubmit = (data: { answer: string }) => {
+    setChats((prev) => [
+      ...prev,
+      {
+        id: chats[chats.length - 1].id + "answer",
+        sender: "user",
+        message: data.answer,
+        loading: false,
+      },
+    ]);
+    reset();
+    setTimeout(() => {
+      setChats((prev) => [
+        ...prev,
+        {
+          id: "loading",
+          sender: "bot",
+          message: "잠시만 기다려주세요...",
+          loading: true,
+          scenarioImage: "",
+          scenarioStep: "1",
+        },
+      ]);
+    }, 2000);
     sendAnswer(
       {
         ...data,
@@ -41,29 +64,17 @@ const ChatInput = ({ userId }: Props) => {
       },
       {
         onSuccess(data) {
-          reset();
-          setTimeout(() => {
-            setChats((prev) => [
-              ...prev,
-              {
-                id: data.scenarioId,
-                sender: "bot",
-                message: data.scenarioContent,
-                loading: true,
-                scenarioImage: data.scenarioImage,
-                scenarioStep: data.scenarioStep,
-              },
-            ]);
-          }, 1000);
-
-          // 3초 뒤  같은 데이터의 로딩 false로 변경 (위에서 추가한 것)
-          setTimeout(() => {
-            setChats((prev) =>
-              prev.map((chat) =>
-                chat.id === data.scenarioId ? { ...chat, loading: false } : chat
-              )
-            );
-          }, 3000);
+          setChats((prev) => [
+            ...prev.filter((chat) => !chat.loading),
+            {
+              id: data.scenarioId,
+              sender: "bot",
+              message: data.scenarioContent,
+              loading: false,
+              scenarioImage: data.scenarioImage,
+              scenarioStep: data.scenarioStep,
+            },
+          ]);
         },
       }
     );
@@ -85,6 +96,7 @@ const ChatInput = ({ userId }: Props) => {
         {...register("answer", {
           required: true,
         })}
+        disabled={isPending}
         placeholder="답변을 입력해주세요."
         className="backdrop-blur-sm rounded-full rounded-tr-none bg-[rgba(31,31,31,0.7)] py-3 h-auto"
       />

@@ -1,7 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
 import type { IScenario } from "@/app/type/IScenario.interface";
-import { useSetAtom } from "jotai";
-import { chatAtom } from "@/app/store/chatAtom";
 
 const postAnswerScenario = async ({
   userId,
@@ -43,7 +41,6 @@ interface IAnswer {
   scenarioIds: string[];
 }
 export const useSendAnswer = ({ userId }: { userId: string }) => {
-  const setChats = useSetAtom(chatAtom);
   return useMutation({
     mutationKey: ["answers", { userId }],
     mutationFn: ({ answer, answerScenarioId, scenarioIds }: IAnswer) => {
@@ -57,17 +54,7 @@ export const useSendAnswer = ({ userId }: { userId: string }) => {
         answerScenarioId,
       });
     },
-    onSettled: (data, error, variables) => {
-      setChats((prev) => [
-        ...prev,
-        {
-          id: variables.answerScenarioId + "answer",
-          sender: "user",
-          message: variables.answer,
-          loading: false,
-        },
-      ]);
-    },
+
     onError: (error) => {
       console.log("error", error);
     },

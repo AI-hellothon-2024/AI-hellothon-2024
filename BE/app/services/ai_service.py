@@ -123,7 +123,7 @@ async def image_create(content, gender, before_image):
 
     prompt = (
         f"{content}\n"
-        f"{system_gender}, 동양인\n"
+        f"{system_gender}, 동양인, 일본애니메이션캐릭터\n"
         f"이미지에 text를 *절대* 포함하지 마십시오.\n"
         f"대화를 기반으로 캐릭터의 대사, 자세, 표정을 상세히 담아 사실적인 스타일로 생성해주세요.\n"
     )

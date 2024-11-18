@@ -41,7 +41,9 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
 
     logger.info("personalities: " + personalities)
 
-    system_gender = "male" if gender == "female" else "male"
+    system_gender = "female"
+    if gender == "female":
+        system_gender = "male"
 
     logger.info("system_gender: " + system_gender)
 
@@ -66,13 +68,9 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
             f"2. **(필수)응답은 어떤 회차이던 반드시 Result에 명시된 형식대로 응답해야한다.\n"
             f"3. 대화는 1번씩 주고 받는다.\n"
             f"4. 대화 흐름에 안맞는 말은 하지 않는다.\n"
-            f"5. 설정된 역활, 성격에서 벗어나는 말은 하지 않는다.\n"
+            f"5. 설정된 역활, 성격에서 벗어나는 절대 말은 하지 않는다. 역활만을 위해 대화한다.\n"
             f"6. 10회 내외로 대화가 **자연스럽게** 끝나도록 한다.\n"
-            f"7. 대화 종료를 유도할때 마지막 답변의 step:::은 end 이다.\n\n"
-            f"#절대적인 응답형식\n"
-            f"step::: (대화의 회차를 작성하는 부분)\n"
-            f"setting::: (Role을 작성하는 부분)\n"
-            f"start::: (너의 대사를 작성하는 부분)\n"
+            f"7. 대화 종료를 유도할때 마지막 답변의 step:::은 end 이다.\n"
         )
         messages = [{"role": "system", "content": prompt}]
     else:
@@ -99,7 +97,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
             f"2. **(필수)응답은 어떤 회차이던 반드시 Result에 명시된 형식대로 응답해야한다.\n"
             f"3. 대화는 1번씩 주고 받는다.\n"
             f"4. 대화 흐름에 안맞는 말은 하지 않는다.\n"
-            f"5. 설정된 역활, 성격에서 벗어나는 말은 하지 않는다.\n"
+            f"5. 설정된 역활, 성격에서 벗어나는 절대 말은 하지 않는다. 역활만을 위해 대화한다.\n"
             f"6. 10회 내외로 대화가 **자연스럽게** 끝나도록 한다.\n"
             f"7. 대화 종료를 유도할때 마지막 답변의 step:::은 end 이다.\n\n"
 

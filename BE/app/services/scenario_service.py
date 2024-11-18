@@ -281,6 +281,10 @@ def parse_llm_content(content):
     setting_match = re.search(r"setting:::\s*(.*?)\n", content, re.DOTALL)
     is_end_match = re.search(r"\bend\b", content, re.IGNORECASE)
 
+    #step::: end 이란 단어가 있으면 이부분만 삭제하고 content로 사용
+    if(re.search(r"step::: end", content)):
+        content = re.sub(r"step::: end", "", content)
+
     llm_result = llm_result_match.group(1) if llm_result_match else content
     setting = setting_match.group(1) if setting_match else "설정값 없음"
     is_end_match = "end" if is_end_match else ""

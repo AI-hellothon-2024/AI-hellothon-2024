@@ -36,13 +36,14 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
     choose_personalities = await db["personalities"].find_one({"number": random_number})
     personalities = choose_personalities['trait']
 
+    system_gender = "male" if gender == "male" else "female"
 
     # 프롬프트 생성
     if scenario_step == "1":
         prompt = (
             f"#Role\n"
             f"- 직업: {job}\n"
-            f"- 성별: {gender}의 반대 성별\n"
+            f"- 성별: {system_gender}\n"
             f"- 역활: {situation_description}\n"
             f"- 성격: {personalities}\n\n"
             f"#Order\n"
@@ -69,7 +70,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
         prompt = (
             f"#Role\n"
             f"- 직업: {job}\n"
-            f"- 성별: {gender}의 반대 성별\n"
+            f"- 성별: {system_gender}\n"
             f"- 역활: {situation_description}\n"
             f"- 성격: {before_settings}\n\n"
             f"#Order\n"

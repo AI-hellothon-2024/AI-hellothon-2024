@@ -47,7 +47,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
             f"- 역활: {situation_description}\n"
             f"- 성격: {personalities}\n\n"
             f"#Order\n"
-            f"1. 부여된 역활, 성격에 맞춰 user에게 먼저 대화를 건다.\n"
+            f"1. 부여된 Role에 맞춰 user에게 먼저 대화를 건다.\n"
             f"2. 아래 부여된 Rule은 절대적으로 지켜라.\n\n"
             f"#Rule\n"
             f"1. 너는 반드시 규칙을 지킴.\n"
@@ -59,7 +59,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
             f"7. 대화 종료를 유도할때 마지막 답변의 step:::은 end 이다.\n\n"
             f"#Result\n"
             f"step::: (대화의 회차를 작성)\n"
-            f"setting::: (부여된 성격을 작성)\n"
+            f"setting::: (Role)\n"
             f"start::: (너의 대사)\n"
         )
         messages = [{"role": "system", "content": prompt}]
@@ -75,7 +75,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
             f"- 역활: {situation_description}\n"
             f"- 성격: {before_settings}\n\n"
             f"#Order\n"
-            f"1. 부여된 역활, 성격에 맞춰 user에게 먼저 대화를 건다.\n"
+            f"1. 부여된 Role에 맞춰 user에게 먼저 대화를 건다.\n"
             f"2. 아래 부여된 Rule은 절대적으로 지켜라.\n\n"
             f"#Rule\n"
             f"1. 너는 반드시 규칙을 지킴.\n"
@@ -87,7 +87,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
             f"7. 대화 종료를 유도할때 마지막 답변의 step:::은 end 이다.\n\n"
             f"#Result\n"
             f"step::: (대화의 회차를 작성)\n"
-            f"setting::: (부여된 성격을 작성)\n"
+            f"setting::: (Role)\n"
             f"start::: (너의 대사)\n"
         )
         messages = previous_conversation + [{"role": "system", "content": prompt}]

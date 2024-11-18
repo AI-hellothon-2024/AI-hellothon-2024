@@ -131,6 +131,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
     await db["answers"].insert_one(answer_data)
 
     answered_scenarios = []
+    before_situation = ""
 
     async def process_previous_scenarios(prev_scenarios, answered_scenario_data):
         nonlocal before_setting, job, gender
@@ -149,6 +150,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
                 user_data = await db["users"].find_one({"first_scenario_id": str(scenario["_id"])})
                 job = user_data.get("job", "")
                 gender = user_data.get("gender", "")
+                before_situation = user_data.get("situation", "")
                 before_image = str(scenario["_id"])
 
         answered_scenarios.append({
@@ -171,7 +173,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         create_before_script = create_script(answered_scenarios)
 
         content = await llm_scenario_create(
-            job, "", gender, create_before_script, next_step, request.userId, before_setting
+            job, before_situation, gender, create_before_script, next_step, request.userId, before_setting
         )
 
         llm_result, setting, is_end_match = parse_llm_content(content)

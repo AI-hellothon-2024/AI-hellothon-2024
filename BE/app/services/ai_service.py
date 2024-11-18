@@ -41,7 +41,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
 
     logger.info("personalities: " + personalities)
 
-    system_gender = "male" if gender == "male" else "female"
+    system_gender = "male" if gender == "female" else "male"
 
     logger.info("system_gender: " + system_gender)
 

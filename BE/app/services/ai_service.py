@@ -90,7 +90,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
             f"setting::: 부여된 성격을 명시\n"
             f"start::: 너의 대사\n"
         )
-        messages = [{"role": "system", "content": prompt}] + previous_conversation
+        messages = previous_conversation + [{"role": "system", "content": prompt}]
 
     payload = {
         "model": "helpy-pro",

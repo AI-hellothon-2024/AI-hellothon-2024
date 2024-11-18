@@ -133,7 +133,7 @@ async def image_create(content, gender, before_image):
         "prompt": prompt,
         "style": "polaroid",
         "width": 512,
-        "height": 512,
+        "height": 1024,
         "steps": 4,
         "num": 1
     }

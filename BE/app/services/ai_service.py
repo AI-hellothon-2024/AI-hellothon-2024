@@ -48,7 +48,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
     # 프롬프트 생성
     if scenario_step == "1":
         prompt = (
-            f"현재 대화의 STEP은 {scenario_step} 입니다.\n"
+            f"현재 대화의 STEP은 1 입니다.\n"
             f"#Role\n"
             f"- 직업: {job}\n"
             f"- 성별: {system_gender}\n"
@@ -77,7 +77,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
             for entry in before_scenario_content
         ]
         prompt = (
-            f"현재 대화의 STEP은 1 입니다.\n"
+            f"현재 대화의 STEP은 {scenario_step} 입니다.\n"
             f"#Role\n"
             f"- 직업: {job}\n"
             f"- 성별: {system_gender}\n"

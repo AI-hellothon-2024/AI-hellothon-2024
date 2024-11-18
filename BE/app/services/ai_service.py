@@ -99,7 +99,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
             f"setting::: (Role을 작성하는 부분)\n"
             f"start::: (너의 대사를 작성하는 부분)\n"
         )
-        messages = previous_conversation + [{"role": "system", "content": prompt}]
+        messages = [{"role": "system", "content": prompt}] + previous_conversation
 
     logger.info(f"LLM 생성 prompt: {messages}")
 

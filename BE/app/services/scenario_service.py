@@ -192,13 +192,14 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         user_data = await db["users"].find_one({"first_scenario_id": str(request.answerScenarioId)})
         job = user_data.get("job", "")
         gender = user_data.get("gender", "")
+        before_situation = user_data.get("situation", "")
         before_image = str(request.answerScenarioId)
 
         create_before_script = create_script(answered_scenarios)
 
         content = await llm_scenario_create(
             job,
-            "",
+            before_situation,
             gender,
             create_before_script,
             next_step,

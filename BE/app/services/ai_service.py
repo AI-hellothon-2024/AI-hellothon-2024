@@ -3,6 +3,7 @@ import logging
 import random
 from app.core.config import settings
 from app.db.session import get_database
+from deep_translator import GoogleTranslator
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -108,11 +109,16 @@ async def image_create(content, gender, before_image):
 
     before_image_url = f"https://zmxpjsmxtgzthtqs.tunnel-pt.elice.io/static/{before_image}"
 
+    # Translate content to English
+    translated_content = GoogleTranslator(source='auto', target='en').translate(content)
+
+    # Construct prompt in English
     prompt = (
-        f"대화: {content}\n"
-        f"그림체는 일본 애니메이션 그림체로 그려줘.\n"
-        f"말풍선 and 글자는 *절대절대* 이미지에 들어가선 안돼\n"
-        f"대화에서 등장인물의 대사와 성격 묘사된 자세 등 세세하게 캐치해서 그려줘.\n"
+        f"Conversation: {translated_content}\n"
+        f"Gender: {gender}\n"
+        f"country: korea\n"
+        f"Do *not* include any text in the image.\n"
+        f"Please capture the character's dialogue, posture, and expressions in detail based on the conversation, and generate it in a realistic style.\n"
     )
 
     payload = {
@@ -131,5 +137,5 @@ async def image_create(content, gender, before_image):
 
     response = await generate_request(url, payload, headers)
     if isinstance(response, dict):
-        return response.get("predictions", "이미지 생성 실패")  # 이미지 URL 또는 생성 실패 메시지 반환
+        return response.get("predictions", "Image generation failed")  # Return image URL or failure message
     return response

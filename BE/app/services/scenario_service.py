@@ -214,7 +214,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         if is_end_match == "end":
             next_step = "end"
 
-    encode_image = await image_create(content, gender, before_image)
+    encode_image = await image_create(llm_result, gender, before_image)
 
     # Save next scenario
     scenario_data = {

@@ -9,7 +9,7 @@ real.env
 *.env
 
 # 로컬 환경파일
-BE/.venv
+BE/venv
 __pycache__/
 *.pyc
 

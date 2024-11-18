@@ -21,6 +21,7 @@ if not logger.handlers:
 
 db = get_database()
 
+
 async def generate_request(url, payload, headers):
     response = requests.post(url, json=payload, headers=headers)
     if response.status_code == 200:
@@ -30,6 +31,7 @@ async def generate_request(url, payload, headers):
             return f"응답 처리 중 에러 발생: {str(e)}"
     else:
         return f"요청 실패: {response.status_code} - {response.text}"
+
 
 async def llm_scenario_create(job, situation, gender, before_scenario_content, scenario_step, user_id, before_settings):
     url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
@@ -74,8 +76,9 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
         f"7. 대화 종료를 유도할때 마지막 답변의 step:::은 end 이다.\n"
     )
 
-    messages = ([{"role": "system", "content": prompt}] +
-                [{"role": entry["role"], "content": entry["content"]} for entry in before_scenario_content] if scenario_step != "1" else [])
+    messages = [{"role": "system", "content": prompt}]
+    if scenario_step != "1":
+        messages += [{"role": entry["role"], "content": entry["content"]} for entry in before_scenario_content]
 
     logger.info(f"LLM 생성 prompt: {messages}")
 
@@ -96,6 +99,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
         logger.info(f"LLM 생성 응답값: {content}")
         return content
     return response
+
 
 async def image_create(content, gender, before_image):
     url = "https://api-cloud-function.elice.io/0133c2f7-9f3f-44b6-a3d6-c24ba8ef4510/generate"

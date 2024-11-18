@@ -98,7 +98,7 @@ const ChatInput = ({ userId }: Props) => {
         })}
         disabled={isPending}
         placeholder="답변을 입력해주세요."
-        className="backdrop-blur-sm rounded-full rounded-tr-none bg-[rgba(31,31,31,0.7)] py-3 h-auto"
+        className="backdrop-blur-sm rounded-full rounded-tr-none bg-[rgba(31,31,31,0.7)] py-3 h-auto px-5"
       />
       <Button type="submit" disabled={!isValid || isPending} className="hidden">
         전송

@@ -31,7 +31,7 @@ const UserName = ({ onNext }: Props) => {
           입력해주세요.
         </div>
         <Input
-          className="!text-xl py-3 rounded-full text-center h-auto"
+          className="!text-xl py-3 rounded-full text-center h-auto rounded-tr-none focus-visible:placeholder:text-transparent"
           {...register("username", {
             required: true,
           })}
@@ -41,7 +41,7 @@ const UserName = ({ onNext }: Props) => {
       <Button
         type="submit"
         disabled={!isValid}
-        className="rounded text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold"
+        className="text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold rounded-2xl"
       >
         다음
       </Button>

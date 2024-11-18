@@ -16,6 +16,9 @@ const config: Config = {
           20: "rgb(0 0 0 / 0.2)",
           DEFAULT: "black",
         },
+        mute: {
+          20: "#D0D0D0",
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

@@ -61,7 +61,10 @@ const Form = () => {
   });
   return (
     <>
-      <Progress value={getProgress(funnel.step)} className="rounded-none h-1" />
+      <Progress
+        value={getProgress(funnel.step)}
+        className="rounded-none h-[2px]"
+      />
       <funnel.Render
         step1={({ history }) => (
           <UserName

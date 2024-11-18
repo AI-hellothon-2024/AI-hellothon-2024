@@ -48,7 +48,7 @@ const Situation = ({ onNext }: Props) => {
                 <ToggleGroupItem
                   key={value}
                   value={value}
-                  className="w-full rounded-full border border-[#D0D0D0] data-[state=on]:border-primary text-xl py-3 h-auto rounded-tr-none"
+                  className="w-full rounded-full border border-[#D0D0D0] data-[state=on]:border-transparent text-xl py-3 h-auto rounded-tr-none data-[state=on]:bg-gradient-to-bl from-[#FF751D] to-[#FF8A3F]"
                 >
                   {name}
                 </ToggleGroupItem>
@@ -60,7 +60,7 @@ const Situation = ({ onNext }: Props) => {
       <Button
         type="submit"
         disabled={!isValid}
-        className="rounded text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold"
+        className="rounded-2xl text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold"
       >
         다음
       </Button>

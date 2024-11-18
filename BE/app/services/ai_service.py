@@ -52,15 +52,15 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
             f"#Rule\n"
             f"1. 너는 반드시 규칙을 지킴.\n"
             f"2. **(필수)응답은 어떤 회차이던 반드시 Result에 명시된 형식대로 응답해야한다.\n"
-            f"3. 대화는 1번씩 Result 형식으로 주고 받는다.\n"
+            f"3. 대화는 1번씩 주고 받는다.\n"
             f"4. 대화 흐름에 안맞는 말은 하지 않는다.\n"
-            f"5. 설정된 성격에서 벗어나는 말은 하지 않는다.\n"
+            f"5. 설정된 역활, 성격에서 벗어나는 말은 하지 않는다.\n"
             f"6. 10회 내외로 대화가 **자연스럽게** 끝나도록 한다.\n"
-            f"7. 대화 종료를 유도할때 마지막 답변의 step은 end 이다.\n\n"
+            f"7. 대화 종료를 유도할때 마지막 답변의 step:::은 end 이다.\n\n"
             f"#Result\n"
-            f"step::: 대화의 회차를 명시\n"
-            f"setting::: 부여된 성격을 명시\n"
-            f"start::: 너의 대사\n"
+            f"step::: (대화의 회차를 작성)\n"
+            f"setting::: (부여된 성격을 작성)\n"
+            f"start::: (너의 대사)\n"
         )
         messages = [{"role": "system", "content": prompt}]
     else:
@@ -80,17 +80,19 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
             f"#Rule\n"
             f"1. 너는 반드시 규칙을 지킴.\n"
             f"2. **(필수)응답은 어떤 회차이던 반드시 Result에 명시된 형식대로 응답해야한다.\n"
-            f"3. 대화는 1번씩 Result 형식으로 주고 받는다.\n"
+            f"3. 대화는 1번씩 주고 받는다.\n"
             f"4. 대화 흐름에 안맞는 말은 하지 않는다.\n"
-            f"5. 설정된 성격에서 벗어나는 말은 하지 않는다.\n"
+            f"5. 설정된 역활, 성격에서 벗어나는 말은 하지 않는다.\n"
             f"6. 10회 내외로 대화가 **자연스럽게** 끝나도록 한다.\n"
-            f"7. 대화 종료를 유도할때 마지막 답변의 step은 end 이다.\n\n"
+            f"7. 대화 종료를 유도할때 마지막 답변의 step:::은 end 이다.\n\n"
             f"#Result\n"
-            f"step::: 대화의 회차를 명시\n"
-            f"setting::: 부여된 성격을 명시\n"
-            f"start::: 너의 대사\n"
+            f"step::: (대화의 회차를 작성)\n"
+            f"setting::: (부여된 성격을 작성)\n"
+            f"start::: (너의 대사)\n"
         )
         messages = previous_conversation + [{"role": "system", "content": prompt}]
+
+    logger.info(f"LLM 생성 prompt: {messages}")
 
     payload = {
         "model": "helpy-pro",

@@ -134,7 +134,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
     before_situation = ""
 
     async def process_previous_scenarios(prev_scenarios, answered_scenario_data):
-        nonlocal before_setting, job, gender
+        nonlocal before_setting, job, gender, before_situation, before_image
 
         for scenario in prev_scenarios:
             answer = await db["answers"].find_one({"answeredScenarioId": str(scenario["_id"])})
@@ -152,8 +152,6 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
                 gender = user_data.get("gender", "")
                 before_situation = user_data.get("situation", "")
                 before_image = str(scenario["_id"])
-
-                logger.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"+before_situation)
 
         answered_scenarios.append({
             "scenarioContent": answered_scenario_data["scenarioContent"],
@@ -173,8 +171,6 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         next_step = int(answered_scenario_data["scenarioStep"]) + 1
 
         create_before_script = create_script(answered_scenarios)
-
-        logger.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" + before_situation)
 
         content = await llm_scenario_create(
             job, before_situation, gender, create_before_script, next_step, request.userId, before_setting

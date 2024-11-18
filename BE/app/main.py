@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from app.api.endpoints import scenario, ws_stt
 
 # Configure logging
@@ -19,10 +20,22 @@ app = FastAPI(title="AI헬로우톤^ㅡ^", description="API Documentation", vers
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # 허용할 Origin을 설정 (예: ["https://example.com"])
-    allow_methods=["*"],  # 허용할 HTTP 메서드 (GET, POST, OPTIONS 등)
+    allow_methods=["GET", "POST", "OPTIONS"],  # 허용할 HTTP 메서드 (GET, POST, OPTIONS 등)
     allow_headers=["*"],  # 허용할 HTTP 헤더
     allow_credentials=True,  # 쿠키나 인증 정보 전달 허용 여부
 )
+
+
+@app.options("/{full_path:path}")
+async def handle_options_request(full_path: str):
+    response = JSONResponse(content=None)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response
+
+
 # 디렉토리 경로
 images_directory = os.path.join(os.getcwd(), "images")
 

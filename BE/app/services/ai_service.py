@@ -109,16 +109,21 @@ async def image_create(content, gender, before_image):
 
     before_image_url = f"https://zmxpjsmxtgzthtqs.tunnel-pt.elice.io/static/{before_image}"
 
-    # Translate content to English
-    translated_content = GoogleTranslator(source='auto', target='en').translate(content)
+    # translated_content = GoogleTranslator(source='auto', target='en').translate(content)
+    #
+    # prompt = (
+    #     f"Conversation: {translated_content}\n"
+    #     f"Gender: {gender}\n"
+    #     f"Nationality: Korean\n"
+    #     f"Do *not* include any text in the image.\n"
+    #     f"Please capture the character's dialogue, posture, and expressions in detail based on the conversation, and generate it in a realistic style.\n"
+    # )
 
-    # Construct prompt in English
     prompt = (
-        f"Conversation: {translated_content}\n"
-        f"Gender: {gender}\n"
-        f"country: korea\n"
-        f"Do *not* include any text in the image.\n"
-        f"Please capture the character's dialogue, posture, and expressions in detail based on the conversation, and generate it in a realistic style.\n"
+        f"{content}\n"
+        f"{gender}, 동양인\n"
+        f"이미지에 text를 *절대* 포함하지 마십시오.\n"
+        f"대화를 기반으로 캐릭터의 대사, 자세, 표정을 상세히 담아 사실적인 스타일로 생성해주세요.\n"
     )
 
     payload = {

@@ -12,6 +12,7 @@ const Background = ({ className, children }: ComponentProps<"div">) => {
     <MotionDiv
       className={className}
       style={{
+        backgroundSize: "110%",
         backgroundImage: data
           ? `url('data:image/png;base64,${data?.scenarioImage}')`
           : undefined,

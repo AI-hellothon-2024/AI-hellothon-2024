@@ -15,13 +15,7 @@ export const dynamicParams = false;
 export const generateStaticParams = () => {
   return ["ongoing", "finished"];
 };
-const situationMapper: {
-  [key in keyof typeof SITUATIONS]: string;
-} = {
-  love: "상사가 고백할 때",
-  daily: "상사가 고백할 때",
-  angry: "상사가 고백할 때",
-};
+
 const Page = async ({
   searchParams,
   params: { status },
@@ -52,7 +46,7 @@ const Page = async ({
             transform -translate-x-1/2 text-white text-lg font-bold
             "
             >
-              {situationMapper[searchParams.situation]}
+              {SITUATIONS[searchParams.situation]}
             </h1>
           </header>
           <div className="row-start-2 px-4 flex py-8 flex-col justify-end gap-8 max-h-full min-h-0 bg-gradient-to-b from-transparent to-[rgba(0,0,0,0.74)]">

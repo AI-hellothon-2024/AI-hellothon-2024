@@ -30,7 +30,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
     if selected_situation:
         situation_description = str(selected_situation.get("description", ""))
     else:
-        situation_description = "직장 동료와 함께 퇴근하는 상황(어색함)"  # 상황에 따라 기본값 설정
+        situation_description = "기본값"
 
     logger.info("situation_description: " + situation_description)
 
@@ -49,6 +49,10 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
     if scenario_step == "1":
         prompt = (
             f"현재 대화의 STEP은 1 입니다.\n"
+            f"#절대적인 응답형식\n"
+            f"step::: (대화의 회차를 작성하는 부분)\n"
+            f"setting::: (Role을 작성하는 부분)\n"
+            f"start::: (너의 대사를 작성하는 부분)\n\n"
             f"#Role\n"
             f"- 직업: {job}\n"
             f"- 성별: {system_gender}\n"
@@ -65,7 +69,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
             f"5. 설정된 역활, 성격에서 벗어나는 말은 하지 않는다.\n"
             f"6. 10회 내외로 대화가 **자연스럽게** 끝나도록 한다.\n"
             f"7. 대화 종료를 유도할때 마지막 답변의 step:::은 end 이다.\n\n"
-            f"#Result\n"
+            f"#절대적인 응답형식\n"
             f"step::: (대화의 회차를 작성하는 부분)\n"
             f"setting::: (Role을 작성하는 부분)\n"
             f"start::: (너의 대사를 작성하는 부분)\n"
@@ -78,6 +82,10 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
         ]
         prompt = (
             f"현재 대화의 STEP은 {scenario_step} 입니다.\n"
+            f"#절대적인 응답형식\n"
+            f"step::: (대화의 회차를 작성하는 부분)\n"
+            f"setting::: (Role을 작성하는 부분)\n"
+            f"start::: (너의 대사를 작성하는 부분)\n\n"
             f"#Role\n"
             f"- 직업: {job}\n"
             f"- 성별: {system_gender}\n"
@@ -94,10 +102,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
             f"5. 설정된 역활, 성격에서 벗어나는 말은 하지 않는다.\n"
             f"6. 10회 내외로 대화가 **자연스럽게** 끝나도록 한다.\n"
             f"7. 대화 종료를 유도할때 마지막 답변의 step:::은 end 이다.\n\n"
-            f"#Result\n"
-            f"step::: (대화의 회차를 작성하는 부분)\n"
-            f"setting::: (Role을 작성하는 부분)\n"
-            f"start::: (너의 대사를 작성하는 부분)\n"
+
         )
         messages = [{"role": "system", "content": prompt}] + previous_conversation
 

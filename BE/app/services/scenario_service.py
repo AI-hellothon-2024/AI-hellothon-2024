@@ -75,7 +75,7 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
             detail="LLM 정확한 응답값 생성에 실패했습니다. 다시 시도해주세요."
         )
 
-    encode_image = await image_create(content, request.gender, "")
+    encode_image = await image_create(content, request.gender, setting)
 
     scenario_data = {
         "create_date": settings.CURRENT_DATETIME,
@@ -132,9 +132,10 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
 
     answered_scenarios = []
     before_situation = ""
+    before_settings = ""
 
     async def process_previous_scenarios(prev_scenarios, answered_scenario_data):
-        nonlocal before_setting, job, gender, before_situation, before_image
+        nonlocal before_setting, job, gender, before_situation, before_settings
 
         for scenario in prev_scenarios:
             answer = await db["answers"].find_one({"answeredScenarioId": str(scenario["_id"])})
@@ -151,7 +152,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
                 job = user_data.get("job", "")
                 gender = user_data.get("gender", "")
                 before_situation = user_data.get("situation", "")
-                before_image = str(scenario["_id"])
+                before_settings = scenario["settings"]
 
         answered_scenarios.append({
             "scenarioContent": answered_scenario_data["scenarioContent"],
@@ -195,7 +196,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         job = user_data.get("job", "")
         gender = user_data.get("gender", "")
         before_situation = user_data.get("situation", "")
-        before_image = str(request.answerScenarioId)
+        before_settings = answered_scenario_data["settings"]
 
         create_before_script = create_script(answered_scenarios)
 
@@ -214,7 +215,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         if is_end_match == "end":
             next_step = "end"
 
-    encode_image = await image_create(llm_result, gender, before_image)
+    encode_image = await image_create(llm_result, gender, before_settings)
 
     # Save next scenario
     scenario_data = {

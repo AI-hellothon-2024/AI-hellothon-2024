@@ -51,7 +51,10 @@ const Page = async ({
           </header>
           <div className="row-start-2 px-4 flex py-8 flex-col justify-end gap-8 max-h-full min-h-0 bg-gradient-to-b from-transparent to-[rgba(0,0,0,0.74)]">
             <Chats {...searchParams} />
-            <ChatInput userId={searchParams.userId} />
+            <ChatInput
+              userId={searchParams.userId}
+              situation={searchParams.situation}
+            />
           </div>
         </Background>
       </HydrationBoundary>

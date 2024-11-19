@@ -5,8 +5,9 @@ import { twMerge, twJoin } from "tailwind-merge";
 import { SITUATIONS, JOBS, GENDER } from "@/lib/constants";
 import { useScenario } from "@/api/useScenario";
 import { MotionDiv } from "@/components/motion";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { chatAtom } from "@/app/store/chatAtom";
+import { scenarioAtom } from "@/app/store/scenarioAtom";
 import Loading from "./Loading";
 
 interface Props extends ComponentProps<"div"> {
@@ -20,9 +21,11 @@ const Chats = ({ userId, username, job, situation, gender }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { data } = useScenario({ userId, username, job, situation, gender });
   const [chats, setChats] = useAtom(chatAtom);
+  const setScenario = useSetAtom(scenarioAtom);
 
   useEffect(() => {
     if (data) {
+      setScenario([data.scenarioId]);
       setChats([
         {
           id: data.scenarioId,

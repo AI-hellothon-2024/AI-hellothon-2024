@@ -4,15 +4,18 @@ import { ComponentProps } from "react";
 import { useSendAnswer } from "@/api/useSendAnswer";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
+import { SITUATIONS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { useAtom } from "jotai";
 import { chatAtom } from "@/app/store/chatAtom";
+import Link from "next/link";
 
 interface Props extends ComponentProps<"div"> {
   userId: string;
+  situation: keyof typeof SITUATIONS;
 }
 
-const ChatInput = ({ userId }: Props) => {
+const ChatInput = ({ userId, situation }: Props) => {
   const [chats, setChats] = useAtom(chatAtom);
   const lastChat = chats.filter((chat) => chat.sender === "bot").at(-1);
   const {
@@ -81,9 +84,11 @@ const ChatInput = ({ userId }: Props) => {
   };
   if (lastChat?.scenarioStep === "end") {
     return (
-      <Button className="rounded text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold">
-        {" "}
-        결과보기
+      <Button
+        className="rounded text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold"
+        asChild
+      >
+        <Link href={`/result/${situation}`}>결과보기</Link>
       </Button>
     );
   }

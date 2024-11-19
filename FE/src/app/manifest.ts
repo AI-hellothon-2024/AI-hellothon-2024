@@ -3,7 +3,7 @@ import { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Aimigo",
-    description: "Apeach web app",
+    description: "Aimigo web app",
     display: "standalone",
     start_url: "/",
     theme_color: "#000000",

@@ -11,7 +11,7 @@ from app.schemas.scenario_schema import (
 )
 from bson import ObjectId
 from app.core.config import settings
-from app.services.ai_service import llm_scenario_create, image_create
+from app.services.ai_service import llm_scenario_create, image_create, llm_result_create, result_image_create
 
 db = get_database()
 
@@ -30,17 +30,20 @@ def load_sample_image():
         return base64.b64encode(image_file.read()).decode('utf-8')
 
 
-def save_image(encoded_image: str, scenario_id: str):
+def save_image(encoded_image: str, scenario_id: str, is_result=False):
     image_dir = os.path.join(os.getcwd(), "images")
     os.makedirs(image_dir, exist_ok=True)
 
-    image_path = os.path.join(image_dir, f"{scenario_id}.png")
+    if is_result:
+        image_path = os.path.join(image_dir, f"result_{scenario_id}.png")
+    else:
+        image_path = os.path.join(image_dir, f"{scenario_id}.png")
+
     with open(image_path, "wb") as image_file:
         image_file.write(base64.b64decode(encoded_image))
 
 
 async def create_scenario(request: ScenarioCreateRequest, client_request: Request) -> ScenarioCreateResponse:
-
     user_data = {
         "userId": request.userId,
         "job": request.job,
@@ -106,7 +109,8 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
 
 
 async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -> ScenarioAnswerResponse:
-    logger.info(f"[save_answer] Saving answer for userId: {request.userId}, answerScenarioId: {request.answerScenarioId}")
+    logger.info(
+        f"[save_answer] Saving answer for userId: {request.userId}, answerScenarioId: {request.answerScenarioId}")
 
     before_setting = ""
     job = ""
@@ -242,17 +246,47 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
 
 
 async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResultResponse:
+    gender = ""
+
+    object_ids = [ObjectId(scenario_id) for scenario_id in request.scenarioIds]
+
+    prev_scenarios_cursor = db["scenarios"].find({"_id": {"$in": object_ids}})
+    prev_scenarios = await prev_scenarios_cursor.to_list(length=None)
+
+    answered_scenarios = []
+    for scenario in prev_scenarios:
+        answer = await db["answers"].find_one({"answeredScenarioId": str(scenario["_id"])})
+        answered_scenarios.append({
+            "scenarioId": str(scenario["_id"]),
+            "scenarioContent": scenario["scenarioContent"],
+            "answer": answer["answer"] if answer else "",
+            "scenarioStep": scenario.get("scenarioStep"),
+        })
+        if scenario.get("scenarioStep") == "1":
+            user_data = await db["users"].find_one({"first_scenario_id": str(scenario["_id"])})
+            gender = user_data.get("gender", "")
+
+    prev_scenarios_script = create_script(prev_scenarios)
+
+    llm_result = await llm_result_create(prev_scenarios_script, request.userId)
+
+    flow_evaluation, flow_explanation, response_tendency, goal_achievement = result_llm_content(llm_result)
+
+    encode_image = await result_image_create(flow_evaluation, gender)
 
     result_data = {
-        "resultId": str(ObjectId()),
         "userId": request.userId,
-        "resultImage": "",
-        "resultContent": "결과 내용 내용 내용 결과 내용 내용 내용 결과 내용 내용 내용 결과 내용 내용 내용 결과 내용 내용 내용 결과 내용 내용 내용",
-        "scenarios": [
-            {"scenarioContent": "시나리오 첫번째 콘텐츠 예시입니다.", "scenarioStep": "1", "answer": "Answer 1"},
-            {"scenarioContent": "시나리오 두번째 콘텐츠 예시입니다. (이게 마지막임)", "scenarioStep": "end", "answer": ""}
-        ]
+        "flowEvaluation": flow_evaluation,
+        "flowExplanation": flow_explanation,
+        "responseTendency": response_tendency,
+        "goalAchievement": goal_achievement,
+        "scenarios": answered_scenarios,
+        "resultImage": encode_image,
     }
+
+    result_id = await db["results"].insert_one(result_data)
+    result_data["resultId"] = str(result_id.inserted_id)
+    save_image(encode_image, str(result_id.inserted_id), is_result=True)
 
     return ScenarioResultResponse(**result_data)
 
@@ -282,8 +316,8 @@ def parse_llm_content(content):
     setting_match = re.search(r"setting:::\s*(.*?)\n", content, re.DOTALL)
     is_end_match = re.search(r"\bend\b", content, re.IGNORECASE)
 
-    #step::: end 이란 단어가 있으면 이부분만 삭제하고 content로 사용
-    if(re.search(r"step::: end", content)):
+    # step::: end 이란 단어가 있으면 이부분만 삭제하고 content로 사용
+    if (re.search(r"step::: end", content)):
         content = re.sub(r"step::: end", "", content)
 
     llm_result = llm_result_match.group(1) if llm_result_match else content
@@ -297,3 +331,17 @@ def parse_llm_content(content):
         )
 
     return llm_result, setting, is_end_match
+
+
+def result_llm_content(content):
+    flow_evaluation = re.search(r"대화의\s*흐름\s*평가\s*[:：]*\s*:::\s*(.*?)\s*(?:\n|$)", content, re.DOTALL)
+    flow_explanation = re.search(r"대화의\s*흐름\s*설명\s*[:：]*\s*:::\s*(.*?)\s*(?:\n|$)", content, re.DOTALL)
+    response_tendency = re.search(r"대답\s*경향\s*성\s*[:：]*\s*:::\s*(.*?)\s*(?:\n|$)", content, re.DOTALL)
+    goal_achievement = re.search(r"대화\s*목표\s*달성도\s*[:：]*\s*:::\s*(.*?)\s*(?:\n|$)", content, re.DOTALL)
+
+    flow_evaluation = flow_evaluation.group(1) if flow_evaluation else ""
+    flow_explanation = flow_explanation.group(1) if flow_explanation else ""
+    response_tendency = response_tendency.group(1) if response_tendency else ""
+    goal_achievement = goal_achievement.group(1) if goal_achievement else ""
+
+    return flow_evaluation, flow_explanation, response_tendency, goal_achievement

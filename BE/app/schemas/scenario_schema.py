@@ -42,8 +42,11 @@ class ScenarioResultRequest(BaseModel):
 
 
 class ScenarioResultResponse(BaseModel):
-    resultId: str
+    resultId : str
     userId: str
-    resultImage: str
-    resultContent: str
+    flowEvaluation: str
+    flowExplanation: str
+    responseTendency: str
+    goalAchievement: str
     scenarios: List[dict]
+    resultImage: str

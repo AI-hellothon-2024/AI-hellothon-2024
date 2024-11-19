@@ -153,7 +153,7 @@ async def llm_result_create(before_scenario_content, user_id):
         f"대답경향성::: (평가내용)\n"
         f"대화목표달성도::: (대화에서 user가 어떤 목표를 달성했는가)\n\n"
         f"#Role\n"
-        f"- 심리학적 지식을 가지고 user의 answer를 *강하게 비판적*으로 작성해\n"
+        f"- 심리학적 지식을 가지고 user의 answer를 *냉정하게 비판적*으로 작성해\n"
         f"- user가 비속어를 사용했다면 평가는 bad야"
         f"#Order\n"
         f"- user의 대화를 평가해서 응답형식 맞춰 작성해줘."

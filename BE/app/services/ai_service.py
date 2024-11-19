@@ -112,12 +112,15 @@ async def image_create(content, gender, situation):
     logger.info("system_gender: " + system_gender)
 
     prompt = (
-        f"concept : {situation}\n"
-        f"대사 : {content}\n"
-        f"{system_gender}, *애니메이션캐릭터*, 2~30대, 성숙, 예쁨, 잘생김, assistant\n"
-        f"이미지에 text를 *절대* 포함하지 마십시오.\n"
-        f"concept, 대화를 기반으로 캐릭터의 대사, 자세, 표정을 상세히 담아 사실적인 스타일로 생성해주세요.\n"
+        f"A highly detailed illustration of a female anime character, age 20s-30s, with a mature and beautiful appearance, drawn in full body focus."
+        f"Concept: {situation}"
+        f"Dialogue: {content}"
+        f"{system_gender}, *anime character*, 20s-30s, mature, beautiful, handsome, assistant"
+        f"Do *not* include any text in the image."
+        f"Based on the concept and dialogue, create the character's pose, facial expression, and details in a realistic and elaborate style."
     )
+
+
 
     payload = {
         "prompt": prompt,

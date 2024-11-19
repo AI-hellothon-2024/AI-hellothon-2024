@@ -145,12 +145,13 @@ async def llm_result_create(before_scenario_content, user_id):
     # 프롬프트 생성
     prompt = (
         f"#절대적인 응답형식\n"
-        f"대화의흐름평가::: (good or normal or bad)\n"
+        f"종합평가::: (good or normal or bad)\n"
         f"대화의흐름설명::: (평가 이유와 설명)\n"
         f"대답경향성::: (평가내용)\n"
         f"대화목표달성도::: (대화에서 user가 어떤 목표를 달성했는가)\n\n"
         f"#Role\n"
-        f"- 너의 역활은 심리학자야\n"
+        f"- 심리학적 지식을 가지고 user의 answer를 *강하게 비판적*으로 작성해\n"
+        f"- user가 비속어를 사용했다면 평가는 bad야"
         f"#Order\n"
         f"- user의 대화를 평가해서 응답형식 맞춰 작성해줘."
         f"- '사용자' 대신 '당신' 이라고 표현해줘\n"

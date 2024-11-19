@@ -334,7 +334,7 @@ def parse_llm_content(content):
 
 
 def result_llm_content(content):
-    flow_evaluation = re.search(r"대화의\s*흐름\s*평가\s*[:：]*\s*:::\s*(.*?)\s*(?:\n|$)", content, re.DOTALL)
+    flow_evaluation = re.search(r"종합\s*평가\s*[:：]*\s*:::\s*(.*?)\s*(?:\n|$)", content, re.DOTALL)
     flow_explanation = re.search(r"대화의\s*흐름\s*설명\s*[:：]*\s*:::\s*(.*?)\s*(?:\n|$)", content, re.DOTALL)
     response_tendency = re.search(r"대답\s*경향\s*성\s*[:：]*\s*:::\s*(.*?)\s*(?:\n|$)", content, re.DOTALL)
     goal_achievement = re.search(r"대화\s*목표\s*달성도\s*[:：]*\s*:::\s*(.*?)\s*(?:\n|$)", content, re.DOTALL)

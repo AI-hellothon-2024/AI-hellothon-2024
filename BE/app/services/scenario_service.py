@@ -324,11 +324,11 @@ def parse_llm_content(content):
     setting = setting_match.group(1) if setting_match else "설정값 없음"
     is_end_match = "end" if is_end_match else ""
 
-    if not setting or not llm_result:
-        raise HTTPException(
-            status_code=500,
-            detail="LLM 정확한 응답값 생성에 실패했습니다. 다시 시도해주세요."
-        )
+    # if not setting:
+    #     raise HTTPException(
+    #         status_code=500,
+    #         detail="LLM 정확한 응답값 생성에 실패했습니다. 다시 시도해주세요."
+    #     )
 
     return llm_result, setting, is_end_match
 

@@ -282,6 +282,7 @@ async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResult
         "goalAchievement": goal_achievement,
         "scenarios": answered_scenarios,
         "resultImage": encode_image,
+        "create_date": settings.CURRENT_DATETIME,
     }
 
     result_id = await db["results"].insert_one(result_data)

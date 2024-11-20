@@ -107,7 +107,7 @@ const ChatInput = ({ userId, situation, username, job, gender }: Props) => {
   }
   return (
     <form
-      className="flex justify-between gap-2 relative pb-[env(safe-area-inset-bottom)]"
+      className="flex justify-between gap-2 relative mb-[env(safe-area-inset-bottom)]"
       onSubmit={handleSubmit(onSubmit)}
     >
       <Input

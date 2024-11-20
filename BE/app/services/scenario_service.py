@@ -55,7 +55,7 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "first_scenario_id": "",
     }
 
-    system_name = get_korean_name(request.userId)
+    system_name = await get_korean_name(request.userId, request.gender)
 
     user_result = await db["users"].insert_one(user_data)
     user_key = str(user_result.inserted_id)

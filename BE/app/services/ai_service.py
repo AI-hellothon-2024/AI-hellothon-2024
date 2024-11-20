@@ -118,8 +118,6 @@ async def image_create(content, gender, situation):
         f"Based on the concept and dialogue, create the character's pose, facial expression, and details in a realistic and elaborate style. plz hand detailed drawing."
     )
 
-
-
     payload = {
         "prompt": prompt,
         "style": "polaroid",
@@ -253,7 +251,11 @@ async def result_image_create(flow_evaluation, gender):
 async def get_korean_name(user_id, gender):
     url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
 
-    messages = [{"role": "system", "content": f"{gender}에 맞는 한국식 직급과 한국 이름을 생성해주세요.(예: 김철수 대리)"}]
+    prompt = (
+        f"{gender}에 맞는 한국식 직급과 한국 이름을 생성해주세요.(예: 김철수 대리)"
+    )
+
+    messages = [{"role": "system", "content": prompt}]
 
     payload = {
         "model": "helpy-pro",
@@ -269,6 +271,6 @@ async def get_korean_name(user_id, gender):
     response = await generate_request(url, payload, headers)
     if isinstance(response, dict):
         content = response.get("choices", [])[0].get("message", {}).get("content", "")
-        logger.info(f"한국식 이름 생성 응답값: {content}")
+        logger.info(f"name result 생성 응답값: {content}")
         return content
     return response

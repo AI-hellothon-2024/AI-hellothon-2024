@@ -25,7 +25,7 @@ const Situation = ({ onNext }: Props) => {
       className="flex flex-col justify-between h-full"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="flex flex-col gap-12">
+      <div className="flex flex-col gap-12 px-5">
         <div className="text-2xl">
           필요한 상황을
           <br />

@@ -25,7 +25,7 @@ const Gender = ({ onNext }: Props) => {
       className="flex flex-col justify-between h-full"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="flex flex-col gap-12">
+      <div className="flex flex-col gap-12 px-5">
         <div className="text-2xl">
           성별을
           <br />

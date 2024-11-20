@@ -22,7 +22,7 @@ const Done = ({ context }: Props) => {
   };
   return (
     <div className="flex justify-between flex-col h-full">
-      <div className="flex flex-col gap-14 items-center">
+      <div className="flex flex-col gap-14 items-center px-5">
         <div className="text-2xl">{SITUATIONS[context.situation]}</div>
         <div className="flex flex-col gap-4 w-full">
           {[

@@ -4,19 +4,32 @@ import { ComponentProps } from "react";
 import { useSendAnswer } from "@/api/useSendAnswer";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { SITUATIONS } from "@/lib/constants";
+import { SITUATIONS, JOBS, GENDER } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { useAtom } from "jotai";
+import { useScenario } from "@/api/useScenario";
 import { chatAtom } from "@/app/store/chatAtom";
 import Link from "next/link";
+import SendButton from "./SendButton";
 
 interface Props extends ComponentProps<"div"> {
   userId: string;
+  username: string;
+  job: keyof typeof JOBS;
+  gender: keyof typeof GENDER;
   situation: keyof typeof SITUATIONS;
+  disabled?: boolean;
 }
 
-const ChatInput = ({ userId, situation }: Props) => {
+const ChatInput = ({ userId, situation, username, job, gender }: Props) => {
   const [chats, setChats] = useAtom(chatAtom);
+  const { isLoading } = useScenario({
+    userId,
+    username,
+    job,
+    situation,
+    gender,
+  });
   const lastChat = chats.filter((chat) => chat.sender === "bot").at(-1);
   const {
     register,
@@ -94,20 +107,23 @@ const ChatInput = ({ userId, situation }: Props) => {
   }
   return (
     <form
-      className="flex justify-between gap-2"
+      className="flex justify-between gap-2 relative"
       onSubmit={handleSubmit(onSubmit)}
     >
       <Input
         {...register("answer", {
           required: true,
         })}
-        disabled={isPending}
+        disabled={isPending || isLoading}
         placeholder="답변을 입력해주세요."
-        className="backdrop-blur-sm rounded-full rounded-tr-none bg-[rgba(31,31,31,0.7)] py-3 h-auto px-5"
+        className="backdrop-blur-sm rounded-full rounded-tr-none bg-[rgba(31,31,31,0.7)] py-3 h-auto px-5 pr-14 disabled:cursor-not-allowed"
       />
-      <Button type="submit" disabled={!isValid || isPending} className="hidden">
-        전송
-      </Button>
+
+      <SendButton
+        type="submit"
+        disabled={!isValid || isPending}
+        className="absolute right-0 h-full disabled:opacity-50 disabled:cursor-not-allowed"
+      />
     </form>
   );
 };

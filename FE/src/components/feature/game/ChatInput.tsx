@@ -122,7 +122,7 @@ const ChatInput = ({ userId, situation, username, job, gender }: Props) => {
       <SendButton
         type="submit"
         disabled={!isValid || isPending}
-        className="absolute right-0 h-full disabled:opacity-50 disabled:cursor-not-allowed top-0"
+        className="absolute right-0 h-full disabled:opacity-50 disabled:cursor-not-allowed bottom-0"
       />
     </form>
   );

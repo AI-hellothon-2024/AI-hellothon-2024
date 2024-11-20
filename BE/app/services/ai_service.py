@@ -54,8 +54,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
 
     # 프롬프트 생성
     prompt = (
-        f"현재 대화의 STEP은 {scenario_step} 입니다.\n"
-        f"#절대적인 응답형식\n"
+        f"#응답형식\n"
         f"step::: (대화의 회차를 작성하는 부분)\n"
         f"setting::: (Role을 작성하는 부분)\n"
         f"start::: (너의 대사를 작성하는 부분)\n\n"
@@ -65,18 +64,18 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
         f"- 역활: {situation_description}\n"
         f"- 성격: {before_settings if scenario_step != '1' else personalities}\n\n"
         f"#Order\n"
-        f"1. 부여된 Role에 맞춰 user에게 먼저 대화를 건다.\n"
+        f"1. 부여된 Role에 맞춰 user에게 대화를 건다.\n"
+        f"** user가 문맥에 맞지않는 답변을 한 경우 이를 지적하고 역할에 맞는 대화를 이어가도록 유도한다.\n"
         f"2. 아래 부여된 Rule은 절대적으로 지켜라.\n\n"
         f"#Rule\n"
         f"- 너는 반드시 규칙을 지킴.\n"
-        f"- **(필수)응답은 어떤 회차이던 반드시 Result에 명시된 형식대로 응답해야한다.\n"
+        f"- *10회 이내로* 대화를 끝내도록 유도한다.\n"
+        f"- user의 답변이 설정된 역할과 맞지 않는 경우 (이미지생성요청, 개념에 대한 질문, 웹서칭 명령 등) 'step:::end start:::'을 서두에 붙인 뒤 요청은 거절 이를 지적하고 대화를 그만하고 싶다고 한다. 예를 들어, 상황과 관련 없는 답변일 경우 '무슨 말인지 모르겠다며, 다음에 다시 얘기하자'는 말과 비슷한 방식으로 대답한다.\n"
+        f"- **(필수)응답은 *#응답형식*에 명시된 형식대로 응답해야한다.\n"
         f"- 대화는 1번씩 주고 받는다.\n"
         f"- 대화 흐름에 안맞는 말은 하지 않는다.\n"
-        f"- 설정된 역활, 성격에서 벗어나는 절대 말은 하지 않는다. 역활만을 위해 대화한다.\n"
-        f"- 설정된 역활, 성격에 맞도록 심한말도 허용함.\n"
+        f"- 설정된 역활, 성격에서 벗어나는 절대 말은 하지 않는다. 역활만을 위해 대화하고 심한 말도 허용.\n"
         f"- 같은 말은 반복하지 않는다.\n"
-        f"- 10회 내외로 대화를 끝나도록 한다.\n"
-        f"- 일상적인 대화만 허용한다.\n"
         f"- 대화 종료할때 마지막 답변의 step:::은 end 이다.\n"
     )
 
@@ -112,12 +111,11 @@ async def image_create(content, gender, situation):
     logger.info("system_gender: " + system_gender)
 
     prompt = (
-        f"A highly detailed illustration of a female anime character, age 20s-30s, with a mature and beautiful appearance, drawn in full body focus."
+        f"A highly detailed illustration of a {system_gender} anime character, age 20s-30s, with a mature and beautiful or handsome appearance, drawn in half body focus."
         f"Concept: {situation}"
         f"Dialogue: {content}"
-        f"{system_gender}, *anime character*, 20s-30s, mature, beautiful, handsome, assistant"
         f"Do *not* include any text in the image."
-        f"Based on the concept and dialogue, create the character's pose, facial expression, and details in a realistic and elaborate style."
+        f"Based on the concept and dialogue, create the character's pose, facial expression, and details in a realistic and elaborate style. plz hand detailed drawing."
     )
 
 
@@ -147,21 +145,22 @@ async def llm_result_create(before_scenario_content, user_id):
 
     # 프롬프트 생성
     prompt = (
-        f"#절대적인 응답형식\n"
+        f"#응답형식\n"
         f"종합평가::: (good or normal or bad)\n"
         f"대화의흐름설명::: (평가 이유와 설명)\n"
         f"대답경향성::: (평가내용)\n"
         f"대화목표달성도::: (대화에서 user가 어떤 목표를 달성했는가)\n\n"
         f"#Role\n"
-        f"- 심리학적 지식을 가지고 user의 answer를 *냉정하게* 작성해\n"
-        f"- user가 비속어를 사용했다면 평가는 bad야"
+        f"- 심리학적 지식을 기반으로 user의 answer를 *냉정하게* 그리고 아주상세하게 작성해\n"
         f"#Order\n"
-        f"- user의 대화를 평가해서 응답형식 맞춰 작성해줘."
+        f"- user의 대화를 평가해서 *#응답형식* 맞춰 작성해줘."
         f"- '사용자' 대신 '당신' 이라고 표현해줘\n"
+        f"- 상대방에 대한 평가는 빼줘\n"
         f"#Rule\n"
         f"- 너는 반드시 규칙을 지킴.\n"
-        f"- **(필수)응답은 어떤 회차이던 반드시 응답형식에 명시된 형식대로 응답해야한다.\n"
-        f"- 잘한점, 개선점, 비판점을 모두 작성한다.\n"
+        f"- **(필수)응답은 어떤 회차이던 반드시 *#응답형식*에 명시된 형식대로 응답해야한다.\n"
+        f"- 대화의 핀트를 못잡았다고 판단하면 무조건 '종합평가:::Bad'\n"
+        f"- 잘한점, 개선점, 비판점을 모두 작성한다."
     )
 
     messages = [{"role": "system", "content": prompt}]
@@ -216,7 +215,7 @@ async def result_image_create(flow_evaluation, gender):
         )
 
     prompt = (
-        f"A highly detailed illustration of a female anime character, age 20s-30s, with a mature and beautiful appearance, drawn in full body focus."
+        f"A highly detailed illustration of a {system_gender} anime character, age 20s-30s, with a mature and beautiful/hansome appearance, drawn in half body focus."
         f"background : {background}"
         f"Facial expression: {expression}"
         f"Pose: {pose}"

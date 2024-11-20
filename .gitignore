@@ -13,6 +13,9 @@ BE/venv
 __pycache__/
 *.pyc
 
+# 백엔드 image 파일
+BE/images
+
 # dependencies
 /node_modules
 /.pnp

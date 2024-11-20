@@ -228,7 +228,8 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         "ip_address": client_request.client.host,
         "scenarioStep": str(next_step),
         "scenarioContent": llm_result,
-        "scenarioImage": encode_image
+        "scenarioImage": encode_image,
+        "settings": before_settings
     }
     next_scenario_insert = await db["scenarios"].insert_one(scenario_data)
     next_scenario_id = str(next_scenario_insert.inserted_id)
@@ -335,6 +336,8 @@ def parse_llm_content(content):
 
 
 def result_llm_content(content):
+    content = re.sub(r"혹시 다른 질문이나 도움이 필요하시면 언제든지 말씀해 주세요\.", "", content, flags=re.DOTALL)
+
     flow_evaluation = re.search(r"종합\s*평가\s*[:：]*\s*:::\s*(.*?)\s*(?:\n|$)", content, re.DOTALL)
     flow_explanation = re.search(r"대화의\s*흐름\s*설명\s*[:：]*\s*:::\s*(.*?)\s*(?:\n|$)", content, re.DOTALL)
     response_tendency = re.search(r"대답\s*경향\s*성\s*[:：]*\s*:::\s*(.*?)\s*(?:\n|$)", content, re.DOTALL)

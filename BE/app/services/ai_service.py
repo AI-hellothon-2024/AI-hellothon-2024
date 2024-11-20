@@ -251,8 +251,13 @@ async def result_image_create(flow_evaluation, gender):
 async def get_korean_name(user_id, gender):
     url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
 
+    system_gender = "male" if gender == "female" else "female"
+    logger.info("system_gender: " + system_gender)
+
     prompt = (
-        f"{gender}에 맞는 한국식 직급과 한국 이름을 생성해주세요.(예: 김철수 대리)"
+        f"{system_gender}에 맞는 한국식 직급과 한국 이름을 1개 생성해주세요.\n"
+        f"앞뒤 다 짜르고 다른 설명 등 아무것도 필요없고 아래 처럼'이름 직급' 1개만 출력해.\n"
+        f"예: 김철수 대리"
     )
 
     messages = [{"role": "system", "content": prompt}]

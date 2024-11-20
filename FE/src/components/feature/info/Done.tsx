@@ -52,7 +52,7 @@ const Done = ({ context }: Props) => {
 
       <Button
         onClick={handleStartGame}
-        className="rounded-2xl text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold"
+        className="rounded-2xl text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold mb-[env(safe-area-inset-bottom)]"
       >
         시작하기
       </Button>

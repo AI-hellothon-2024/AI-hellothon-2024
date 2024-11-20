@@ -60,7 +60,7 @@ const Situation = ({ onNext }: Props) => {
       <Button
         type="submit"
         disabled={!isValid}
-        className="rounded-2xl text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold"
+        className="rounded-2xl text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold mb-[env(safe-area-inset-bottom)]"
       >
         다음
       </Button>

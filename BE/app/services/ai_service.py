@@ -115,7 +115,7 @@ async def image_create(content, gender, situation):
         f"Concept: {situation}"
         f"Dialogue: {content}"
         f"Do *not* include any text in the image."
-        f"Based on the concept and dialogue, create the character's pose, facial expression, and details in a realistic and elaborate style. plz hand detailed drawing."
+        f"Based on the concept and dialogue, create the character's pose, facial expression, and details in a realistic and elaborate style."
     )
 
     payload = {
@@ -191,6 +191,8 @@ async def result_image_create(flow_evaluation, gender):
     system_gender = "male" if gender == "female" else "female"
     logger.info("system_gender: " + system_gender)
 
+    flow_evaluation = flow_evaluation.lower()
+
     if flow_evaluation.strip() == "bad":
         background = "very dark tone"
         expression = "contemptuous expression and angry"
@@ -213,19 +215,25 @@ async def result_image_create(flow_evaluation, gender):
         )
 
     prompt = (
-        f"A highly detailed illustration of a {system_gender} anime character, age 20s-30s, with a mature and beautiful/hansome appearance, drawn in half body focus."
-        f"background : {background}"
-        f"Facial expression: {expression}"
-        f"Pose: {pose}"
-        f"border : {border}"
-        f"Ensure the character is drawn in such a way that fills the entire frame without leaving empty spaces, while staying within the given borders."
-        f"Border decorations:"
-        f"  - Minimal: Basic straight lines with crude decoration elements to suggest simplicity."
-        f"  - Ordinary: Modestly decorated border, with some gentle curves or simple ornamental details."
-        f"  - Extremely fancy: Elaborate and intricate decorations with curves, multiple elements, and colors such as gold to make it feel luxurious."
-        f"Border: Draw a 20px border around all four sides of the image without using white for the border color."
-        f"The image should be designed as if it were part of a trading card, avoiding the look of a Polaroid or any kind of printed photograph."
-        f"There should be *absolutely no text* in the image, and all elements must adhere strictly to the descriptions provided."
+        f"A highly detailed illustration of a {system_gender} anime character, age 20s-30s, with a mature and beautiful/handsome appearance, drawn in full body focus. "
+        f"Ensure the character is drawn in such a way that fills the frame, but without making the composition feel "
+        f"overly cramped, allowing some breathing room around the character."
+        f"background: {background} "
+        f"Facial expression: {expression} "
+        f"Pose: {pose} "
+        f"decorations: {border} "
+        f"Border decorations: "
+        f"  - Minimal: Basic straight lines with crude decoration elements to suggest simplicity. "
+        f"  - Ordinary: Modestly decorated border, with some gentle curves or simple ornamental details. "
+        f"  - Extremely fancy: Elaborate and intricate decorations with curves, multiple elements, and colors such as "
+        f"gold to make it feel luxurious."
+        f"Do *not* include any text or a border in the image; just the character and decorations. "
+        f"The image should be designed as if it were part of a trading card, avoiding the look of a Polaroid or any "
+        f"kind of printed photograph."
+        f"Ensure that the character is centered and the composition does not feel too cramped, with enough space left "
+        f"around the character to achieve a balanced and appealing look."
+        f"There should be *absolutely no text* in the image, and all elements must adhere strictly to the "
+        f"descriptions provided."
     )
 
     payload = {
@@ -249,6 +257,7 @@ async def result_image_create(flow_evaluation, gender):
 
 
 async def get_korean_name(user_id, gender):
+    logger.info("한국 이름 생성 요청 ::::::::::::::::::::: ")
     url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
 
     system_gender = "male" if gender == "female" else "female"

@@ -34,7 +34,9 @@ const UserName = ({ onNext }: Props) => {
           className="!text-xl py-3 rounded-full text-center h-auto rounded-tr-none focus-visible:placeholder:text-transparent"
           {...register("username", {
             required: true,
+            maxLength: 10,
           })}
+          maxLength={10}
           placeholder="사용자 이름"
         />
       </div>

@@ -11,7 +11,7 @@ from app.schemas.scenario_schema import (
 )
 from bson import ObjectId
 from app.core.config import settings
-from app.services.ai_service import llm_scenario_create, image_create, llm_result_create, result_image_create
+from app.services.ai_service import llm_scenario_create, image_create, llm_result_create, result_image_create, get_korean_name
 
 db = get_database()
 
@@ -54,6 +54,9 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "ip_address": client_request.client.host,
         "first_scenario_id": "",
     }
+
+    system_name = get_korean_name(request.userId)
+
     user_result = await db["users"].insert_one(user_data)
     user_key = str(user_result.inserted_id)
 
@@ -87,6 +90,7 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "scenarioStep": "1",
         "scenarioContent": llm_result,
         "settings": setting,
+        "systemName": system_name,
         "scenarioImage": encode_image
     }
     log_data_without_image(scenario_data, context="create_scenario - Scenario Data")
@@ -101,6 +105,7 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
     response_data = {
         "scenarioId": scenario_id,
         "userId": request.userId,
+        "systemName": system_name,
         "scenarioStep": "1",
         "scenarioContent": llm_result,
         "scenarioImage": encode_image

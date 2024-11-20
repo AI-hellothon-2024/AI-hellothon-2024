@@ -248,3 +248,27 @@ async def result_image_create(flow_evaluation, gender):
     if isinstance(response, dict):
         return response.get("predictions", "Image generation failed")  # Return image URL or failure message
     return response
+
+
+async def get_korean_name(user_id, gender):
+    url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
+
+    messages = [{"role": "system", "content": f"{gender}에 맞는 한국식 직급과 한국 이름을 생성해주세요.(예: 김철수 대리)"}]
+
+    payload = {
+        "model": "helpy-pro",
+        "sess_id": user_id,
+        "messages": messages,
+    }
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "authorization": f"Bearer {settings.ML_API_KEY}"
+    }
+
+    response = await generate_request(url, payload, headers)
+    if isinstance(response, dict):
+        content = response.get("choices", [])[0].get("message", {}).get("content", "")
+        logger.info(f"한국식 이름 생성 응답값: {content}")
+        return content
+    return response

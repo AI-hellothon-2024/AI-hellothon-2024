@@ -15,6 +15,7 @@ class ScenarioCreateRequest(BaseModel):
 class ScenarioCreateResponse(BaseModel):
     scenarioId: str
     userId: str
+    systemName: str
     scenarioStep: str
     scenarioContent: str
     scenarioImage: str

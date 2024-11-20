@@ -10,6 +10,8 @@ class ScenarioCreateRequest(BaseModel):
     situation: str
     userName: str
     gender: str
+    systemName: str
+    personality: str
 
 
 class ScenarioCreateResponse(BaseModel):

@@ -55,7 +55,8 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "first_scenario_id": "",
     }
 
-    system_name = await get_korean_name(request.userId, request.gender)
+    system_name = request.systemName
+    # await get_korean_name(request.userId, request.gender)
 
     user_result = await db["users"].insert_one(user_data)
     user_key = str(user_result.inserted_id)
@@ -67,7 +68,9 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "",
         "1",
         request.userId,
-        "")
+        "",
+        request.personality
+    )
 
     llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)
     setting_match = re.search(r"setting:::\s*(.*?)\n", content, re.DOTALL)

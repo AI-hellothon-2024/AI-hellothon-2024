@@ -34,7 +34,7 @@ async def generate_request(url, payload, headers):
         return f"요청 실패: {response.status_code} - {response.text}"
 
 
-async def llm_scenario_create(job, situation, gender, before_scenario_content, scenario_step, user_id, before_settings):
+async def llm_scenario_create(job, situation, gender, before_scenario_content, scenario_step, user_id, before_settings, personalitie):
     url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
 
     logger.info("situation: " + situation)
@@ -44,10 +44,14 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
     logger.info("situation_description: " + situation_description)
 
     # 성격
-    random_number = random.randint(1, 100)
-    choose_personalities = await db["personalities"].find_one({"number": random_number})
-    personalities = choose_personalities['trait']
-    logger.info("personalities: " + personalities)
+    selected_personalities = await db["personalities"].find_one({"trait": {"$regex": personalitie, "$options": "i"}})
+    personalities = selected_personalities["trait"] if selected_personalities else ""
+    logger.info("personalities:::: " + personalities)
+    if personalities == "":
+        raise HTTPException(
+            status_code=400,
+            detail="성격 값이 잘못되었습니다ㅠㅠ 다시........"
+        )
 
     system_gender = "male" if gender == "female" else "female"
     logger.info("system_gender: " + system_gender)
@@ -70,7 +74,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
         f"#Rule\n"
         f"- 너는 반드시 규칙을 지킴.\n"
         f"- *10회 이내로* 대화를 끝내도록 유도한다.\n"
-        f"- user의 답변이 설정된 역할과 맞지 않는 경우 (이미지생성요청, 개념에 대한 질문, 웹서칭 명령 등) 'step:::end start:::'을 서두에 붙인 뒤 요청은 거절 이를 지적하고 대화를 그만하고 싶다고 한다. 예를 들어, 상황과 관련 없는 답변일 경우 '무슨 말인지 모르겠다며, 다음에 다시 얘기하자'는 말과 비슷한 방식으로 대답한다.\n"
+        f"- user의 답변이 설정된 역할과 맞지 않는 경우 (이미지생성요청, 개념에 대한 질문, 웹서칭 명령 등) 'step:::end start:::'을 가장 앞에 붙인 뒤 요청은 거절 이를 지적하고 대화를 그만하고 싶다고 한다. 예를 들어, 상황과 관련 없는 답변일 경우 '무슨 말인지 모르겠다며, 다음에 다시 얘기하자'는 말과 비슷한 방식으로 대답한다.\n"
         f"- **(필수)응답은 *#응답형식*에 명시된 형식대로 응답해야한다.\n"
         f"- 대화는 1번씩 주고 받는다.\n"
         f"- 대화 흐름에 안맞는 말은 하지 않는다.\n"
@@ -252,7 +256,7 @@ async def result_image_create(flow_evaluation, gender):
 
     response = await generate_request(url, payload, headers)
     if isinstance(response, dict):
-        return response.get("predictions", "Image generation failed")  # Return image URL or failure message
+        return response.get("predictions", "Image generation failed")
     return response
 
 
@@ -264,9 +268,8 @@ async def get_korean_name(user_id, gender):
     logger.info("system_gender: " + system_gender)
 
     prompt = (
-        f"{system_gender}에 맞는 한국식 직급과 한국 이름을 1개 생성해주세요.\n"
-        f"앞뒤 다 짜르고 다른 설명 등 아무것도 필요없고 아래 처럼'이름 직급' 1개만 출력해.\n"
-        f"예: 김철수 대리"
+        f"{system_gender}에 맞는 한국식 직급과 한국 이름을 1개 생성, 앞뒤 다 짜르고 다른 설명 등 아무것도 필요없고 아래 처럼'이름 직급' 1개만 출력해.\n"
+        f"(예)김철수 대리"
     )
 
     messages = [{"role": "system", "content": prompt}]

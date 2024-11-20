@@ -41,7 +41,7 @@ const UserName = ({ onNext }: Props) => {
       <Button
         type="submit"
         disabled={!isValid}
-        className="text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold rounded-2xl"
+        className="text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold rounded-2xl mb-[env(safe-area-inset-bottom)]"
       >
         다음
       </Button>

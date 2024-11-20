@@ -1,4 +1,4 @@
-import { useQuery, QueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { SITUATIONS, JOBS, GENDER } from "@/lib/constants";
 import type { IScenario } from "@/app/type/IScenario.interface";
 
@@ -53,25 +53,5 @@ export const useScenario = ({
     queryKey: ["posts", { userId }],
     queryFn: () => getScenario({ userId, username, job, situation, gender }),
     refetchInterval: 0,
-  });
-};
-export const prefetchScenario = ({
-  userId,
-  username,
-  job,
-  situation,
-  gender,
-  queryClient,
-}: {
-  userId: string;
-  username: string;
-  job: keyof typeof JOBS;
-  situation: keyof typeof SITUATIONS;
-  gender: keyof typeof GENDER;
-  queryClient: QueryClient;
-}) => {
-  return queryClient.prefetchQuery({
-    queryKey: ["posts", { userId }],
-    queryFn: () => getScenario({ userId, username, job, situation, gender }),
   });
 };

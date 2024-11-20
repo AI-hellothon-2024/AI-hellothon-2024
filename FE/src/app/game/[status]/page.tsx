@@ -5,7 +5,6 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
-import { prefetchScenario } from "@/api/useScenario";
 import LeaveDrawer from "@/components/feature/game/LeaveDrawer";
 import Background from "@/components/feature/game/Background";
 import Chats from "@/components/feature/game/Chats";
@@ -18,8 +17,8 @@ export const generateStaticParams = () => {
 
 const Page = async ({
   searchParams,
-  params: { status },
-}: {
+}: // params: { status },
+{
   params: {
     status: "ongoing" | "finished";
   };
@@ -32,14 +31,11 @@ const Page = async ({
   };
 }) => {
   const queryClient = new QueryClient();
-  if (status === "ongoing") {
-    await prefetchScenario({ ...searchParams, queryClient });
-  }
   return (
     <>
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <Background className="w-full bg-no-repeat bg-cover h-full bg-center grid grid-rows-2 flex-grow-0 min-h-0 justify-start">
-          <header className="flex items-center sticky top-0 left-0 self-start h-16 bg-dim-70">
+        <Background className="w-full bg-no-repeat bg-cover h-full bg-center grid grid-rows-2 min-h-0 justify-start grid-cols-1">
+          <header className="flex items-center sticky top-0 left-0 self-start h-16 bg-dim-70 w-full">
             <LeaveDrawer />
             <h1
               className="absolute left-1/2
@@ -49,7 +45,7 @@ const Page = async ({
               {SITUATIONS[searchParams.situation]}
             </h1>
           </header>
-          <div className="row-start-2 px-4 flex py-8 flex-col justify-end gap-8 max-h-full min-h-0 bg-gradient-to-b from-transparent to-[rgba(0,0,0,0.74)]">
+          <div className="row-start-2 px-4 flex py-8 flex-col justify-end gap-8 max-h-full min-h-0 bg-gradient-to-b from-transparent to-[rgba(0,0,0,0.74)] w-full">
             <Chats {...searchParams} />
             <ChatInput
               userId={searchParams.userId}

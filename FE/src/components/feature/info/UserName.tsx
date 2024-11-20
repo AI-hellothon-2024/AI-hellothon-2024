@@ -24,7 +24,7 @@ const UserName = ({ onNext }: Props) => {
       className="flex flex-col justify-between h-full"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="flex flex-col gap-12">
+      <div className="flex flex-col gap-12 px-5">
         <div className="text-2xl">
           사용자 이름을
           <br />
@@ -34,14 +34,16 @@ const UserName = ({ onNext }: Props) => {
           className="!text-xl py-3 rounded-full text-center h-auto rounded-tr-none focus-visible:placeholder:text-transparent"
           {...register("username", {
             required: true,
+            maxLength: 10,
           })}
+          maxLength={10}
           placeholder="사용자 이름"
         />
       </div>
       <Button
         type="submit"
         disabled={!isValid}
-        className="text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold rounded-2xl"
+        className="text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold rounded-2xl mb-[env(safe-area-inset-bottom)]"
       >
         다음
       </Button>

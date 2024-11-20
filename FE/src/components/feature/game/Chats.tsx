@@ -37,7 +37,7 @@ const Chats = ({ userId, username, job, situation, gender }: Props) => {
         },
       ]);
     }
-  }, [data, setChats]);
+  }, [data, setChats, setScenario]);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -55,7 +55,7 @@ const Chats = ({ userId, username, job, situation, gender }: Props) => {
           <MotionDiv
             key={chat.id}
             className={twMerge(
-              "p-6 w-full text-[#F8F8F8] rounded-b-2xl backdrop-blur-sm",
+              "p-6 w-full text-[#F8F8F8] rounded-b-2xl backdrop-blur-sm break-all",
               twJoin(
                 chat.sender === "bot"
                   ? "bg-[rgba(0,0,0,0.8)] rounded-tr-2xl"
@@ -75,21 +75,6 @@ const Chats = ({ userId, username, job, situation, gender }: Props) => {
           </MotionDiv>
         </>
       ))}
-      {/* <MotionDiv
-        className={twMerge(
-          "p-6 w-full text-[#F8F8F8] rounded-b-2xl backdrop-blur-sm bg-[rgba(0,0,0,0.8)] rounded-tr-2xl"
-        )}
-        initial={{
-          opacity: 0,
-          y: -10,
-        }}
-        whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
-        viewport={{
-          once: true,
-        }}
-      >
-        <Loading />
-      </MotionDiv> */}
     </div>
   );
 };

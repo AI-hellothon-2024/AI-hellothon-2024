@@ -18,7 +18,7 @@ const LeaveDrawer = () => {
       <DrawerTrigger>
         <ChevronLeft className="ml-2" />
       </DrawerTrigger>
-      <DrawerContent className="max-w-[600px] mx-auto bg-[#1E1E1E] border-[#1E1E1E]">
+      <DrawerContent className="max-w-[600px] mx-auto bg-[#1E1E1E] border-[#1E1E1E] pb-[env(safe-area-inset-bottom)]">
         <DrawerHeader>
           <DrawerClose className="absolute top-8 right-8">
             <X color="#DEDEDE" />

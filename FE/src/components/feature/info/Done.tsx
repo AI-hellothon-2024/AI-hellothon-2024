@@ -22,7 +22,7 @@ const Done = ({ context }: Props) => {
   };
   return (
     <div className="flex justify-between flex-col h-full">
-      <div className="flex flex-col gap-14 items-center">
+      <div className="flex flex-col gap-14 items-center px-5">
         <div className="text-2xl">{SITUATIONS[context.situation]}</div>
         <div className="flex flex-col gap-4 w-full">
           {[
@@ -52,7 +52,7 @@ const Done = ({ context }: Props) => {
 
       <Button
         onClick={handleStartGame}
-        className="rounded-2xl text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold"
+        className="rounded-2xl text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold mb-[env(safe-area-inset-bottom)]"
       >
         시작하기
       </Button>

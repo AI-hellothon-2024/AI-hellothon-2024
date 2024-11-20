@@ -48,6 +48,7 @@ const Page = async ({
           <div className="row-start-2 px-4 flex py-8 flex-col justify-end gap-8 max-h-full min-h-0 bg-gradient-to-b from-transparent to-[rgba(0,0,0,0.74)] w-full">
             <Chats {...searchParams} />
             <ChatInput
+              {...searchParams}
               userId={searchParams.userId}
               situation={searchParams.situation}
             />

@@ -51,7 +51,7 @@ body {
     --ring: 25 100% 63%;
   }
   .dark {
-    --background: 240 10% 3.9%;
+    --background: #1e1e1e;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
@@ -83,6 +83,6 @@ body {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-[#1E1E1E] text-[#F8F8F8];
   }
 }

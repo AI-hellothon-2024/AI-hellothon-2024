@@ -14,7 +14,7 @@ from app.schemas.scenario_schema import (
     ScenarioResultRequest, ScenarioResultResponse
 )
 from app.services.ai_service import llm_scenario_create, image_create, llm_result_create, result_image_create, \
-    toxic_check
+    toxic_check, one_line_result
 
 db = get_database()
 
@@ -298,15 +298,18 @@ async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResult
 
     encode_image = await result_image_create(flow_evaluation, gender)
 
+    one_line = await one_line_result(flow_explanation, response_tendency, goal_achievement, request.userId)
+
     result_data = {
         "userId": request.userId,
         "flowEvaluation": flow_evaluation,
+        "oneLineResult": one_line,
         "flowExplanation": flow_explanation,
         "responseTendency": response_tendency,
         "goalAchievement": goal_achievement,
         "scenarios": answered_scenarios,
-        "resultImage": encode_image,
         "create_date": settings.CURRENT_DATETIME,
+        "resultImage": encode_image,
     }
 
     result_id = await db["results"].insert_one(result_data)

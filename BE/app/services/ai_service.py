@@ -331,6 +331,41 @@ async def toxic_check(content):
         return f"응답 처리 중 에러 발생: {str(e)}"
 
 
+async def one_line_result(result_one, result_two, result_three, user_id):
+    url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
+
+    # 프롬프트 생성
+    prompt = (
+        f"{result_one}\n"
+        f"{result_two}\n"
+        f"{result_three}\n"
+        f"이걸 구어체로 MZ하게 한줄 요약 해줘\n"
+    )
+
+    messages = [{"role": "system", "content": prompt}]
+
+    payload = {
+        "model": "helpy-pro",
+        "sess_id": user_id,
+        "messages": messages,
+    }
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "authorization": f"Bearer {settings.ML_API_KEY}"
+    }
+
+    response = await generate_request(url, payload, headers)
+    if isinstance(response, dict):
+        content = response.get("choices", [])[0].get("message", {}).get("content", "")
+        logger.info(f"LLM result 생성 응답값: {content}")
+        return content
+    return response
+
+
+
+
+
 async def test_image_create():
     url = "https://api-cloud-function.elice.io/0133c2f7-9f3f-44b6-a3d6-c24ba8ef4510/generate"
 

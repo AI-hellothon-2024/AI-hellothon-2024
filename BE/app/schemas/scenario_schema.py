@@ -45,8 +45,9 @@ class ScenarioResultRequest(BaseModel):
 
 
 class ScenarioResultResponse(BaseModel):
-    resultId : str
+    resultId: str
     userId: str
+    oneLineResult: str
     flowEvaluation: str
     flowExplanation: str
     responseTendency: str

@@ -11,11 +11,13 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, X } from "lucide-react";
 import { chatAtom } from "@/app/store/chatAtom";
 import { useSetAtom } from "jotai";
 
 const LeaveDrawer = () => {
+  const queryClient = useQueryClient();
   const setChats = useSetAtom(chatAtom);
   return (
     <Drawer>
@@ -47,6 +49,9 @@ const LeaveDrawer = () => {
             className="rounded-full py-3 h-auto font-semibold text-lg bg-[#424242] text-mute-20 hover:bg-[#494949]"
             onClick={() => {
               setChats([]);
+              queryClient.invalidateQueries({
+                queryKey: ["scenario"],
+              });
             }}
           >
             <Link href={"/"}>종료하기</Link>

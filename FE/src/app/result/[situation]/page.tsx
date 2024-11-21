@@ -10,6 +10,7 @@ import { chatAtom } from "@/app/store/chatAtom";
 import { SITUATIONS } from "@/lib/constants";
 import Loading from "@/components/common/Loading";
 import Stars from "@/components/feature/result/Stars";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Page = ({
   params: { situation },
@@ -23,6 +24,7 @@ const Page = ({
     personality: string;
   };
 }) => {
+  const queryClient = useQueryClient();
   const setChats = useSetAtom(chatAtom);
   const userId = useAtomValue(userIdAtom);
   const scenarioIds = useAtomValue(scenarioAtom);
@@ -77,6 +79,9 @@ const Page = ({
           className="rounded-2xl text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold  w-full"
           onClick={() => {
             setChats([]);
+            queryClient.invalidateQueries({
+              queryKey: ["scenario"],
+            });
           }}
         >
           <Link href="/">처음으로</Link>

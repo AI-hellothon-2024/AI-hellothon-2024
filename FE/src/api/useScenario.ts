@@ -60,7 +60,7 @@ export const useScenario = ({
   personality: string;
 }) => {
   return useQuery<IScenario>({
-    queryKey: ["posts", { userId }],
+    queryKey: ["scenario", { userId }],
     queryFn: () =>
       getScenario({
         userId,

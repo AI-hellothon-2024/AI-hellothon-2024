@@ -128,6 +128,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
     gender = ""
 
     is_toxic = await toxic_check(request.answer)
+    logger.info(f"[save_answer] Toxic check result::::::::::::::::::::::::::::::::::::: {is_toxic}")
 
     answered_scenario_data = await db["scenarios"].find_one({"_id": ObjectId(request.answerScenarioId)})
     if answered_scenario_data is None:
@@ -192,7 +193,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
 
         create_before_script = create_script(answered_scenarios)
 
-        if is_toxic == 'True':
+        if is_toxic:
             llm_result = "사용자의 입력이 부적절하여 대화를 종료합니다."
             next_step = "end"
         else:
@@ -236,7 +237,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             before_personality
         )
 
-        if is_toxic == 'True':
+        if is_toxic:
             llm_result = "사용자의 입력이 부적절하여 대화를 종료합니다."
             next_step = "end"
         else:

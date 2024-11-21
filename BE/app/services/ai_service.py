@@ -34,7 +34,8 @@ async def generate_request(url, payload, headers):
         return f"요청 실패: {response.status_code} - {response.text}"
 
 
-async def llm_scenario_create(job, situation, gender, before_scenario_content, scenario_step, user_id, before_settings, personalitie):
+async def llm_scenario_create(job, situation, gender, before_scenario_content, scenario_step, user_id, before_settings,
+                              personalitie):
     url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
 
     logger.info("situation: " + situation)
@@ -125,7 +126,7 @@ async def image_create(content, gender, situation):
     payload = {
         "prompt": prompt,
         "style": "polaroid",
-        "width": 512,
+        "width": 472,
         "height": 1024,
         "steps": 4,
         "num": 1
@@ -243,7 +244,7 @@ async def result_image_create(flow_evaluation, gender):
     payload = {
         "prompt": prompt,
         "style": "polaroid",
-        "width": 512,
+        "width": 1024,
         "height": 1024,
         "steps": 4,
         "num": 1
@@ -303,7 +304,7 @@ async def toxic_check(content):
     }
 
     # 요청 데이터
-    payload = {"content": content}
+    payload = {"text": [content]}
 
     try:
         # POST 요청

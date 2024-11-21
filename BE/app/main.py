@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.api.endpoints import scenario, ws_stt, collection
+from app.api.endpoints import scenario, ws_stt, collection, test
 from app.core.config import settings
 from app.db.session import get_database
 
@@ -130,6 +130,7 @@ app.mount("/static", StaticFiles(directory=os.path.join(os.getcwd(), "images")),
 app.include_router(scenario.router, prefix="/scenario", tags=["scenario"])
 app.include_router(ws_stt.router, prefix="/ws", tags=["websocket"])
 app.include_router(collection.router, prefix="/collection", tags=["collection"])
+app.include_router(test.router, prefix="/test", tags=["test"])
 
 
 @app.get("/")

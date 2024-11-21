@@ -1,3 +1,6 @@
+import base64
+import os
+
 import requests
 import logging
 import random
@@ -244,8 +247,8 @@ async def result_image_create(flow_evaluation, gender):
     payload = {
         "prompt": prompt,
         "style": "polaroid",
-        "width": 1024,
-        "height": 1024,
+        "width": 512,
+        "height": 512,
         "steps": 4,
         "num": 1
     }
@@ -326,3 +329,82 @@ async def toxic_check(content):
             return f"요청 실패: {response.status_code} - {response.text}"
     except Exception as e:
         return f"응답 처리 중 에러 발생: {str(e)}"
+
+
+async def test_image_create():
+    url = "https://api-cloud-function.elice.io/0133c2f7-9f3f-44b6-a3d6-c24ba8ef4510/generate"
+
+    # 분위기를 랜덤하게 설정하기 위한 키워드 리스트
+    moods = [
+        "cheerful and lively",           # 활기차고 즐거운
+        "calm and focused",              # 차분하고 집중된
+        "funny and lighthearted",        # 재미있고 유쾌한
+        "friendly and casual",           # 친근하고 캐주얼한
+        "professional and inspiring",    # 전문적이고 영감을 주는
+        "relaxed and collaborative",     # 편안하고 협력적인
+        "exciting and adventurous",      # 신나고 모험적인
+        "serene and peaceful",           # 고요하고 평화로운
+        "energetic and productive",      # 에너제틱하고 생산적인
+        "motivational and supportive",   # 동기부여적이고 지지적인
+        "creative and innovative",       # 창의적이고 혁신적인
+        "playful and humorous",          # 장난스럽고 유머러스한
+        "intense and competitive",       # 강렬하고 경쟁적인
+        "welcoming and inclusive",       # 환영받는 느낌이고 포용적인
+        "dynamic and fast-paced",        # 역동적이고 빠른 템포의
+        "optimistic and forward-thinking", # 낙관적이고 미래지향적인
+        "warm and comforting",           # 따뜻하고 위로가 되는
+        "structured and organized",      # 구조적이고 조직적인
+        "casual and spontaneous",        # 캐주얼하고 즉흥적인
+        "focused and determined"         # 집중적이고 결단력 있는
+    ]
+
+    # 분위기와 인원 수 무작위 선택
+    selected_mood = random.choice(moods)
+    num_characters = random.randint(1, 10)  # 1명에서 10명 사이
+
+    # 프롬프트 생성
+    prompt = (
+        f"Concept: * {selected_mood} company life *."
+        f"Illustrate {num_characters} anime character(s) in their 20s-30s, *pretty, hansome* interacting in an office setting. "
+        f"The characters should be engaged in a {selected_mood} interaction, "
+        f"showing mature, stylish, and approachable appearances, with visible signs of their current mood. "
+        f"The background should depict a vibrant and modern office environment that matches the mood. "
+        f"Do *not* include empty spaces or text in the image. Focus on creating a detailed and dynamic composition."
+    )
+
+    payload = {
+        "prompt": prompt,
+        "style": "polaroid",
+        "width": 512,
+        "height": 1024,
+        "steps": 4,
+        "num": 1
+    }
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "Authorization": f"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzExNTc2NzMsIm5iZiI6MTczMTE1NzY3Mywia2V5X2lkIjoiYzg2MWQ2MDQtN2I4Yi00MGNjLThkZmYtZGZlYzFhNDA1ZDRhIn0.ZIcLVo0ZGBIYjdNuRM20auHli6Msql36Cptzc1qBs50"
+    }
+
+    # Call the generate request
+    response_data = await generate_request(url, payload, headers)
+
+    # Extract the encoded image from the predictions key
+    if isinstance(response_data, dict) and "predictions" in response_data:
+        encoded_image = response_data["predictions"]
+    else:
+        raise ValueError("Response does not contain 'predictions'")
+
+    # Create image directory
+    image_dir = os.path.join(os.getcwd(), "images")
+    os.makedirs(image_dir, exist_ok=True)
+
+    # Generate a random file name for the image
+    scenario_id = random.randint(1, 1000000)
+    image_path = os.path.join(image_dir, f"{scenario_id}.png")
+
+    # Write the decoded image to a file
+    with open(image_path, "wb") as image_file:
+        image_file.write(base64.b64decode(encoded_image))
+
+    return image_path

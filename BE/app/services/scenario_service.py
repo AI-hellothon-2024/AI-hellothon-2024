@@ -28,11 +28,6 @@ def log_data_without_image(data: dict, context: str = "General"):
     logger.info(f"[{context}] Data (without encode_image): {data_without_image}")
 
 
-def load_sample_image():
-    with open("app/sample-image.png", "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
-
-
 def save_image(encoded_image: str, scenario_id: str, is_result=False):
     image_dir = os.path.join(os.getcwd(), "images")
     os.makedirs(image_dir, exist_ok=True)
@@ -256,7 +251,8 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         "scenarioStep": str(next_step),
         "scenarioContent": llm_result,
         "scenarioImage": encode_image,
-        "settings": before_settings
+        "settings": before_settings,
+        "personality": before_personality
     }
     next_scenario_insert = await db["scenarios"].insert_one(scenario_data)
     next_scenario_id = str(next_scenario_insert.inserted_id)

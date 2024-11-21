@@ -127,7 +127,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
     job = ""
     gender = ""
 
-    is_toxic = toxic_check(request.answer)
+    is_toxic = await toxic_check(request.answer)
 
     answered_scenario_data = await db["scenarios"].find_one({"_id": ObjectId(request.answerScenarioId)})
     if answered_scenario_data is None:

@@ -1,20 +1,69 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { MotionDiv } from "@/components/motion";
+import { useState } from "react";
+import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Home() {
+  const [bg, setBg] = useState(1);
   return (
-    <div className="flex flex-col h-full gap-10">
-      <div className="flex-grow flex flex-col gap-8">
-        <div className="flex-grow flex-center">hero</div>
-        <Button asChild>
-          <Link href={"/info"} className="mx-10 bg-gray-200 py-6 text-center">
-            플레이
-          </Link>
-        </Button>
+    <MotionDiv
+      className="w-full h-dvh overflow-y-clip bg-center grid grid-rows-5"
+      style={{
+        backgroundImage: `url(/splash/${bg}.png)`,
+      }}
+    >
+      <div className="row-span-2">
+        <div className="self-start mb-4 flex mx-auto backdrop-blur rounded-full border w-fit px-5 py-2 font-bold items-center text-primary gap-2">
+          <Button
+            variant={"secondary"}
+            className="rounded-full aspect-square"
+            onClick={() => {
+              setBg((prev) => (prev === 26 ? 1 : prev + 1));
+            }}
+          >
+            <ChevronLeft />
+          </Button>
+          <Button
+            variant={"secondary"}
+            className="rounded-full aspect-square"
+            onClick={() => {
+              setBg((prev) => (prev === 1 ? 26 : prev - 1));
+            }}
+          >
+            <ChevronRight />
+          </Button>
+        </div>
       </div>
-      <footer className="flex self-center w-full py-4 justify-center">
-        footer
-      </footer>
-    </div>
+
+      <div className="bg-gradient-to-b to-[#1E1E1E] from-transparent h-full px-9 flex flex-col justify-end pb-[74px] gap-14 row-span-3 via-60% via-[#1E1E1E]">
+        <div className="flex flex-col items-center gap-3">
+          <div>사회초년생을 위한</div>
+          <Image src="/logo.png" width={129} height={40} alt="AImigo" />
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <Button
+            asChild
+            className="rounded-full rounded-tr-none text-xl font-medium h-auto py-3 text-[#F8F8F8]"
+          >
+            <Link href={"/info"}>시작하기</Link>
+          </Button>
+          <Button
+            // asChild
+            variant={"outline"}
+            disabled
+            className="rounded-full rounded-tr-none text-xl font-medium h-auto py-3 text-white bg-transparent border-current disabled:opacity-40"
+          >
+            {/* <Link href={"/info"}> */}
+            임시
+            {/* </Link> */}
+          </Button>
+        </div>
+      </div>
+    </MotionDiv>
   );
 }

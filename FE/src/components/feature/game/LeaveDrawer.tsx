@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import {
   Drawer,
@@ -11,8 +12,11 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, X } from "lucide-react";
+import { chatAtom } from "@/app/store/chatAtom";
+import { useSetAtom } from "jotai";
 
 const LeaveDrawer = () => {
+  const setChats = useSetAtom(chatAtom);
   return (
     <Drawer>
       <DrawerTrigger>
@@ -41,6 +45,9 @@ const LeaveDrawer = () => {
           <Button
             asChild
             className="rounded-full py-3 h-auto font-semibold text-lg bg-[#424242] text-mute-20 hover:bg-[#494949]"
+            onClick={() => {
+              setChats([]);
+            }}
           >
             <Link href={"/"}>종료하기</Link>
           </Button>

@@ -49,9 +49,7 @@ const LeaveDrawer = () => {
             className="rounded-full py-3 h-auto font-semibold text-lg bg-[#424242] text-mute-20 hover:bg-[#494949]"
             onClick={() => {
               setChats([]);
-              queryClient.invalidateQueries({
-                queryKey: ["scenario"],
-              });
+              queryClient.clear();
             }}
           >
             <Link href={"/"}>종료하기</Link>

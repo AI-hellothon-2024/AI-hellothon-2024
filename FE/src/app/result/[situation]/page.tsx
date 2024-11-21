@@ -79,9 +79,7 @@ const Page = ({
           className="rounded-2xl text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold  w-full"
           onClick={() => {
             setChats([]);
-            queryClient.invalidateQueries({
-              queryKey: ["scenario"],
-            });
+            queryClient.clear();
           }}
         >
           <Link href="/">처음으로</Link>

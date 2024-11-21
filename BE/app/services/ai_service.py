@@ -199,7 +199,8 @@ async def result_image_create(flow_evaluation, gender):
     system_gender = "male" if gender == "female" else "female"
     logger.info("system_gender: " + system_gender)
 
-    flow_evaluation = flow_evaluation.lower()
+    flow_evaluation = flow_evaluation.lower().strip()
+    logger.info("flow_evaluation:::::::::::::::::::::::: " + flow_evaluation)
 
     if flow_evaluation.strip() == "bad":
         background = "very dark tone"

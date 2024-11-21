@@ -2,8 +2,8 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Aimigo",
-    description: "Aimigo web app",
+    name: "AImigo",
+    description: "IT업계 신입사원을 위한 시뮬레이션",
     display: "standalone",
     start_url: "/",
     theme_color: "#000000",

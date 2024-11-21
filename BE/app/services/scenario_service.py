@@ -13,7 +13,8 @@ from app.schemas.scenario_schema import (
     ScenarioAnswerRequest, ScenarioAnswerResponse,
     ScenarioResultRequest, ScenarioResultResponse
 )
-from app.services.ai_service import llm_scenario_create, image_create, llm_result_create, result_image_create, toxic_check
+from app.services.ai_service import llm_scenario_create, image_create, llm_result_create, result_image_create, \
+    toxic_check
 
 db = get_database()
 
@@ -367,7 +368,7 @@ def result_llm_content(content):
     response_tendency = re.search(r"대답\s*경향\s*성\s*[:：]*\s*:::\s*(.*?)\s*(?:\n|$)", content, re.DOTALL)
     goal_achievement = re.search(r"대화\s*목표\s*달성도\s*[:：]*\s*:::\s*(.*?)\s*(?:\n|$)", content, re.DOTALL)
 
-    flow_evaluation = flow_evaluation.group(1) if flow_evaluation else ""
+    flow_evaluation = flow_evaluation.group(1).lower() if flow_evaluation else ""
     flow_explanation = flow_explanation.group(1) if flow_explanation else ""
     response_tendency = response_tendency.group(1) if response_tendency else ""
     goal_achievement = goal_achievement.group(1) if goal_achievement else ""

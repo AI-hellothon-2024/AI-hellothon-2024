@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouter } from "next/navigation";
-import { useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { SITUATIONS, GENDER, JOBS } from "@/lib/constants";
 import { userIdAtom } from "@/app/store/userAtom";
 import { Button } from "@/components/ui/button";
@@ -11,12 +11,20 @@ interface Props {
 }
 
 const Done = ({ context }: Props) => {
-  const setUserId = useSetAtom(userIdAtom);
+  const [userId, setUserId] = useAtom(userIdAtom);
   const router = useRouter();
 
   const handleStartGame = () => {
-    const userId = window.crypto.randomUUID();
-    setUserId(userId);
+    if (!userId) {
+      const userId = window.crypto.randomUUID();
+      setUserId(userId);
+      const qs = new URLSearchParams({
+        ...context,
+        userId,
+      });
+      router.push(`/game/ongoing?${qs}`);
+      return;
+    }
     const qs = new URLSearchParams({
       ...context,
       userId,

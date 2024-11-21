@@ -1,14 +1,16 @@
 "use client";
 
-import { ComponentProps, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
+import type { Dispatch, SetStateAction, ComponentProps } from "react";
 import { twMerge, twJoin } from "tailwind-merge";
-import { SITUATIONS, JOBS, GENDER } from "@/lib/constants";
+import { SITUATIONS, JOBS, GENDER, PERSONALITIES } from "@/lib/constants";
 import { useScenario } from "@/api/useScenario";
 import { MotionDiv } from "@/components/motion";
 import { useAtom, useSetAtom } from "jotai";
 import { chatAtom } from "@/app/store/chatAtom";
 import { scenarioAtom } from "@/app/store/scenarioAtom";
-import Loading from "./Loading";
+import ChatLoading from "./ChatLoading";
+import Loading from "@/components/common/Loading";
 
 interface Props extends ComponentProps<"div"> {
   userId: string;
@@ -16,10 +18,30 @@ interface Props extends ComponentProps<"div"> {
   job: keyof typeof JOBS;
   situation: keyof typeof SITUATIONS;
   gender: keyof typeof GENDER;
+  setHasScroll: Dispatch<SetStateAction<boolean>>;
+  systemName: string;
+  personality: string;
 }
-const Chats = ({ userId, username, job, situation, gender }: Props) => {
+const Chats = ({
+  userId,
+  username,
+  job,
+  situation,
+  gender,
+  setHasScroll,
+  systemName,
+  personality,
+}: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { data } = useScenario({ userId, username, job, situation, gender });
+  const { data, isLoading } = useScenario({
+    userId,
+    username,
+    job,
+    situation,
+    gender,
+    systemName,
+    personality,
+  });
   const [chats, setChats] = useAtom(chatAtom);
   const setScenario = useSetAtom(scenarioAtom);
 
@@ -42,9 +64,22 @@ const Chats = ({ userId, username, job, situation, gender }: Props) => {
   useEffect(() => {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+      setHasScroll(scrollTop + clientHeight < scrollHeight);
     }
-  }, [chats]);
+  }, [chats, setHasScroll]);
 
+  if (isLoading) {
+    return (
+      <div className="fixed top-0 left-0 w-dvw h-dvh flex justify-center backdrop-blur-lg text-[#F8F8F8] items-center z-10 text-2xl font-semibold">
+        <div className="flex flex-col items-center">
+          <Loading />
+          <div>{systemName}</div>
+          <div>{PERSONALITIES[personality as keyof typeof PERSONALITIES]}</div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div
       className="flex flex-col overflow-y-auto gap-2 scroll-smooth"
@@ -71,7 +106,7 @@ const Chats = ({ userId, username, job, situation, gender }: Props) => {
               once: true,
             }}
           >
-            {chat.loading ? <Loading /> : chat.message}
+            {chat.loading ? <ChatLoading /> : chat.message}
           </MotionDiv>
         </>
       ))}

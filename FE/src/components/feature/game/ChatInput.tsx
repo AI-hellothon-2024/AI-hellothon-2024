@@ -19,9 +19,19 @@ interface Props extends ComponentProps<"div"> {
   gender: keyof typeof GENDER;
   situation: keyof typeof SITUATIONS;
   disabled?: boolean;
+  systemName: string;
+  personality: string;
 }
 
-const ChatInput = ({ userId, situation, username, job, gender }: Props) => {
+const ChatInput = ({
+  userId,
+  situation,
+  username,
+  job,
+  gender,
+  systemName,
+  personality,
+}: Props) => {
   const [chats, setChats] = useAtom(chatAtom);
   const { isLoading } = useScenario({
     userId,
@@ -29,6 +39,8 @@ const ChatInput = ({ userId, situation, username, job, gender }: Props) => {
     job,
     situation,
     gender,
+    systemName,
+    personality,
   });
   const lastChat = chats.filter((chat) => chat.sender === "bot").at(-1);
   const {

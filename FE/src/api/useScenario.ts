@@ -8,12 +8,16 @@ const getScenario = async ({
   job,
   situation,
   gender,
+  systemName,
+  personality,
 }: {
   userId: string;
   username: string;
   job: keyof typeof JOBS;
   situation: keyof typeof SITUATIONS;
   gender: keyof typeof GENDER;
+  systemName: string;
+  personality: string;
 }): Promise<IScenario> => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/scenario`, {
     method: "POST",
@@ -26,6 +30,8 @@ const getScenario = async ({
       job,
       situation,
       gender,
+      systemName,
+      personality,
     }),
   });
 
@@ -41,6 +47,8 @@ export const useScenario = ({
   job,
   situation,
   gender,
+  systemName,
+  personality,
 }: // select,
 {
   userId: string;
@@ -48,10 +56,21 @@ export const useScenario = ({
   job: keyof typeof JOBS;
   situation: keyof typeof SITUATIONS;
   gender: keyof typeof GENDER;
+  systemName: string;
+  personality: string;
 }) => {
   return useQuery<IScenario>({
     queryKey: ["posts", { userId }],
-    queryFn: () => getScenario({ userId, username, job, situation, gender }),
+    queryFn: () =>
+      getScenario({
+        userId,
+        username,
+        job,
+        situation,
+        gender,
+        systemName,
+        personality,
+      }),
     refetchInterval: 0,
   });
 };

@@ -23,7 +23,7 @@ app = FastAPI(title="AI헬로우톤^ㅡ^", description="API Documentation", vers
 db = get_database()
 
 # Add CORS middleware to handle OPTIONS requests
-app.add_middleware(
+app.add_middleware(  # type: ignore
     CORSMiddleware,
     allow_origins=["*"],  # 허용할 Origin을 설정 (예: ["https://example.com"])
     allow_methods=["GET", "POST", "OPTIONS"],  # 허용할 HTTP 메서드 (GET, POST, OPTIONS 등)

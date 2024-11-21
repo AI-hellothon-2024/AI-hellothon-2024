@@ -11,7 +11,7 @@ export default function Home() {
   const [bg, setBg] = useState(1);
   return (
     <MotionDiv
-      className="w-full h-dvh overflow-y-clip bg-center grid grid-rows-5"
+      className="w-full h-dvh overflow-y-clip bg-center grid grid-rows-5 transition-all"
       style={{
         backgroundImage: `url(/splash/${bg}.png)`,
       }}
@@ -41,8 +41,18 @@ export default function Home() {
 
       <div className="bg-gradient-to-b to-[#1E1E1E] from-transparent h-full px-9 flex flex-col justify-end pb-[74px] gap-14 row-span-3 via-60% via-[#1E1E1E]">
         <div className="flex flex-col items-center gap-3">
-          <div>사회초년생을 위한</div>
-          <Image src="/logo.png" width={129} height={40} alt="AImigo" />
+          <MotionDiv
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+          >
+            사회초년생을 위한
+          </MotionDiv>
+          <MotionDiv
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+          >
+            <Image src="/logo.png" width={129} height={40} alt="AImigo" />
+          </MotionDiv>
         </div>
 
         <div className="flex flex-col gap-4">

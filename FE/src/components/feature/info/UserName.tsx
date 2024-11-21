@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import type { InfoForm } from "./Form";
 import { useForm } from "react-hook-form";
+import { twJoin, twMerge } from "tailwind-merge";
 
 interface Props {
   onNext: (username: string) => void;
@@ -10,7 +11,7 @@ interface Props {
 const UserName = ({ onNext }: Props) => {
   const {
     register,
-    formState: { isValid },
+    formState: { isValid, errors },
     handleSubmit,
   } = useForm<Pick<InfoForm, "username">>({
     mode: "all",
@@ -30,15 +31,33 @@ const UserName = ({ onNext }: Props) => {
           <br />
           입력해주세요.
         </div>
-        <Input
-          className="!text-xl py-3 rounded-full text-center h-auto rounded-tr-none focus-visible:placeholder:text-transparent"
-          {...register("username", {
-            required: true,
-            maxLength: 10,
-          })}
-          maxLength={10}
-          placeholder="사용자 이름"
-        />
+        <div className="flex flex-col gap-3">
+          <Input
+            className={twMerge(
+              "!text-xl py-3 rounded-full text-center h-auto rounded-tr-none focus-visible:placeholder:text-transparent",
+              twJoin(
+                errors.username && "focus-visible:ring-red-500 border-red-950"
+              )
+            )}
+            {...register("username", {
+              required: true,
+              maxLength: {
+                value: 10,
+                message: "10자 이하로 입력해주세요.",
+              },
+            })}
+            maxLength={10 + 1}
+            placeholder="사용자 이름"
+          />
+          <span
+            className={twMerge(
+              "text-sm opacity-0 transition-opacity text-red-500 self-end",
+              twJoin(errors.username && "opacity-100")
+            )}
+          >
+            {errors.username?.message}
+          </span>
+        </div>
       </div>
       <Button
         type="submit"

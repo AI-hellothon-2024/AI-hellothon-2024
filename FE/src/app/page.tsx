@@ -11,7 +11,7 @@ export default function Home() {
   const [bg, setBg] = useState(1);
   return (
     <MotionDiv
-      className="w-full h-dvh overflow-y-clip bg-center grid grid-rows-5 transition-all"
+      className="w-full h-dvh overflow-y-clip bg-center grid grid-rows-5 transition-all bg-cover bg-no-repeat"
       style={{
         backgroundImage: `url(/splash/${bg}.png)`,
       }}

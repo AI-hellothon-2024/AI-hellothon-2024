@@ -38,7 +38,7 @@ const Page = ({
     <div className="flex flex-col text-[#F8F8F8] items-center">
       {data && (
         <div
-          className="w-dvw aspect-square"
+          className="w-full aspect-square"
           style={{
             backgroundImage: `url('data:image/png;base64,${data?.resultImage}')`,
             backgroundSize: "cover",

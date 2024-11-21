@@ -1,17 +1,19 @@
-import logging
 import base64
+import logging
 import os
 import re
+
+from bson import ObjectId
 from fastapi import Request, HTTPException
+
+from app.core.config import settings
 from app.db.session import get_database
 from app.schemas.scenario_schema import (
     ScenarioCreateRequest, ScenarioCreateResponse,
     ScenarioAnswerRequest, ScenarioAnswerResponse,
     ScenarioResultRequest, ScenarioResultResponse
 )
-from bson import ObjectId
-from app.core.config import settings
-from app.services.ai_service import llm_scenario_create, image_create, llm_result_create, result_image_create, get_korean_name
+from app.services.ai_service import llm_scenario_create, image_create, llm_result_create, result_image_create
 
 db = get_database()
 
@@ -94,6 +96,7 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "scenarioContent": llm_result,
         "settings": setting,
         "systemName": system_name,
+        "personality": request.personality,
         "scenarioImage": encode_image
     }
     log_data_without_image(scenario_data, context="create_scenario - Scenario Data")
@@ -145,9 +148,10 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
     answered_scenarios = []
     before_situation = ""
     before_settings = ""
+    before_personality = ""
 
     async def process_previous_scenarios(prev_scenarios, answered_scenario_data):
-        nonlocal before_setting, job, gender, before_situation, before_settings
+        nonlocal before_setting, job, gender, before_situation, before_settings, before_personality
 
         for scenario in prev_scenarios:
             answer = await db["answers"].find_one({"answeredScenarioId": str(scenario["_id"])})
@@ -160,6 +164,8 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
 
             if scenario["scenarioStep"] == "1":
                 before_setting = scenario["settings"]
+                before_personality = scenario["personality"]
+
                 user_data = await db["users"].find_one({"first_scenario_id": str(scenario["_id"])})
                 job = user_data.get("job", "")
                 gender = user_data.get("gender", "")
@@ -186,7 +192,8 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         create_before_script = create_script(answered_scenarios)
 
         content = await llm_scenario_create(
-            job, before_situation, gender, create_before_script, next_step, request.userId, before_setting
+            job, before_situation, gender, create_before_script, next_step, request.userId, before_setting,
+            before_personality
         )
 
         llm_result, setting, is_end_match = parse_llm_content(content)
@@ -209,6 +216,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         gender = user_data.get("gender", "")
         before_situation = user_data.get("situation", "")
         before_settings = answered_scenario_data["settings"]
+        before_personality = answered_scenario_data["personality"]
 
         create_before_script = create_script(answered_scenarios)
 
@@ -219,7 +227,8 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             create_before_script,
             next_step,
             request.userId,
-            answered_scenario_data.get("settings", "")
+            answered_scenario_data.get("settings", ""),
+            before_personality
         )
 
         llm_result, setting, is_end_match = parse_llm_content(content)

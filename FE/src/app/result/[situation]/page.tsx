@@ -38,7 +38,9 @@ const Page = ({
       )}
       <div className="flex flex-col px-8 items-center">
         <div className="mt-9">
-          {data && <Stars flowEvaluation={data.flowEvaluation} />}
+          {data?.flowEvaluation && (
+            <Stars flowEvaluation={data.flowEvaluation} />
+          )}
         </div>
         <div className="flex flex-col items-center gap-4 mt-[50px]">
           <div className="font-semibold text-2xl">{SITUATIONS[situation]}</div>

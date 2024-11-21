@@ -36,7 +36,7 @@ const item: Variants = {
   show: { opacity: 1 },
 };
 const Stars = ({ flowEvaluation }: { flowEvaluation: string }) => {
-  switch (flowEvaluation) {
+  switch (flowEvaluation.toLowerCase()) {
     case "bad":
       return (
         <MotionDiv

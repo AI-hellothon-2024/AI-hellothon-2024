@@ -192,7 +192,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
 
         create_before_script = create_script(answered_scenarios)
 
-        if is_toxic:
+        if is_toxic == 'True':
             llm_result = "사용자의 입력이 부적절하여 대화를 종료합니다."
             next_step = "end"
         else:
@@ -236,7 +236,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             before_personality
         )
 
-        if is_toxic:
+        if is_toxic == 'True':
             llm_result = "사용자의 입력이 부적절하여 대화를 종료합니다."
             next_step = "end"
         else:

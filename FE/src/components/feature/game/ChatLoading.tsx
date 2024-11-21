@@ -23,7 +23,7 @@ const Icon = ({ className, ...props }: SVGMotionProps<SVGElement>) => {
     </MotionSVG>
   );
 };
-const Loading = () => {
+const ChatLoading = () => {
   return (
     <div className="flex gap-2 justify-center min-g-6 items-center">
       <Icon
@@ -48,4 +48,4 @@ const Loading = () => {
   );
 };
 
-export default Loading;
+export default ChatLoading;

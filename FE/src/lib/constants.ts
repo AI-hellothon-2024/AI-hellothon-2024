@@ -14,3 +14,7 @@ export const GENDER = {
   male: "남성",
   female: "여성",
 } as const;
+
+export const PERSONALITIES = {
+  Adventurous: "모험심이 강한",
+} as const;

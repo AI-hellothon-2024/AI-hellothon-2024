@@ -1,4 +1,3 @@
-import React from "react";
 import { SITUATIONS, JOBS, GENDER } from "@/lib/constants";
 import {
   HydrationBoundary,
@@ -7,8 +6,7 @@ import {
 } from "@tanstack/react-query";
 import LeaveDrawer from "@/components/feature/game/LeaveDrawer";
 import Background from "@/components/feature/game/Background";
-import Chats from "@/components/feature/game/Chats";
-import ChatInput from "@/components/feature/game/ChatInput";
+import Content from "./Content";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => {
@@ -45,14 +43,7 @@ const Page = async ({
               {SITUATIONS[searchParams.situation]}
             </h1>
           </header>
-          <div className="row-start-2 px-4 flex py-8 flex-col justify-end gap-8 max-h-full min-h-0 bg-gradient-to-b from-transparent to-[rgba(0,0,0,0.74)] w-full">
-            <Chats {...searchParams} />
-            <ChatInput
-              {...searchParams}
-              userId={searchParams.userId}
-              situation={searchParams.situation}
-            />
-          </div>
+          <Content {...searchParams} />
         </Background>
       </HydrationBoundary>
     </>

@@ -113,7 +113,11 @@ const ChatInput = ({
         className="rounded text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold"
         asChild
       >
-        <Link href={`/result/${situation}`}>결과보기</Link>
+        <Link
+          href={`/result/${situation}?systemName=${systemName}&personality=${personality}`}
+        >
+          결과보기
+        </Link>
       </Button>
     );
   }

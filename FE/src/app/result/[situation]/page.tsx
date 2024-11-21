@@ -12,9 +12,14 @@ import Stars from "@/components/feature/result/Stars";
 
 const Page = ({
   params: { situation },
+  searchParams: { systemName, personality },
 }: {
   params: {
     situation: keyof typeof SITUATIONS;
+  };
+  searchParams: {
+    systemName: string;
+    personality: string;
   };
 }) => {
   const userId = useAtomValue(userIdAtom);
@@ -44,9 +49,9 @@ const Page = ({
         </div>
         <div className="flex flex-col items-center gap-4 mt-[50px]">
           <div className="font-semibold text-2xl">{SITUATIONS[situation]}</div>
-          <div className="font-semibold text-2xl">이름</div>
+          <div className="font-semibold text-2xl">{systemName}</div>
           <div className="border border-current rounded-full px-[60px] py-3 text-lg">
-            성격
+            {personality}
           </div>
         </div>
         <div className="mt-[106px] flex flex-col gap-11">

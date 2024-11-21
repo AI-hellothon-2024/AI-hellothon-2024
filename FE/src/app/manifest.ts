@@ -6,8 +6,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "IT업계 신입사원을 위한 시뮬레이션",
     display: "standalone",
     start_url: "/",
-    theme_color: "#000000",
-    background_color: "#FF8C42",
+    theme_color: "#1E1E1E",
+    background_color: "#1E1E1E",
     icons: [
       {
         src: "icons/icon-96.png",

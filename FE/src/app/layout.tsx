@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: "IT업계 신입사원을 위한 시뮬레이션",
 };
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#1E1E1E",
   viewportFit: "cover",
 };
 

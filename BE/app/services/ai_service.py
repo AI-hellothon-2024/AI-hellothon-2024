@@ -340,6 +340,7 @@ async def one_line_result(result_one, result_two, result_three, user_id):
         f"{result_two}\n"
         f"{result_three}\n"
         f"이걸 구어체로 MZ하게 한줄 요약 해줘\n"
+        f"*다른말은 보내지말고* 딱 한줄대사만 해"
     )
 
     messages = [{"role": "system", "content": prompt}]

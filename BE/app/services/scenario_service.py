@@ -270,6 +270,28 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
 
 
 async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResultResponse:
+    existing_result = await db["results"].find_one({
+        "userId": request.userId,
+        "scenarioIds": {"$all": request.scenarioIds},
+        "$and": [
+            {"flowEvaluation": {"$regex": "error", "$options": "i"}},
+            {"oneLineResult": {"$regex": "error", "$options": "i"}},
+            {"flowExplanation": {"$regex": "error", "$options": "i"}},
+            {"responseTendency": {"$regex": "error", "$options": "i"}},
+            {"goalAchievement": {"$regex": "error", "$options": "i"}},
+            {"flowEvaluation": {"$ne": ""}},
+            {"oneLineResult": {"$ne": ""}},
+            {"flowExplanation": {"$ne": ""}},
+            {"responseTendency": {"$ne": ""}},
+            {"goalAchievement": {"$ne": ""}},
+        ],
+    })
+
+    if existing_result:
+        existing_result["resultId"] = str(existing_result["_id"])
+        del existing_result["_id"]
+        return ScenarioResultResponse(**existing_result)
+
     gender = ""
 
     object_ids = [ObjectId(scenario_id) for scenario_id in request.scenarioIds]
@@ -310,6 +332,7 @@ async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResult
         "scenarios": answered_scenarios,
         "create_date": settings.CURRENT_DATETIME,
         "resultImage": encode_image,
+        "scenarioIds": request.scenarioIds
     }
 
     result_id = await db["results"].insert_one(result_data)

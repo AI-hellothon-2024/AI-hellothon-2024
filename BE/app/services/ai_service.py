@@ -153,7 +153,7 @@ async def llm_result_create(before_scenario_content, user_id):
         f"대답경향성::: (평가내용)\n"
         f"대화목표달성도::: (대화에서 user가 어떤 목표를 달성했는가)\n\n"
         f"#Role\n"
-        f"- 심리학적 지식을 기반으로 user의 answer를 *냉정하게* 그리고 아주상세하게 작성해\n"
+        f"- 심리학적 지식을 기반으로 user의 answer를 *냉정하게* 그리고 상세하게 *레포트형식*으로 작성해\n"
         f"#Order\n"
         f"- user의 대화를 평가해서 *#응답형식* 맞춰 작성해줘."
         f"- '사용자' 대신 '당신' 이라고 표현해줘\n"
@@ -291,3 +291,37 @@ async def get_korean_name(user_id, gender):
         logger.info(f"name result 생성 응답값: {content}")
         return content
     return response
+
+
+async def toxic_check(content):
+    url = "https://api-cloud-function.elice.io/cf3b3742-4bf5-433b-9042-bc8c563c25cc/predict"
+
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "Authorization": f"Bearer {settings.ML_API_KEY}"
+    }
+
+    # 요청 데이터
+    payload = {"content": content}
+
+    try:
+        # POST 요청
+        response = requests.post(url, headers=headers, json=payload)
+
+        # 응답 성공 여부 확인
+        if response.status_code == 200:
+            result = response.json()
+            if isinstance(result, list) and result:  # 응답이 리스트이고 비어 있지 않을 때
+                first_item = result[0]
+                is_toxic = first_item.get("is_toxic", False)
+                score = first_item.get("score", 0)
+
+                # 조건 확인
+                if is_toxic and score >= 0.8:
+                    return True
+            return False
+        else:
+            return f"요청 실패: {response.status_code} - {response.text}"
+    except Exception as e:
+        return f"응답 처리 중 에러 발생: {str(e)}"

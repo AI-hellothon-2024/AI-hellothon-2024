@@ -13,7 +13,7 @@ from app.schemas.scenario_schema import (
     ScenarioAnswerRequest, ScenarioAnswerResponse,
     ScenarioResultRequest, ScenarioResultResponse
 )
-from app.services.ai_service import llm_scenario_create, image_create, llm_result_create, result_image_create
+from app.services.ai_service import llm_scenario_create, image_create, llm_result_create, result_image_create, toxic_check
 
 db = get_database()
 
@@ -126,7 +126,8 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
     before_setting = ""
     job = ""
     gender = ""
-    before_image = ""
+
+    is_toxic = toxic_check(request.answer)
 
     answered_scenario_data = await db["scenarios"].find_one({"_id": ObjectId(request.answerScenarioId)})
     if answered_scenario_data is None:
@@ -191,15 +192,19 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
 
         create_before_script = create_script(answered_scenarios)
 
-        content = await llm_scenario_create(
-            job, before_situation, gender, create_before_script, next_step, request.userId, before_setting,
-            before_personality
-        )
-
-        llm_result, setting, is_end_match = parse_llm_content(content)
-
-        if is_end_match == "end":
+        if is_toxic:
+            llm_result = "사용자의 입력이 부적절하여 대화를 종료합니다."
             next_step = "end"
+        else:
+            content = await llm_scenario_create(
+                job, before_situation, gender, create_before_script, next_step, request.userId, before_setting,
+                before_personality
+            )
+
+            llm_result, setting, is_end_match = parse_llm_content(content)
+
+            if is_end_match == "end":
+                next_step = "end"
 
     else:
         # 첫번째 시나리오에 대한 응답
@@ -231,10 +236,13 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             before_personality
         )
 
-        llm_result, setting, is_end_match = parse_llm_content(content)
-
-        if is_end_match == "end":
+        if is_toxic:
+            llm_result = "사용자의 입력이 부적절하여 대화를 종료합니다."
             next_step = "end"
+        else:
+            llm_result, setting, is_end_match = parse_llm_content(content)
+            if is_end_match == "end":
+                next_step = "end"
 
     encode_image = await image_create(llm_result, gender, before_settings)
 

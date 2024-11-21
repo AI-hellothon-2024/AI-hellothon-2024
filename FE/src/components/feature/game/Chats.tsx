@@ -72,7 +72,7 @@ const Chats = ({
   if (isLoading) {
     return (
       <div className="fixed top-0 left-0 w-dvw h-dvh flex justify-center backdrop-blur text-[#F8F8F8] items-center z-10 text-2xl font-semibold">
-        <div className="flex flex-col items-center gap-14">
+        <div className="flex flex-col items-center gap-14 -translate-y-2">
           <Loading />
           <div className="flex flex-col items-center mt-2">
             <div>{systemName}님과의</div>
@@ -96,7 +96,7 @@ const Chats = ({
         <MotionDiv
           key={chat.id}
           className={twMerge(
-            "p-6 w-full text-[#F8F8F8] rounded-b-2xl backdrop-blur-sm break-all",
+            "p-6 w-full text-[#F8F8F8] rounded-b-2xl backdrop-blur-sm break-all whitespace-break-spaces",
             twJoin(
               chat.sender === "bot"
                 ? "bg-[rgba(0,0,0,0.8)] rounded-tr-2xl"

@@ -1,6 +1,7 @@
 "use client";
 
-import { ComponentProps } from "react";
+import { ChangeEvent, ComponentProps } from "react";
+import TextareaAutosize from "react-textarea-autosize";
 import { useSendAnswer } from "@/api/useSendAnswer";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { useScenario } from "@/api/useScenario";
 import { chatAtom } from "@/app/store/chatAtom";
 import Link from "next/link";
 import SendButton from "./SendButton";
+import { cn } from "@/lib/utils";
 
 interface Props extends ComponentProps<"div"> {
   userId: string;
@@ -126,14 +128,30 @@ const ChatInput = ({
       className="flex justify-between gap-2 relative mb-[env(safe-area-inset-bottom)]"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <Input
+      <TextareaAutosize
+        className={cn(
+          "flex w-full  border border-input text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 md:text-sm backdrop-blur-sm bg-[rgba(31,31,31,0.7)] py-3 h-auto px-5 pr-14 disabled:cursor-not-allowed rounded-[28px] rounded-tr-none resize-none leading-none"
+        )}
+        disabled={isPending || isLoading}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit(onSubmit)();
+          }
+        }}
+        placeholder="답변을 입력해주세요."
+        {...register("answer", {
+          required: true,
+        })}
+      />
+      {/* <Input
         {...register("answer", {
           required: true,
         })}
         disabled={isPending || isLoading}
         placeholder="답변을 입력해주세요."
         className="backdrop-blur-sm rounded-full rounded-tr-none bg-[rgba(31,31,31,0.7)] py-3 h-auto px-5 pr-14 disabled:cursor-not-allowed"
-      />
+      /> */}
 
       <SendButton
         type="submit"

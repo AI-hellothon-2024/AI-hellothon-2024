@@ -3,7 +3,10 @@ import { twMerge } from "tailwind-merge";
 
 const SendButton = ({ className, ...props }: ComponentProps<"button">) => {
   return (
-    <button className={twMerge("px-4", className)} {...props}>
+    <button
+      className={twMerge("px-4 flex items-end py-3", className)}
+      {...props}
+    >
       <svg
         width="24"
         height="24"

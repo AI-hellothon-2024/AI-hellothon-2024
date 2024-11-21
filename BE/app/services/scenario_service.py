@@ -271,20 +271,22 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
 
 async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResultResponse:
     existing_result = await db["results"].find_one({
-        "userId": request.userId,
+        # "userId": request.userId,
         "scenarioIds": {"$all": request.scenarioIds},
-        "$and": [
-            {"flowEvaluation": {"$regex": "error", "$options": "i"}},
-            {"oneLineResult": {"$regex": "error", "$options": "i"}},
-            {"flowExplanation": {"$regex": "error", "$options": "i"}},
-            {"responseTendency": {"$regex": "error", "$options": "i"}},
-            {"goalAchievement": {"$regex": "error", "$options": "i"}},
-            {"flowEvaluation": {"$ne": ""}},
-            {"oneLineResult": {"$ne": ""}},
-            {"flowExplanation": {"$ne": ""}},
-            {"responseTendency": {"$ne": ""}},
-            {"goalAchievement": {"$ne": ""}},
-        ],
+        # "$and": [
+        #     {"flowEvaluation": {"$regex": "error", "$options": "i"}},
+        #     {"oneLineResult": {"$regex": "error", "$options": "i"}},
+        #     {"flowExplanation": {"$regex": "error", "$options": "i"}},
+        #     {"responseTendency": {"$regex": "error", "$options": "i"}},
+        #     {"goalAchievement": {"$regex": "error", "$options": "i"}},
+        #     {"resultImage": {"$regex": "error", "$options": "i"}},
+        #     {"flowEvaluation": {"$ne": ""}},
+        #     {"oneLineResult": {"$ne": ""}},
+        #     {"flowExplanation": {"$ne": ""}},
+        #     {"responseTendency": {"$ne": ""}},
+        #     {"goalAchievement": {"$ne": ""}},
+        #     {"resultImage": {"$ne": ""}},
+        # ],
     })
 
     if existing_result:

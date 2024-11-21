@@ -3,9 +3,10 @@ import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useResult } from "@/api/useResult";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { userIdAtom } from "@/app/store/userAtom";
 import { scenarioAtom } from "@/app/store/scenarioAtom";
+import { chatAtom } from "@/app/store/chatAtom";
 import { SITUATIONS } from "@/lib/constants";
 import Loading from "@/components/common/Loading";
 import Stars from "@/components/feature/result/Stars";
@@ -22,6 +23,7 @@ const Page = ({
     personality: string;
   };
 }) => {
+  const setChats = useSetAtom(chatAtom);
   const userId = useAtomValue(userIdAtom);
   const scenarioIds = useAtomValue(scenarioAtom);
   const { data, isLoading } = useResult({ userId, scenarioIds });
@@ -73,6 +75,9 @@ const Page = ({
         <Button
           asChild
           className="rounded-2xl text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold  w-full"
+          onClick={() => {
+            setChats([]);
+          }}
         >
           <Link href="/">처음으로</Link>
         </Button>

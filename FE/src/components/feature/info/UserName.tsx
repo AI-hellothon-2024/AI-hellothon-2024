@@ -34,9 +34,10 @@ const UserName = ({ onNext }: Props) => {
         <div className="flex flex-col gap-3">
           <Input
             className={twMerge(
-              "!text-xl py-3 rounded-full text-center h-auto rounded-tr-none focus-visible:placeholder:text-transparent",
+              "!text-xl py-3 rounded-full text-center h-auto rounded-tr-none focus-visible:placeholder:text-transparent border-[#737373]",
               twJoin(
-                errors.username && "focus-visible:ring-red-500 border-red-950"
+                errors.username?.message &&
+                  "focus-visible:ring-red-500 border-red-500"
               )
             )}
             {...register("username", {

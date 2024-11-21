@@ -10,7 +10,7 @@ interface Props extends PropsWithChildren {
 const Layout = ({ children, params }: Props) => {
   return (
     <>
-      <header>{SITUATIONS[params.situation]}</header>
+      {/* <header className="w-dvw ">{SITUATIONS[params.situation]}</header> */}
       {children}
     </>
   );

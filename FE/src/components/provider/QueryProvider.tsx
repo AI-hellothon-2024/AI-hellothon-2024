@@ -39,7 +39,7 @@ export default function QueryProvider({
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      {window.location.protocol === "http:" && (
+      {typeof window !== undefined && window.location.protocol === "http:" && (
         <ReactQueryDevtools initialIsOpen={false} />
       )}
     </QueryClientProvider>

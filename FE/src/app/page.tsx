@@ -6,6 +6,7 @@ import { MotionDiv } from "@/components/motion";
 import { useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import GalleryButton from "@/components/feature/main/GalleryButton";
 
 export default function Home() {
   const [bg, setBg] = useState(1);
@@ -63,16 +64,7 @@ export default function Home() {
           >
             <Link href={"/info"}>시작하기</Link>
           </Button>
-          <Button
-            // asChild
-            variant={"outline"}
-            disabled
-            className="rounded-full rounded-tr-none text-xl font-medium h-auto py-3 text-white bg-transparent border-current disabled:opacity-40"
-          >
-            {/* <Link href={"/info"}> */}
-            임시
-            {/* </Link> */}
-          </Button>
+          <GalleryButton />
         </div>
       </div>
     </MotionDiv>

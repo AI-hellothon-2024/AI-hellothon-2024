@@ -344,6 +344,20 @@ async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResult
     return ScenarioResultResponse(**result_data)
 
 
+async def get_scenario_results_by_id(scenario_id: str) -> ScenarioResultResponse:
+    result_data = await db["results"].find_one({"_id": ObjectId(scenario_id)})
+
+    if not result_data:
+        raise ValueError("결과를 찾을 수 없습니다.")
+
+    if result_data:
+        result_data["resultId"] = str(result_data["_id"])
+        del result_data["_id"]
+        return ScenarioResultResponse(**result_data)
+
+    return ScenarioResultResponse(**result_data)
+
+
 def create_script(answered_scenarios):
     # answered_scenarios를 scenarioStep 기준으로 정렬
     sorted_scenarios = sorted(answered_scenarios,

@@ -153,11 +153,11 @@ async def llm_result_create(before_scenario_content, user_id):
     prompt = (
         f"#응답형식\n"
         f"종합평가::: (good or normal or bad)\n"
-        f"대화의흐름설명::: (평가 이유와 설명)\n"
+        f"대화의흐름설명::: (user의 answer가 어떤 부분이 잘못되었는지 설명하고 잘되는 예시도 들어서 설명)\n"
         f"대답경향성::: (평가내용)\n"
         f"대화목표달성도::: (대화에서 user가 어떤 목표를 달성했는가)\n\n"
         f"#Role\n"
-        f"- 심리학적 지식을 기반으로 user의 answer를 *냉정하게* 그리고 상세하게 *레포트형식*으로 작성해\n"
+        f"- 심리학적 지식을 기반으로 user의 answer를 (assistant는 필요없음) *냉정하게* 그리고 상세하게 *레포트형식*으로 작성해\n"
         f"#Order\n"
         f"- user의 대화를 평가해서 *#응답형식* 맞춰 작성해줘."
         f"- '사용자' 대신 '당신' 이라고 표현해줘\n"
@@ -165,8 +165,8 @@ async def llm_result_create(before_scenario_content, user_id):
         f"#Rule\n"
         f"- 너는 반드시 규칙을 지킴.\n"
         f"- **(필수)응답은 어떤 회차이던 반드시 *#응답형식*에 명시된 형식대로 응답해야한다.\n"
-        f"- 대화의 핀트를 못잡았다고 판단하면 무조건 '종합평가:::Bad'\n"
-        f"- 잘한점, 개선점, 비판점을 모두 작성한다."
+        # f"- 대화의 핀트를 못잡았다고 판단하면 무조건 '종합평가:::Bad'\n"
+        # f"- 잘한점, 개선점, 비판점을 모두 작성한다."
     )
 
     messages = [{"role": "system", "content": prompt}]

@@ -7,8 +7,9 @@ from app.schemas.scenario_schema import (
     ScenarioResultRequest, ScenarioResultResponse
 )
 from app.services.scenario_service import (
-    create_scenario, save_answer, get_scenario_results
+    create_scenario, save_answer, get_scenario_results, get_scenario_results_by_id
 )
+from fastapi import Query
 
 router = APIRouter()
 
@@ -50,3 +51,19 @@ async def answer_scenario_endpoint(request: ScenarioAnswerRequest, client_reques
 async def result_scenario_endpoint(request: ScenarioResultRequest):
     result = await get_scenario_results(request)
     return result
+
+@router.get("/result", response_model=ScenarioResultResponse)
+async def get_result_by_id(result_id: str = Query(..., alias="resultId")):
+    try:
+        result = await get_scenario_results_by_id(result_id)
+        return result
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"결과를 찾을 수 없습니다: {str(e)}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"결과 조회 오류: {str(e)}"
+        )

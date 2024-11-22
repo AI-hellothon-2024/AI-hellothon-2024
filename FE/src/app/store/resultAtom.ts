@@ -3,7 +3,7 @@ import { atomWithStorage } from "jotai/utils";
 
 interface ResultDto {
   userId: string;
-  scenarioIds: string[];
+  resultId: string;
 }
 
 export const resultAtom = atomWithStorage<ResultDto[]>("result", []);

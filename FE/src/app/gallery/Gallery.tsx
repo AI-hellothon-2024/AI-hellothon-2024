@@ -4,7 +4,7 @@ import { useAtomValue } from "jotai";
 import { userIdAtom } from "@/app/store/userAtom";
 import { useCollection } from "@/api/useCollection";
 import Link from "next/link";
-import { SITUATIONS } from "@/lib/constants";
+import { SITUATIONS, PERSONALITIES } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 import { MiniStars } from "@/components/feature/result/Stars";
 import { ChevronLeft } from "lucide-react";
@@ -32,7 +32,7 @@ const Gallery = () => {
           </h1>
         </div>
       </header>
-      <div className="flex flex-col px-4">
+      <div className="flex flex-col px-4 gap-9">
         {data
           ? Object.entries(groupBy(data.result, (data) => data.situation)).map(
               ([situation, results]) => (
@@ -72,11 +72,11 @@ const Gallery = () => {
                         </div>
                         <div className="flex flex-col p-1.5 gap-1">
                           <span className="text-[#D0D0D0] font-light text-xs">
-                            {result.personality || "지나치게 말수가 적은"}
+                            {PERSONALITIES[result.personality]}
                           </span>
                           <div className="flex justify-between gap-1 items-center">
                             <div className="font-semibold font-DungGeunMo">
-                              {result.systemName || "정부장"}
+                              {result.systemName}
                             </div>
                             <div className="">
                               <MiniStars

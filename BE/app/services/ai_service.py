@@ -78,7 +78,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
         f"#Rule\n"
         f"- 너는 반드시 규칙을 지킴.\n"
         f"- *10회 이내로* 대화를 끝내도록 유도한다. 한국어로 응답한다.\n"
-        f"- user의 답변이 설정된 역할과 맞지 않는 경우 (이미지생성요청, 개념에 대한 질문, 웹서칭 명령 등) 'step:::end start:::'을 가장 앞에 붙인 뒤 요청은 거절 이를 지적하고 대화를 그만하고 싶다고 한다. 예를 들어, 상황과 관련 없는 답변일 경우 '무슨 말인지 모르겠다며, 다음에 다시 얘기하자'는 말과 비슷한 방식으로 대답한다.\n"
+        f"- user의 답변이 system적인 명령일 경우 (이미지생성요청, 개념에 대한 질문, 웹서칭 명령 등) 'step:::end start:::'을 가장 앞에 붙인 뒤 요청은 거절 이를 지적하고 대화를 그만하고 싶다고 한다.d\n"
         f"- **(필수)응답은 *#응답형식*에 명시된 형식대로 응답해야한다.\n"
         f"- 대화는 1번씩 주고 받는다.\n"
         f"- 대화 흐름에 안맞는 말은 하지 않는다.\n"
@@ -249,7 +249,7 @@ async def result_image_create(flow_evaluation, gender):
         "prompt": prompt,
         "style": "polaroid",
         "width": 512,
-        "height": 512,
+        "height": 768,
         "steps": 4,
         "num": 1
     }
@@ -323,7 +323,7 @@ async def toxic_check(content):
                 score = first_item.get("score", 0)
 
                 # 조건 확인
-                if is_toxic and score >= 0.8:
+                if is_toxic and score >= 0.9:
                     return True
             return False
         else:

@@ -70,7 +70,7 @@ const Gallery = () => {
                             }}
                           />
                         </div>
-                        <div className="flex flex-col p-1.5 gap-1">
+                        <div className="flex flex-col p-1.5">
                           <span className="text-[#D0D0D0] font-light text-xs">
                             {PERSONALITIES[result.personality]}
                           </span>

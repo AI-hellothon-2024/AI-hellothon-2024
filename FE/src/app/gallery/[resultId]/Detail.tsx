@@ -22,7 +22,7 @@ const Detail = ({ resultId }: Props) => {
   const { data, isLoading } = useCollectionDetail({ userId, resultId });
   return (
     <>
-      <header className="sticky top-0 w-full bg-[#1E1E1E] h-[60px] flex items-center justify-between px-4 z-10">
+      <header className="sticky top-0 w-full bg-[#1E1E1E] h-[60px] flex items-center justify-between px-4 z-10 text-lg font-semibold">
         <button onClick={() => router.back()}>
           <ChevronLeft />
         </button>
@@ -96,8 +96,23 @@ const Detail = ({ resultId }: Props) => {
           <div className="mb-20">
             <KakaoShare
               imgUrl={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${data.resultId}.png`}
+              className="flex gap-2 items-center rounded-full bg-[#F8F8F8]"
             >
-              공유하기
+              <svg
+                width="18"
+                height="17"
+                viewBox="0 0 18 17"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M9 14C13.9706 14 18 10.866 18 7C18 3.13401 13.9706 0 9 0C4.02944 0 0 3.13401 0 7C0 9.33234 1.46658 11.3983 3.72161 12.6703L3 17L7.29706 13.8749C7.84849 13.957 8.41779 14 9 14Z"
+                  fill="#070707"
+                />
+              </svg>
+              카카오톡 공유하기
             </KakaoShare>
           </div>
         )}

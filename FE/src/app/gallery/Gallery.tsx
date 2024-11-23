@@ -4,29 +4,43 @@ import { useAtomValue } from "jotai";
 import { userIdAtom } from "@/app/store/userAtom";
 import { useCollection } from "@/api/useCollection";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { MiniStars } from "@/components/feature/result/Stars";
+import { ChevronLeft } from "lucide-react";
 
 const Gallery = () => {
   const userId = useAtomValue(userIdAtom);
+  const router = useRouter();
   const { data, isLoading } = useCollection({ userId });
   return (
-    <div className="flex flex-col">
-      <p>Gallery</p>
-      <div className="grid grid-cols-3 gap-2">
-        {data?.result.map((result) => (
-          <Link
-            key={result.resultId}
-            href={`/gallery/${result.resultId}`}
-            className="aspect-square"
-          >
-            <img
-              // src={`data:image/png;base64,${result.resultImage}`}
-              src={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${result.resultId}.png`}
-              className="aspect-square"
-            />
-          </Link>
-        ))}
+    <>
+      <header className="h-[60px] sticky top-0 flex items-center font-semibold text-lg z-10 px-4">
+        <button onClick={() => router.back()}>
+          <ChevronLeft />
+        </button>
+        <h1 className="flex-grow text-center -translate-x-3">결과 모아보기</h1>
+      </header>
+      <div className="flex flex-col px-4">
+        <div className="grid grid-cols-3 gap-1">
+          {data?.result.map((result) => (
+            <Link
+              key={result.resultId}
+              href={`/gallery/${result.resultId}`}
+              className={`aspect-square p-[5px] flex flex-col bg-[#424242] rounded-xl gap-1.5 items-center pb-2`}
+            >
+              <div className={`aspect-square rounded-lg overflow-hidden`}>
+                <img
+                  src={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${result.resultId}.png`}
+                />
+              </div>
+              <div className="h-[12px]">
+                <MiniStars flowEvaluation="good" />
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

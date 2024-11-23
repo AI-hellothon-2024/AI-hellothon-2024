@@ -5,16 +5,20 @@ const Icon = ({
   className,
   fill = false,
   delay = 0,
+  width = 24,
+  height = 21,
 }: {
   className?: string;
   fill?: boolean;
   delay?: number;
+  width?: number;
+  height?: number;
 }) => {
   return (
     <div className={className}>
       <svg
-        width="24"
-        height="21"
+        width={width}
+        height={height}
         viewBox="0 0 24 21"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -367,6 +371,16 @@ const Stars = ({ flowEvaluation }: { flowEvaluation: string }) => {
       <Icon fill />
       <Icon fill={score !== "bad"} className="-translate-y-2" delay={0.3} />
       <Icon fill={score === "good"} delay={0.6} />
+    </div>
+  );
+};
+export const MiniStars = ({ flowEvaluation }: { flowEvaluation: string }) => {
+  const score = flowEvaluation.toLowerCase();
+  return (
+    <div className="flex gap-1">
+      <Icon fill width={15} height={12} />
+      <Icon fill={score !== "bad"} width={15} height={12} delay={0.3} />
+      <Icon fill={score === "good"} width={15} height={12} delay={0.6} />
     </div>
   );
 };

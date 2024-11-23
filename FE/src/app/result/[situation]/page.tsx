@@ -40,7 +40,7 @@ const Page = ({
   ) : (
     <>
       <header className="sticky top-0 w-full bg-[#1E1E1E] h-[60px] px-4 z-10 flex">
-        <div className="flex w-full justify-center items-center flex-grow relative">
+        <div className="flex w-full justify-center items-center flex-grow relative text-lg font-semibold">
           <Link href={"/"} className="abolute left-4 block top-0">
             <ChevronLeft />
           </Link>

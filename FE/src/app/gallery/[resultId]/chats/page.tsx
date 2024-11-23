@@ -19,7 +19,7 @@ const Page = ({
   const router = useRouter();
   return (
     <div className="flex flex-col">
-      <header className="sticky top-0 w-full bg-[#1E1E1E] h-[60px] flex items-center px-4 z-10">
+      <header className="sticky top-0 w-full bg-[#1E1E1E] h-[60px] flex items-center px-4 z-10 text-lg font-semibold">
         <button onClick={() => router.back()}>
           <ChevronLeft />
         </button>

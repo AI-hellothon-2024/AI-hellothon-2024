@@ -151,6 +151,69 @@ async def llm_result_create(before_scenario_content, user_id):
 
     # 프롬프트 생성
     prompt = (
+        # 언어적 표현 분석
+        f"*** 평가기준 ***"
+        f"언어적 표현 분석: {{"
+        f"    단어 선택: 긍정적/부정적, 추상적/구체적 여부."
+        f"    감정 단어 사용 여부: 대화에 감정을 담는 단어가 있는지 확인."
+        f"    문장의 논리성과 명확성: 문장이 일관되고 명확한지 확인."
+        f"    문법적 정확성: 문법적 오류가 있는지 분석."
+        f"}}"
+
+        # 비언어적 표현 분석
+        f"비언어적 표현 분석: {{"
+        f"    대화 흐름: 끊김, 막힘, 또는 비정상적인 흐름 여부."
+        f"    대화 속도: 빠르거나 느리게 진행되는지."
+        f"    암묵적 메시지: 숨겨진 의도나 감정 파악."
+        f"}}"
+
+        # 대인관계 및 상호작용 분석
+        f"대인관계 및 상호작용 분석: {{"
+        f"    역할과 권력 역학: 대화에서 주도권이 누구에게 있는지 확인."
+        f"    공감 및 경청: 상대방의 말을 잘 듣고 공감하는지."
+        f"    갈등 요소: 대화 중 갈등이 나타나며 해결이 이루어지는지."
+        f"}}"
+
+        # 심리적 상태와 동기
+        f"심리적 상태와 동기: {{"
+        f"    화자의 감정 상태: 스트레스, 불안, 분노 등이 드러나는지."
+        f"    진정성과 동기: 대화가 진실되고 숨겨진 의도가 없는지 확인."
+        f"}}"
+
+        # 인지적 요소 분석
+        f"인지적 요소 분석: {{"
+        f"    논리적 사고 및 문제 해결: 대화가 논리적으로 문제를 해결하는 방향으로 나아가는지."
+        f"    인지적 왜곡: 과잉 일반화, 흑백 사고 등의 왜곡 징후가 있는지."
+        f"}}"
+
+        # 감정 및 정서적 표현 분석
+        f"감정 및 정서적 표현 분석: {{"
+        f"    감정 표현의 일관성: 대화 내용과 감정 표현이 일치하는지."
+        f"    긍정적/부정적 감정 비율: 긍정적 감정이 부정적 감정보다 많은지."
+        f"}}"
+
+        # 문화적 및 환경적 요인
+        f"문화적 및 환경적 요인: {{"
+        f"    문화적 맥락: 대화에서 나타나는 문화적 특성."
+        f"    환경적 요소: 대화 환경이 안정적이거나 긴장되었는지."
+        f"}}"
+
+        # 치료적 대화 분석
+        f"치료적 대화 분석: {{"
+        f"    라포 형성 여부: 참여자 간 신뢰와 연결감을 형성했는지."
+        f"    치료적 기술 사용: 반영, 명료화, 요약 같은 기술이 사용되었는지."
+        f"    감정 해소 여부: 대화가 감정 표현 및 해소로 이어졌는지."
+        f"}}"
+
+        # 심리학적 모델 활용
+        f"심리학적 모델 활용: {{"
+        f"    Erikson의 발달 단계: 대화에서 특정 발달 과업이 나타나는지."
+        f"    Maslow의 욕구 단계: 욕구(생리적, 안전, 소속 등) 수준을 파악."
+        f"    자기결정 이론: 자율성, 관계성, 유능감과의 연결성 분석."
+        f"}}"
+
+
+
         f"#응답형식\n"
         f"종합평가::: (good or normal or bad)\n"
         f"대화의흐름설명::: (user의 answer가 어떤 부분이 잘못되었는지 설명하고 잘되는 예시도 들어서 설명)\n"
@@ -299,40 +362,39 @@ async def get_korean_name(user_id, gender):
 
 
 async def toxic_check(content):
+    return False
 
-    return True
-
-    url = "https://api-cloud-function.elice.io/cf3b3742-4bf5-433b-9042-bc8c563c25cc/predict"
-
-    headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "Authorization": f"Bearer {settings.ML_API_KEY}"
-    }
-
-    # 요청 데이터
-    payload = {"text": [content]}
-
-    try:
-        # POST 요청
-        response = requests.post(url, headers=headers, json=payload)
-
-        # 응답 성공 여부 확인
-        if response.status_code == 200:
-            result = response.json()
-            if isinstance(result, list) and result:  # 응답이 리스트이고 비어 있지 않을 때
-                first_item = result[0]
-                is_toxic = first_item.get("is_toxic", False)
-                score = first_item.get("score", 0)
-
-                # 조건 확인
-                if is_toxic and score >= 0.9:
-                    return True
-            return False
-        else:
-            return f"요청 실패: {response.status_code} - {response.text}"
-    except Exception as e:
-        return f"응답 처리 중 에러 발생: {str(e)}"
+    # url = "https://api-cloud-function.elice.io/cf3b3742-4bf5-433b-9042-bc8c563c25cc/predict"
+    #
+    # headers = {
+    #     "accept": "application/json",
+    #     "content-type": "application/json",
+    #     "Authorization": f"Bearer {settings.ML_API_KEY}"
+    # }
+    #
+    # # 요청 데이터
+    # payload = {"text": [content]}
+    #
+    # try:
+    #     # POST 요청
+    #     response = requests.post(url, headers=headers, json=payload)
+    #
+    #     # 응답 성공 여부 확인
+    #     if response.status_code == 200:
+    #         result = response.json()
+    #         if isinstance(result, list) and result:  # 응답이 리스트이고 비어 있지 않을 때
+    #             first_item = result[0]
+    #             is_toxic = first_item.get("is_toxic", False)
+    #             score = first_item.get("score", 0)
+    #
+    #             # 조건 확인
+    #             if is_toxic and score >= 0.9:
+    #                 return True
+    #         return False
+    #     else:
+    #         return f"요청 실패: {response.status_code} - {response.text}"
+    # except Exception as e:
+    #     return f"응답 처리 중 에러 발생: {str(e)}"
 
 
 async def one_line_result(result_one, result_two, result_three, user_id):

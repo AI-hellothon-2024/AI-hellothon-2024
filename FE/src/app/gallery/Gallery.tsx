@@ -64,6 +64,7 @@ const Gallery = () => {
                             fill
                             src={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${result.resultId}.png`}
                             alt="result"
+                            priority
                             style={{
                               objectFit: "cover",
                             }}

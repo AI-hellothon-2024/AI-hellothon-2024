@@ -9,7 +9,7 @@ class CollectionListRequest(BaseModel):
 class ListItem(BaseModel):
     job: str
     situation: str
-    system: str
+    systemName: str
     personality: str
     resultId: str
     flowEvaluation: str

@@ -66,7 +66,9 @@ const Detail = ({ resultId }: Props) => {
       </div>
 
       <div className="flex flex-col text-[#F8F8F8] items-center px-4 gap-14 mt-14 pb-4">
-        <SituationIcon situation={"love"} />
+        <div className="w-[100px] aspect-square animate-pulse">
+          <SituationIcon situation={"love"} />
+        </div>
         <div className="flex flex-col gap-5 w-full">
           <div className="flex flex-col gap-5 items-center rounded-2xl p-4 pb-6 bg-[rgba(217,217,217,0.15)] w-full">
             <div className="font-DungGeunMo">대화의 흐름</div>

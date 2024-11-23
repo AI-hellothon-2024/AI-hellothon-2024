@@ -221,6 +221,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         before_settings = answered_scenario_data["settings"]
         before_personality = answered_scenario_data["personality"]
         before_system_name = answered_scenario_data["systemName"]
+        before_user_name = user_data["userName"]
 
         create_before_script = create_script(answered_scenarios)
 
@@ -231,8 +232,9 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             create_before_script,
             next_step,
             request.userId,
-            answered_scenario_data.get("settings", ""),
-            before_personality
+            before_personality,
+            before_user_name,
+            before_system_name
         )
 
         if is_toxic:

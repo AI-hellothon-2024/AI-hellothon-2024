@@ -28,14 +28,14 @@ def log_data_without_image(data: dict, context: str = "General"):
     logger.info(f"[{context}] Data (without encode_image): {data_without_image}")
 
 
-def save_image(encoded_image: str, scenario_id: str, is_result=False):
+async def save_image(encoded_image: str, image_id: str, is_result=False):
     image_dir = os.path.join(os.getcwd(), "images")
     os.makedirs(image_dir, exist_ok=True)
 
     if is_result:
-        image_path = os.path.join(image_dir, f"result_{scenario_id}.png")
+        image_path = os.path.join(image_dir, f"result_{image_id}.png")
     else:
-        image_path = os.path.join(image_dir, f"{scenario_id}.png")
+        image_path = os.path.join(image_dir, f"{image_id}.png")
 
     with open(image_path, "wb") as image_file:
         image_file.write(base64.b64decode(encoded_image))
@@ -71,12 +71,12 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
     )
 
     llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)
-    setting_match = re.search(r"setting:::\s*(.*?)\n", content, re.DOTALL)
 
     llm_result = llm_result_match.group(1) if llm_result_match else "대화 시작 없음"
-    setting = setting_match.group(1) if setting_match else "설정값 없음"
+    setting_search = await db["situations"].find_one({"name": request.situation})
+    setting = str(setting_search.get("description", "기본값")) if setting_search else "기본값"
 
-    if not setting or not llm_result:
+    if not llm_result:
         raise HTTPException(
             status_code=500,
             detail="LLM 정확한 응답값 생성에 실패했습니다. 다시 시도해주세요."
@@ -100,7 +100,7 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
     insert_scenario = await db["scenarios"].insert_one(scenario_data)
     scenario_id = str(insert_scenario.inserted_id)
 
-    save_image(encode_image, scenario_id)
+    await save_image(encode_image, scenario_id)
 
     await db["users"].update_one({"_id": ObjectId(user_key)}, {"$set": {"first_scenario_id": scenario_id}})
 
@@ -196,7 +196,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
                 before_personality
             )
 
-            llm_result, setting, is_end_match = parse_llm_content(content)
+            llm_result, is_end_match = parse_llm_content(content)
 
             if is_end_match == "end":
                 next_step = "end"
@@ -236,7 +236,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             llm_result = "사용자의 입력이 부적절하여 대화를 종료합니다."
             next_step = "end"
         else:
-            llm_result, setting, is_end_match = parse_llm_content(content)
+            llm_result, is_end_match = parse_llm_content(content)
             if is_end_match == "end":
                 next_step = "end"
 
@@ -256,6 +256,8 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
     }
     next_scenario_insert = await db["scenarios"].insert_one(scenario_data)
     next_scenario_id = str(next_scenario_insert.inserted_id)
+
+    await save_image(encode_image, next_scenario_id, is_result=False)
 
     next_scenario_data = {
         "userId": request.userId,
@@ -348,7 +350,8 @@ async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResult
     result_data["gender"] = user_data["gender"]
     result_data["systemName"] = before_scenario_data["systemName"]
     result_data["personality"] = before_scenario_data["personality"]
-    save_image(encode_image, str(result_id.inserted_id), is_result=True)
+
+    await save_image(encode_image, str(result_id.inserted_id), is_result=True)
 
     return ScenarioResultResponse(**result_data)
 
@@ -389,7 +392,7 @@ def create_script(answered_scenarios):
 
 def parse_llm_content(content):
     llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)
-    setting_match = re.search(r"setting:::\s*(.*?)\n", content, re.DOTALL)
+    # setting_match = re.search(r"setting:::\s*(.*?)\n", content, re.DOTALL)
     is_end_match = re.search(r"\bend\b", content, re.IGNORECASE)
 
     # step::: end 이란 단어가 있으면 이부분만 삭제하고 content로 사용
@@ -397,7 +400,7 @@ def parse_llm_content(content):
         content = re.sub(r"step::: end", "", content)
 
     llm_result = llm_result_match.group(1) if llm_result_match else content
-    setting = setting_match.group(1) if setting_match else "설정값 없음"
+    # setting = setting_match.group(1) if setting_match else "설정값 없음"
     is_end_match = "end" if is_end_match else ""
 
     # if not setting:
@@ -406,7 +409,7 @@ def parse_llm_content(content):
     #         detail="LLM 정확한 응답값 생성에 실패했습니다. 다시 시도해주세요."
     #     )
 
-    return llm_result, setting, is_end_match
+    return llm_result, is_end_match
 
 
 def result_llm_content(content):

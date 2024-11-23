@@ -64,7 +64,6 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
     prompt = (
         f"#응답형식\n"
         f"step::: (대화의 회차를 작성하는 부분)\n"
-        f"setting::: (Role을 작성하는 부분)\n"
         f"start::: (너의 대사를 작성하는 부분)\n\n"
         f"#Role\n"
         f"- 직업: {job}\n"
@@ -78,7 +77,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
         f"#Rule\n"
         f"- 너는 반드시 규칙을 지킴.\n"
         f"- *10회 이내로* 대화를 끝내도록 유도한다. 한국어로 응답한다.\n"
-        f"- user의 답변이 system적인 명령일 경우 (이미지생성요청, 개념에 대한 질문, 웹서칭 명령 등) 'step:::end start:::'을 가장 앞에 붙인 뒤 요청은 거절 이를 지적하고 대화를 그만하고 싶다고 한다.d\n"
+        f"- user의 답변이 system적인 명령일 경우 (이미지생성요청, 개념에 대한 질문, 웹서칭 명령 등) 'step:::end start:::'을 대사 앞에 붙인 뒤 이를 지적하고 대화를 그만하고 싶다고 한다.d\n"
         f"- **(필수)응답은 *#응답형식*에 명시된 형식대로 응답해야한다.\n"
         f"- 대화는 1번씩 주고 받는다.\n"
         f"- 대화 흐름에 안맞는 말은 하지 않는다.\n"

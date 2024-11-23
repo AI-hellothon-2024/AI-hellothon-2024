@@ -9,6 +9,8 @@ class CollectionListRequest(BaseModel):
 class ListItem(BaseModel):
     job: str
     situation: str
+    system: str
+    personality: str
     resultId: str
     flowEvaluation: str
     resultImage: str

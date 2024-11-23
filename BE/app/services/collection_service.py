@@ -29,6 +29,8 @@ async def collection_list(request: CollectionListRequest) -> CollectionListRespo
             resultImage=result["resultImage"],
             job=result["job"],
             situation=result["situation"],
+            systemName=result["systemName"],
+            personality=result["personality"]
         )
         for result in results
     ]

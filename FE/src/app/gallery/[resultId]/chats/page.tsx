@@ -3,7 +3,7 @@ import React, { Fragment } from "react";
 import Link from "next/link";
 import { useAtomValue } from "jotai";
 import { userIdAtom } from "@/app/store/userAtom";
-import { History, ChevronLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCollectionDetail } from "@/api/useCollectionDetail";
 import Loading from "@/components/common/Loading";

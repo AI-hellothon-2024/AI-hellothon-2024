@@ -330,39 +330,6 @@ const Icon = ({
     </div>
   );
 };
-const Star = (props: HTMLMotionProps<"div">) => {
-  return (
-    <MotionDiv {...props}>
-      <svg
-        width="40"
-        height="37"
-        viewBox="0 0 40 37"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M20 30.8575L29.3375 36.505C31.0475 37.54 33.14 36.01 32.69 34.075L30.215 23.455L38.4725 16.3C39.98 14.995 39.17 12.52 37.19 12.3625L26.3225 11.44L22.07 1.40496C21.305 -0.417539 18.695 -0.417539 17.93 1.40496L13.6775 11.4175L2.81 12.34C0.829996 12.4975 0.0199955 14.9725 1.5275 16.2775L9.785 23.4325L7.31 34.0525C6.86 35.9875 8.95249 37.5175 10.6625 36.4825L20 30.8575Z"
-          fill="white"
-        />
-      </svg>
-    </MotionDiv>
-  );
-};
-const container: Variants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.4,
-      delayChildren: 0.4,
-    },
-  },
-};
-
-const item: Variants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1 },
-};
 
 const Stars = ({ flowEvaluation }: { flowEvaluation: string }) => {
   const score = flowEvaluation.toLowerCase();
@@ -374,13 +341,38 @@ const Stars = ({ flowEvaluation }: { flowEvaluation: string }) => {
     </div>
   );
 };
+const MiniStar = ({
+  fill = false,
+  delay = 0,
+}: {
+  fill?: boolean;
+  delay?: number;
+}) => {
+  return (
+    <svg
+      width="11"
+      height="10"
+      viewBox="0 0 11 10"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <MotionPath
+        d="M5.66726 8.40469L8.12831 9.89318C8.57901 10.166 9.13052 9.76272 9.01192 9.25272L8.35959 6.45364L10.536 4.56782C10.9333 4.22387 10.7198 3.57154 10.198 3.53003L7.33366 3.28689L6.21284 0.642001C6.01121 0.161651 5.3233 0.161651 5.12168 0.642001L4.00086 3.28096L1.13655 3.5241C0.61469 3.56561 0.401201 4.21794 0.798528 4.56189L2.97493 6.44771L2.3226 9.24679C2.204 9.75679 2.75551 10.16 3.20621 9.88725L5.66726 8.40469Z"
+        fill={fill ? "#FF8C42" : "#737373"}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.5 + delay }}
+      />
+    </svg>
+  );
+};
 export const MiniStars = ({ flowEvaluation }: { flowEvaluation: string }) => {
   const score = flowEvaluation.toLowerCase();
   return (
     <div className="flex gap-1">
-      <Icon fill width={15} height={12} />
-      <Icon fill={score !== "bad"} width={15} height={12} delay={0.3} />
-      <Icon fill={score === "good"} width={15} height={12} delay={0.6} />
+      <MiniStar fill />
+      <MiniStar fill={score !== "bad"} delay={0.3} />
+      <MiniStar fill={score === "good"} delay={0.6} />
     </div>
   );
 };

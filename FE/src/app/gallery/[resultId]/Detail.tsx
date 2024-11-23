@@ -11,17 +11,21 @@ import { History, ChevronLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import SituationIcon from "@/components/common/SituationIcon";
 import KakaoShare from "@/components/common/KakaoShare";
+import { useRouter } from "next/navigation";
 
 interface Props {
   resultId: string;
 }
 const Detail = ({ resultId }: Props) => {
+  const router = useRouter();
   const userId = useAtomValue(userIdAtom);
   const { data, isLoading } = useCollectionDetail({ userId, resultId });
   return (
     <>
       <header className="sticky top-0 w-full bg-[#1E1E1E] h-[60px] flex items-center justify-between px-4 z-10">
-        <ChevronLeft />
+        <button onClick={() => router.back()}>
+          <ChevronLeft />
+        </button>
         <span>자세히보기</span>
         <Link href={`/gallery/${resultId}/chats`}>
           <History />

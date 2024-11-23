@@ -56,7 +56,7 @@ const Detail = ({ resultId }: Props) => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col font-DungGeunMo w-1/2 flex-grow-0 mx-auto items-center">
+        <div className="flex flex-col font-DungGeunMo w-2/3 flex-grow-0 mx-auto items-center [word-break:auto-phrase]">
           <div className="mb-3 text-2xl">“</div>
           <p className="flex-grow-0 text-center">{data?.oneLineResult}</p>
           <div className="mb-6 text-2xl">”</div>

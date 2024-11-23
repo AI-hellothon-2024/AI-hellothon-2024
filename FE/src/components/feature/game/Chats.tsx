@@ -127,13 +127,13 @@ const Chats = ({
       className="flex flex-col overflow-y-auto gap-2 scroll-smooth"
       ref={containerRef}
     >
-      {chats.map((chat) => (
+      {chats.map(({ id, sender, loading, message }) => (
         <MotionDiv
-          key={chat.id}
+          key={id}
           className={twMerge(
-            "p-6 w-full text-[#F8F8F8] rounded-b-2xl backdrop-blur-sm break-all whitespace-break-spaces",
+            "px-6 py-4 w-full text-[#F8F8F8] rounded-b-2xl backdrop-blur-sm break-all whitespace-break-spaces flex flex-col gap-1",
             twJoin(
-              chat.sender === "bot"
+              sender === "bot"
                 ? "bg-[rgba(0,0,0,0.8)] rounded-tr-2xl"
                 : "bg-[rgba(31,31,31,0.7)] rounded-tl-2xl border border-primary box-border"
             )
@@ -147,7 +147,12 @@ const Chats = ({
             once: true,
           }}
         >
-          {chat.loading ? <ChatLoading /> : chat.message}
+          {!loading && sender === "bot" && (
+            <span className="text-primary font-DungGeunMo text-xs">
+              {systemName}
+            </span>
+          )}
+          {loading ? <ChatLoading /> : message}
         </MotionDiv>
       ))}
     </div>

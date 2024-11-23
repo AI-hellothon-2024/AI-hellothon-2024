@@ -15,10 +15,18 @@ const Gallery = () => {
   return (
     <>
       <header className="h-[60px] sticky top-0 flex items-center font-semibold text-lg z-10 px-4">
-        <button onClick={() => router.back()}>
-          <ChevronLeft />
-        </button>
-        <h1 className="flex-grow text-center -translate-x-3">결과 모아보기</h1>
+        <div className="relative w-full flex items-center">
+          <button onClick={() => router.back()}>
+            <ChevronLeft />
+          </button>
+          <h1
+            className="absolute top-0 
+            left-1/2 transform -translate-x-1/2
+          "
+          >
+            결과 모아보기
+          </h1>
+        </div>
       </header>
       <div className="flex flex-col px-4">
         <div className="grid grid-cols-3 gap-1">
@@ -31,6 +39,7 @@ const Gallery = () => {
               <div className={`aspect-square rounded-lg overflow-hidden`}>
                 <img
                   src={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${result.resultId}.png`}
+                  className="rounded-lg"
                 />
               </div>
               <div className="h-[12px]">

@@ -6,17 +6,17 @@ import KakaoScript from "@/components/script/KakaoScript";
 
 import "./globals.css";
 
-const pretendard = localFont({
-  src: "./fonts/PretendardVariable.woff2",
-  display: "swap",
-  weight: "45 920",
-  variable: "--font-pretendard",
-});
 const dungGeunMo = localFont({
   src: "./fonts/DungGeunMo.woff2",
   display: "swap",
   weight: "45 920",
   variable: "--font-dungGeunMo",
+});
+const minSans = localFont({
+  src: "./fonts/MinSansVF.ttf",
+  display: "swap",
+  weight: "45 920",
+  variable: "--font-minsans",
 });
 
 export const metadata: Metadata = {
@@ -34,8 +34,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${pretendard.variable} ${dungGeunMo.variable}`}>
-      <body className={`${pretendard.className} antialiased`}>
+    <html lang="ko" className={`${minSans.variable} ${dungGeunMo.variable}`}>
+      <body className={`${minSans.className} antialiased`}>
         <QueryProvider>
           <main className="max-w-[600px] mx-auto min-h-dvh shadow-lg flex flex-col">
             {children}

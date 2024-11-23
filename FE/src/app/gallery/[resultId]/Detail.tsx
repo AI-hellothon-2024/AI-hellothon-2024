@@ -5,7 +5,7 @@ import { userIdAtom } from "@/app/store/userAtom";
 import { useCollectionDetail } from "@/api/useCollectionDetail";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { SITUATIONS } from "@/lib/constants";
+import { SITUATIONS, PERSONALITIES } from "@/lib/constants";
 import Stars from "@/components/feature/result/Stars";
 import { History, ChevronLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -35,23 +35,26 @@ const Detail = ({ resultId }: Props) => {
                 <Stars flowEvaluation={data.flowEvaluation} />
               </div>
             )}
-            <div className="text-2xl font-DungGeunMo mt-3">상황</div>
+            <div className="text-2xl font-DungGeunMo mt-3">
+              {data?.situation && SITUATIONS[data.situation]}
+            </div>
             <div className="flex gap-[5px] mt-5">
-              <Badge className="bg-[rgba(217,217,217,0.15)] text-white px-2 py-1">
-                이름이름
-              </Badge>
-              <Badge className="bg-[rgba(217,217,217,0.15)] text-white px-2 py-1">
-                성격성격
-              </Badge>
+              {data && (
+                <>
+                  <Badge className="bg-[rgba(217,217,217,0.15)] text-white px-2 py-1">
+                    {data.systemName}
+                  </Badge>
+                  <Badge className="bg-[rgba(217,217,217,0.15)] text-white px-2 py-1">
+                    {PERSONALITIES[data.personality]}
+                  </Badge>
+                </>
+              )}
             </div>
           </div>
         </div>
         <div className="flex flex-col font-DungGeunMo w-1/2 flex-grow-0 mx-auto items-center">
           <div className="mb-3 text-2xl">“</div>
-          <p className="flex-grow-0 text-center">
-            {data?.oneLineResult ||
-              "구차적으로 뭘 원하는지 말해줘야 대화가 이어지지구차적으로 뭘 원하는지 말해줘야 대화가 이어지지"}
-          </p>
+          <p className="flex-grow-0 text-center">{data?.oneLineResult}</p>
           <div className="mb-6 text-2xl">”</div>
         </div>
         {data && (

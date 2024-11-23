@@ -1,5 +1,5 @@
 export const JOBS = {
-  productMangaer: "기획자",
+  productManager: "기획자",
   designer: "디자이너",
   developer: "개발자",
 } as const;

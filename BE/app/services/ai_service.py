@@ -210,9 +210,7 @@ async def llm_result_create(before_scenario_content, user_id):
         f"    Erikson의 발달 단계: 대화에서 특정 발달 과업이 나타나는지."
         f"    Maslow의 욕구 단계: 욕구(생리적, 안전, 소속 등) 수준을 파악."
         f"    자기결정 이론: 자율성, 관계성, 유능감과의 연결성 분석."
-        f"}}"
-
-
+        f"}}\n\n"
 
         f"#응답형식\n"
         f"종합평가::: (good or normal or bad)\n"
@@ -239,7 +237,7 @@ async def llm_result_create(before_scenario_content, user_id):
 
     payload = {
         "model": "helpy-pro",
-        "sess_id": user_id,
+        "sess_id": "hello-thon-team5-communication-teacher1",
         "messages": messages,
     }
     headers = {

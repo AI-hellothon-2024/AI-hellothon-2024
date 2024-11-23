@@ -18,7 +18,6 @@ const KakaoShare = ({ imgUrl, children, ...props }: KakaoShareProps) => {
       {...props}
       onClick={() => {
         const { Kakao } = window;
-
         Kakao.Share.sendDefault({
           objectType: "feed",
           content: {

@@ -7,6 +7,8 @@ class CollectionListRequest(BaseModel):
 
 
 class ListItem(BaseModel):
+    job: str
+    situation: str
     resultId: str
     flowEvaluation: str
     resultImage: str
@@ -14,8 +16,6 @@ class ListItem(BaseModel):
 
 class CollectionListResponse(BaseModel):
     userId: str
-    job: str
-    situation: str
     result: List[ListItem]
 
 

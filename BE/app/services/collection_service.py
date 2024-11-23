@@ -1,3 +1,5 @@
+import logging
+
 from app.schemas.collection_schema import CollectionListRequest, CollectionListResponse, ListItem, \
     CollectionDetailRequest, CollectionDetailResponse, ScenarioItem
 from app.db.session import get_database
@@ -6,6 +8,9 @@ from bson import ObjectId
 from datetime import datetime
 
 db = get_database()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 async def collection_list(request: CollectionListRequest) -> CollectionListResponse:
@@ -27,12 +32,16 @@ async def collection_list(request: CollectionListRequest) -> CollectionListRespo
     })
     matched_scenarios = await matched_scenarios_cursor.to_list(length=None)
 
+    for scsc in matched_scenarios:
+        logger.info("::::::::::::" + scsc)
+
     matched_scenario_ids = [scenario["_id"] for scenario in matched_scenarios]
 
     user_cursor = db["users"].find({
         "first_scenario_id": {"$in": matched_scenario_ids}
     })
     users = await user_cursor.to_list(length=None)
+
 
     user_data_map = {
         user["first_scenario_id"]: {
@@ -42,27 +51,34 @@ async def collection_list(request: CollectionListRequest) -> CollectionListRespo
         for user in users
     }
 
+    logger.info(f"user_data_map: {user_data_map}")
+
     result_list = []
     for result in results:
         job = ""
         situation = ""
+        logger.info(f"Processing result: {result}")
         for s_id in result.get("scenarioIds", []):
             scenario_id = ObjectId(s_id) if ObjectId.is_valid(s_id) else None
+            if scenario_id:
+                logger.info(f"Checking scenario_id: {scenario_id}")
             if scenario_id and scenario_id in user_data_map:
+                logger.info(f"Matched scenario_id: {scenario_id} in user_data_map")
                 job = user_data_map[scenario_id]["job"]
                 situation = user_data_map[scenario_id]["situation"]
+                logger.info(f"Assigned job: {job}, situation: {situation} for scenario_id: {scenario_id}")
                 break
 
         # 결과 데이터 추가
-        result_list.append(
-            ListItem(
-                resultId=str(result["_id"]),
-                flowEvaluation=result["flowEvaluation"],
-                resultImage=result["resultImage"],
-                job=job,
-                situation=situation
-            )
+        result_item = ListItem(
+            resultId=str(result["_id"]),
+            flowEvaluation=result["flowEvaluation"],
+            resultImage=result["resultImage"],
+            job=job,
+            situation=situation
         )
+        logger.info(f"Result item: {result_item}")
+        result_list.append(result_item)
 
     return CollectionListResponse(
         userId=request.userId,

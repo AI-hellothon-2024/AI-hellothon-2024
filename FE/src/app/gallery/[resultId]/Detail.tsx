@@ -19,7 +19,7 @@ const Detail = ({ resultId }: Props) => {
   const { data, isLoading } = useCollectionDetail({ userId, resultId });
   return (
     <>
-      <header className="sticky top-0 w-full bg-[#1E1E1E] h-[60px] flex items-center justify-between px-4">
+      <header className="sticky top-0 w-full bg-[#1E1E1E] h-[60px] flex items-center justify-between px-4 z-10">
         <ChevronLeft />
         <span>자세히보기</span>
         <Link href={`/gallery/${resultId}/chats`}>

@@ -309,8 +309,8 @@ async def result_image_create(flow_evaluation, gender):
     payload = {
         "prompt": prompt,
         "style": "watercolor",
-        "width": 512,
-        "height": 768,
+        "width": 1024,
+        "height": 1024,
         "steps": 4,
         "num": 1
     }

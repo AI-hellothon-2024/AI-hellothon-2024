@@ -73,7 +73,7 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
 
     llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)
 
-    llm_result = llm_result_match.group(1) if llm_result_match else "대화 시작 없음"
+    llm_result = llm_result_match.group(1) if llm_result_match else content
     setting_search = await db["situations"].find_one({"name": request.situation})
     setting = str(setting_search.get("description", "기본값")) if setting_search else "기본값"
 

@@ -87,12 +87,15 @@ const Detail = ({ resultId }: Props) => {
             <p>{data?.goalAchievement}</p>
           </div>
         </div>
+
         {data && (
-          <KakaoShare
-            imgUrl={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${data.resultId}.png`}
-          >
-            공유하기
-          </KakaoShare>
+          <div className="mb-20">
+            <KakaoShare
+              imgUrl={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${data.resultId}.png`}
+            >
+              공유하기
+            </KakaoShare>
+          </div>
         )}
       </div>
 

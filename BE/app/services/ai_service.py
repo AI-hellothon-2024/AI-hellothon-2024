@@ -70,7 +70,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
         f"- 직업: {job}\n"
         f"- 성별: {system_gender}\n"
         f"- 역활: {situation_description}\n"
-        f"- 성격: {before_settings if scenario_step != '1' else personalities}\n\n"
+        f"- 성격: {personalities}\n\n"
         f"#Order\n"
         f"1. 부여된 Role에 맞춰 user에게 대화를 건다.\n"
         f"** user가 문맥에 맞지않는 답변을 한 경우 이를 지적하고 역할에 맞는 대화를 이어가도록 유도한다.\n"

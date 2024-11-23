@@ -119,12 +119,10 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
     logger.info(
         f"[save_answer] Saving answer for userId: {request.userId}, answerScenarioId: {request.answerScenarioId}")
 
-    before_setting = ""
     job = ""
     gender = ""
 
     is_toxic = await toxic_check(request.answer)
-    logger.info(f"[save_answer] Toxic check result::::::::::::::::::::::::::::::::::::: {is_toxic}")
 
     answered_scenario_data = await db["scenarios"].find_one({"_id": ObjectId(request.answerScenarioId)})
     if answered_scenario_data is None:
@@ -147,9 +145,10 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
     before_situation = ""
     before_settings = ""
     before_personality = ""
+    before_systemName = ""
 
     async def process_previous_scenarios(prev_scenarios, answered_scenario_data):
-        nonlocal before_setting, job, gender, before_situation, before_settings, before_personality
+        nonlocal job, gender, before_situation, before_settings, before_personality, before_systemName
 
         for scenario in prev_scenarios:
             answer = await db["answers"].find_one({"answeredScenarioId": str(scenario["_id"])})
@@ -161,14 +160,13 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             })
 
             if scenario["scenarioStep"] == "1":
-                before_setting = scenario["settings"]
-                before_personality = scenario["personality"]
-
                 user_data = await db["users"].find_one({"first_scenario_id": str(scenario["_id"])})
                 job = user_data.get("job", "")
                 gender = user_data.get("gender", "")
+                before_personality = scenario["personality"]
                 before_situation = user_data.get("situation", "")
                 before_settings = scenario["settings"]
+                before_systemName = scenario["systemName"]
 
         answered_scenarios.append({
             "scenarioContent": answered_scenario_data["scenarioContent"],
@@ -194,7 +192,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             next_step = "end"
         else:
             content = await llm_scenario_create(
-                job, before_situation, gender, create_before_script, next_step, request.userId, before_setting,
+                job, before_situation, gender, create_before_script, next_step, request.userId, before_settings,
                 before_personality
             )
 
@@ -219,6 +217,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         before_situation = user_data.get("situation", "")
         before_settings = answered_scenario_data["settings"]
         before_personality = answered_scenario_data["personality"]
+        before_systemName = answered_scenario_data["systemName"]
 
         create_before_script = create_script(answered_scenarios)
 
@@ -252,7 +251,8 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         "scenarioContent": llm_result,
         "scenarioImage": encode_image,
         "settings": before_settings,
-        "personality": before_personality
+        "personality": before_personality,
+        "systemName": before_systemName,
     }
     next_scenario_insert = await db["scenarios"].insert_one(scenario_data)
     next_scenario_id = str(next_scenario_insert.inserted_id)
@@ -271,27 +271,30 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
 
 async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResultResponse:
     existing_result = await db["results"].find_one({
-        # "userId": request.userId,
+        "userId": request.userId,
         "scenarioIds": {"$all": request.scenarioIds},
-        # "$and": [
-        #     {"flowEvaluation": {"$regex": "error", "$options": "i"}},
-        #     {"oneLineResult": {"$regex": "error", "$options": "i"}},
-        #     {"flowExplanation": {"$regex": "error", "$options": "i"}},
-        #     {"responseTendency": {"$regex": "error", "$options": "i"}},
-        #     {"goalAchievement": {"$regex": "error", "$options": "i"}},
-        #     {"resultImage": {"$regex": "error", "$options": "i"}},
-        #     {"flowEvaluation": {"$ne": ""}},
-        #     {"oneLineResult": {"$ne": ""}},
-        #     {"flowExplanation": {"$ne": ""}},
-        #     {"responseTendency": {"$ne": ""}},
-        #     {"goalAchievement": {"$ne": ""}},
-        #     {"resultImage": {"$ne": ""}},
-        # ],
+    })
+
+    object_id_list = [ObjectId(id_str) for id_str in request.scenarioIds]
+    before_scenario_data = await db["scenarios"].find_one({
+        "_id": {"$in": object_id_list},
+        "scenarioStep": "1"
+    })
+
+    user_data = await db["users"].find_one({
+        "first_scenario_id": str(before_scenario_data["_id"])
     })
 
     if existing_result:
         existing_result["resultId"] = str(existing_result["_id"])
         del existing_result["_id"]
+        existing_result["userId"] = request.userId
+        existing_result["job"] = user_data["job"]
+        existing_result["situation"] = user_data["situation"]
+        existing_result["userName"] = user_data["userName"]
+        existing_result["gender"] = user_data["gender"]
+        existing_result["systemName"] = before_scenario_data["systemName"]
+        existing_result["personality"] = before_scenario_data["personality"]
         return ScenarioResultResponse(**existing_result)
 
     gender = ""
@@ -339,6 +342,12 @@ async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResult
 
     result_id = await db["results"].insert_one(result_data)
     result_data["resultId"] = str(result_id.inserted_id)
+    result_data["job"] = user_data["job"]
+    result_data["situation"] = user_data["situation"]
+    result_data["userName"] = user_data["userName"]
+    result_data["gender"] = user_data["gender"]
+    result_data["systemName"] = before_scenario_data["systemName"]
+    result_data["personality"] = before_scenario_data["personality"]
     save_image(encode_image, str(result_id.inserted_id), is_result=True)
 
     return ScenarioResultResponse(**result_data)

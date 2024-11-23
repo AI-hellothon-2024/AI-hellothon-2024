@@ -13,6 +13,8 @@ import SituationIcon from "@/components/common/SituationIcon";
 import KakaoShare from "@/components/common/KakaoShare";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/common/Loading";
+import JobBadge from "@/components/feature/result/JobBadge";
+import Image from "next/image";
 
 interface Props {
   resultId: string;
@@ -59,25 +61,27 @@ const Detail = ({ resultId }: Props) => {
                   <Badge className="bg-[rgba(217,217,217,0.15)] text-white px-2 py-1">
                     {PERSONALITIES[data.personality]}
                   </Badge>
+                  <JobBadge job={data.job} />
                 </>
               )}
             </div>
           </div>
         </div>
-        <div className="flex flex-col font-DungGeunMo w-2/3 flex-grow-0 mx-auto items-center [word-break:auto-phrase]">
-          <div className="mb-3 text-2xl">“</div>
+        <div className="flex flex-col font-DungGeunMo w-2/3 flex-grow-0 mx-auto items-center [word-break:auto-phrase] gap-3 mb-6 ">
+          <div className="text-2xl">“</div>
           <p className="flex-grow-0 text-center">{data?.oneLineResult}</p>
-          <div className="mb-6 text-2xl">”</div>
+          <div className="text-2xl mt-2">”</div>
         </div>
         {data && (
-          <div
-            className="w-full aspect-square bg-center"
-            style={{
-              // backgroundImage: `url('data:image/png;base64,${data?.resultImage}')`,
-              backgroundImage: `url('${process.env.NEXT_PUBLIC_API_HOST}/static/result_${data.resultId}.png')`,
-              backgroundSize: "120%",
-            }}
-          ></div>
+          <div className="w-full aspect-square bg-center">
+            <Image
+              src={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${data.resultId}.png`}
+              alt="result"
+              layout="fill"
+              objectFit="cover"
+              priority
+            />
+          </div>
         )}
       </div>
 

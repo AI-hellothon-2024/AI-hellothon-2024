@@ -1,8 +1,8 @@
 import type { IScenario } from "./IScenario.interface";
-import { SITUATIONS, PERSONALITIES } from "@/lib/constants";
+import { SITUATIONS, PERSONALITIES, JOBS } from "@/lib/constants";
 export interface IResult {
   resultId: string;
-  job: string;
+  job: keyof typeof JOBS;
   situation: keyof typeof SITUATIONS;
   userName: string;
   gender: string;

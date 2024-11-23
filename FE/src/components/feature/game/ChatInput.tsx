@@ -115,11 +115,7 @@ const ChatInput = ({
         className="rounded text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold"
         asChild
       >
-        <Link
-          href={`/result/${situation}?systemName=${systemName}&personality=${personality}`}
-        >
-          결과보기
-        </Link>
+        <Link href={`/result`}>결과보기</Link>
       </Button>
     );
   }
@@ -144,15 +140,6 @@ const ChatInput = ({
           required: true,
         })}
       />
-      {/* <Input
-        {...register("answer", {
-          required: true,
-        })}
-        disabled={isPending || isLoading}
-        placeholder="답변을 입력해주세요."
-        className="backdrop-blur-sm rounded-full rounded-tr-none bg-[rgba(31,31,31,0.7)] py-3 h-auto px-5 pr-14 disabled:cursor-not-allowed"
-      /> */}
-
       <SendButton
         type="submit"
         disabled={!isValid || isPending}

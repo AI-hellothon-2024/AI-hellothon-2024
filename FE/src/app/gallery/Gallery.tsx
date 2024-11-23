@@ -19,7 +19,8 @@ const Gallery = () => {
             className="aspect-square"
           >
             <img
-              src={`data:image/png;base64,${result.resultImage}`}
+              // src={`data:image/png;base64,${result.resultImage}`}
+              src={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${result.resultId}.png`}
               className="aspect-square"
             />
           </Link>

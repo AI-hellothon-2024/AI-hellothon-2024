@@ -10,6 +10,7 @@ import Stars from "@/components/feature/result/Stars";
 import { History, ChevronLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import SituationIcon from "@/components/common/SituationIcon";
+import KakaoShare from "@/components/common/KakaoShare";
 
 interface Props {
   resultId: string;
@@ -26,7 +27,6 @@ const Detail = ({ resultId }: Props) => {
           <History />
         </Link>
       </header>
-      <div className="font-DungGeunMo">{data?.oneLineResult}</div>
       <div className="flex flex-col gap-8">
         <div className="flex flex-col items-center mt-[22px]">
           <div className="flex flex-col items-center">
@@ -61,7 +61,8 @@ const Detail = ({ resultId }: Props) => {
           <div
             className="w-full aspect-square bg-center"
             style={{
-              backgroundImage: `url('data:image/png;base64,${data?.resultImage}')`,
+              // backgroundImage: `url('data:image/png;base64,${data?.resultImage}')`,
+              backgroundImage: `url('${process.env.NEXT_PUBLIC_API_HOST}/static/result_${data.resultId}.png')`,
               backgroundSize: "120%",
             }}
           ></div>
@@ -86,7 +87,15 @@ const Detail = ({ resultId }: Props) => {
             <p>{data?.goalAchievement}</p>
           </div>
         </div>
+        {data && (
+          <KakaoShare
+            imgUrl={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${data.resultId}.png`}
+          >
+            공유하기
+          </KakaoShare>
+        )}
       </div>
+
       <div className="w-full sticky bottom-[calc(env(safe-area-inset-bottom)+16px)] px-4">
         <Button
           asChild

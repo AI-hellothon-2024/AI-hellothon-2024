@@ -82,7 +82,8 @@ const Page = ({
             <div
               className="w-full aspect-square bg-center bg-no-repeat"
               style={{
-                backgroundImage: `url('data:image/png;base64,${data?.resultImage}')`,
+                // backgroundImage: `url('data:image/png;base64,${data?.resultImage}')`,
+                backgroundImage: `url('${process.env.NEXT_PUBLIC_API_HOST}/static/result_${data.resultId}.png')`,
                 backgroundSize: "120%",
               }}
             ></div>

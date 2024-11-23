@@ -19,7 +19,7 @@ const Icon = ({
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <g clip-path="url(#clip0_496_2854)">
+        <g clipPath="url(#clip0_496_2854)">
           <path
             d="M23.9986 8.39648H22.5897V9.79639H23.9986V8.39648Z"
             fill="white"

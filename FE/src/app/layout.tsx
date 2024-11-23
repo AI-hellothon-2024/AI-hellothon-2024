@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import QueryProvider from "@/components/provider/QueryProvider";
+import KakaoScript from "@/components/script/KakaoScript";
+
 import "./globals.css";
 
 const pretendard = localFont({
@@ -41,6 +43,7 @@ export default function RootLayout({
         </QueryProvider>
       </body>
       <GoogleAnalytics gaId="G-BXMPGJ5BMX" />
+      <KakaoScript />
     </html>
   );
 }

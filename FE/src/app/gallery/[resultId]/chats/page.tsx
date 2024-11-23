@@ -6,6 +6,7 @@ import { userIdAtom } from "@/app/store/userAtom";
 import { History, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCollectionDetail } from "@/api/useCollectionDetail";
+import Loading from "@/components/common/Loading";
 
 const Page = ({
   params: { resultId },
@@ -15,8 +16,15 @@ const Page = ({
   };
 }) => {
   const userId = useAtomValue(userIdAtom);
-  const { data } = useCollectionDetail({ userId, resultId });
+  const { data, isLoading } = useCollectionDetail({ userId, resultId });
   const router = useRouter();
+  if (isLoading) {
+    return (
+      <div className="flex justify-center h-dvh items-center text-[#FF8C42]">
+        <Loading />
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col">
       <header className="sticky top-0 w-full bg-[#1E1E1E] h-[60px] flex items-center px-4 z-10 text-lg font-semibold">

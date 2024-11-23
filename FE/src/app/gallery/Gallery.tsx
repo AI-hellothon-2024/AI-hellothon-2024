@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MiniStars } from "@/components/feature/result/Stars";
 import { ChevronLeft } from "lucide-react";
+import { groupBy } from "@/lib/utils";
 
 const Gallery = () => {
   const userId = useAtomValue(userIdAtom);
@@ -37,7 +38,7 @@ const Gallery = () => {
               className={`p-[5px] flex flex-col bg-[#424242] rounded-xl gap-1.5 items-center pb-2`}
             >
               <div
-                className={`overflow-hidden aspect-square`}
+                className={`overflow-hidden aspect-square w-full`}
                 style={{ borderRadius: "11px" }}
               >
                 <img

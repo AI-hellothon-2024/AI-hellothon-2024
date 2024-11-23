@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import SituationIcon from "@/components/common/SituationIcon";
 import KakaoShare from "@/components/common/KakaoShare";
 import { useRouter } from "next/navigation";
+import Loading from "@/components/common/Loading";
 
 interface Props {
   resultId: string;
@@ -20,6 +21,13 @@ const Detail = ({ resultId }: Props) => {
   const router = useRouter();
   const userId = useAtomValue(userIdAtom);
   const { data, isLoading } = useCollectionDetail({ userId, resultId });
+  if (isLoading) {
+    return (
+      <div className="flex justify-center h-dvh items-center text-[#FF8C42]">
+        <Loading />
+      </div>
+    );
+  }
   return (
     <>
       <header className="sticky top-0 w-full bg-[#1E1E1E] h-[60px] flex items-center justify-between px-4 z-10 text-lg font-semibold">

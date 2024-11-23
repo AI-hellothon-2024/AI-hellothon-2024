@@ -38,7 +38,7 @@ const Page = async ({
           <LeaveDrawer />
           <h1
             className="absolute left-1/2
-            transform -translate-x-1/2 text-white text-lg font-bold
+            transform -translate-x-1/2 text-white text-lg font-bold w-max
             "
           >
             {SITUATIONS[searchParams.situation]}

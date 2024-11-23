@@ -36,7 +36,10 @@ const Page = ({
         {data?.scenarios.map(
           ({ scenarioId, scenarioContent, answer }, index) => (
             <Fragment key={scenarioId}>
-              <div className="p-6 w-full text-[#F8F8F8] rounded-b-[28px] backdrop-blur-sm break-all whitespace-break-spaces bg-[rgba(0,0,0,0.8)] rounded-tr-[28px] empty:hidden">
+              <div className="p-6 w-full text-[#F8F8F8] rounded-b-[28px] backdrop-blur-sm break-all whitespace-break-spaces bg-[rgba(0,0,0,0.8)] rounded-tr-[28px] empty:hidden flex flex-col gap-2">
+                <span className="text-primary font-DungGeunMo text-xs">
+                  {data.systemName}
+                </span>
                 {scenarioContent}
               </div>
               <div className="p-6 w-full text-[#F8F8F8] rounded-b-[28px] backdrop-blur-sm break-all whitespace-break-spaces bg-[rgba(31,31,31,0.7)] rounded-tl-[28px] border border-primary box-border empty:hidden">

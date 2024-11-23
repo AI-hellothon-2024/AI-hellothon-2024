@@ -71,7 +71,7 @@ const Page = () => {
             <div className="text-2xl mt-2">”</div>
           </div>
           {data && (
-            <div className="w-full aspect-square relative">
+            <div className="w-full aspect-square bg-center overflow-hidden relative">
               <Image
                 src={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${data.resultId}.png`}
                 alt="result"
@@ -84,7 +84,7 @@ const Page = () => {
         </div>
         <div className="flex flex-col text-[#F8F8F8] items-center px-4 gap-14 mt-14 pb-4">
           <div className="w-[100px] aspect-square animate-pulse">
-            <SituationIcon situation={"love"} />
+            {data?.situation && <SituationIcon situation={data.situation} />}
           </div>
           <div className="flex flex-col gap-5 w-full">
             <div className="flex flex-col gap-5 items-center rounded-2xl p-4 pb-6 bg-[rgba(217,217,217,0.15)] w-full">

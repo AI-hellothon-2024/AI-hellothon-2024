@@ -112,7 +112,7 @@ const ChatInput = ({
   if (lastChat?.scenarioStep === "end") {
     return (
       <Button
-        className="rounded text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold"
+        className="rounded-2xl text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold"
         asChild
       >
         <Link href={`/result`}>결과보기</Link>

@@ -319,7 +319,7 @@ async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResult
             user_data = await db["users"].find_one({"first_scenario_id": str(scenario["_id"])})
             gender = user_data.get("gender", "")
 
-    prev_scenarios_script = create_script(prev_scenarios)
+    prev_scenarios_script = create_script(answered_scenarios)
 
     llm_result = await llm_result_create(prev_scenarios_script, request.userId)
 

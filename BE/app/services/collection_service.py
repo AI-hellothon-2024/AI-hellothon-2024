@@ -9,24 +9,61 @@ db = get_database()
 
 
 async def collection_list(request: CollectionListRequest) -> CollectionListResponse:
-    # userId로 조회하는데, 이제 error문자열을 곁들이지 않은.. image 생성에 실패한 row...
     results_cursor = db["results"].find({
         "userId": request.userId,
         "resultImage": {"$not": {"$regex": "error"}}
     })
     results = await results_cursor.to_list(length=None)
 
-    # 결과 리스트 생성
-    result_list = [
-        ListItem(
-            resultId=str(result["_id"]),
-            flowEvaluation=result["flowEvaluation"],
-            resultImage=result["resultImage"],
-        )
-        for result in results
-    ]
+    scenario_ids = []
+    for result in results:
+        scenario_ids.extend(result.get("scenarioIds", []))
 
-    # CollectionListResponse 반환
+    scenario_object_ids = [ObjectId(s_id) for s_id in scenario_ids if ObjectId.is_valid(s_id)]
+
+    matched_scenarios_cursor = db["scenarios"].find({
+        "_id": {"$in": scenario_object_ids},
+        "scenarioStep": 1
+    })
+    matched_scenarios = await matched_scenarios_cursor.to_list(length=None)
+
+    matched_scenario_ids = [scenario["_id"] for scenario in matched_scenarios]
+
+    user_cursor = db["users"].find({
+        "first_scenario_id": {"$in": matched_scenario_ids}
+    })
+    users = await user_cursor.to_list(length=None)
+
+    user_data_map = {
+        user["first_scenario_id"]: {
+            "job": user.get("job", ""),
+            "situation": user.get("situation", "")
+        }
+        for user in users
+    }
+
+    result_list = []
+    for result in results:
+        job = ""
+        situation = ""
+        for s_id in result.get("scenarioIds", []):
+            scenario_id = ObjectId(s_id) if ObjectId.is_valid(s_id) else None
+            if scenario_id and scenario_id in user_data_map:
+                job = user_data_map[scenario_id]["job"]
+                situation = user_data_map[scenario_id]["situation"]
+                break
+
+        # 결과 데이터 추가
+        result_list.append(
+            ListItem(
+                resultId=str(result["_id"]),
+                flowEvaluation=result["flowEvaluation"],
+                resultImage=result["resultImage"],
+                job=job,
+                situation=situation
+            )
+        )
+
     return CollectionListResponse(
         userId=request.userId,
         result=result_list

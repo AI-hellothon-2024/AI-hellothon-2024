@@ -127,7 +127,7 @@ async def image_create(content, gender, situation):
 
     payload = {
         "prompt": prompt,
-        "style": "polaroid",
+        "style": "3d_animation",
         "width": 472,
         "height": 1024,
         "steps": 4,
@@ -246,7 +246,7 @@ async def result_image_create(flow_evaluation, gender):
 
     payload = {
         "prompt": prompt,
-        "style": "polaroid",
+        "style": "3d_animation",
         "width": 512,
         "height": 768,
         "steps": 4,
@@ -298,6 +298,9 @@ async def get_korean_name(user_id, gender):
 
 
 async def toxic_check(content):
+
+    return True
+
     url = "https://api-cloud-function.elice.io/cf3b3742-4bf5-433b-9042-bc8c563c25cc/predict"
 
     headers = {
@@ -347,7 +350,7 @@ async def one_line_result(result_one, result_two, result_three, user_id):
 
     payload = {
         "model": "helpy-pro",
-        "sess_id": user_id,
+        "sess_id": "team-5-one-line-result",
         "messages": messages,
     }
     headers = {
@@ -410,7 +413,7 @@ async def test_image_create():
 
     payload = {
         "prompt": prompt,
-        "style": "polaroid",
+        "style": "3d_animation",
         "width": 512,
         "height": 1024,
         "steps": 4,

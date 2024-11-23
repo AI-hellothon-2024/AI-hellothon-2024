@@ -25,7 +25,7 @@ const Icon = ({ className, ...props }: SVGMotionProps<SVGElement>) => {
 };
 const ChatLoading = () => {
   return (
-    <div className="flex gap-2 justify-center min-g-6 items-center">
+    <div className="flex gap-2 justify-center min-g-6 items-center my-2">
       <Icon
         animate={{
           y: [0, -4, 0],

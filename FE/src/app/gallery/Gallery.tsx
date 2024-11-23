@@ -34,12 +34,14 @@ const Gallery = () => {
             <Link
               key={result.resultId}
               href={`/gallery/${result.resultId}`}
-              className={`aspect-square p-[5px] flex flex-col bg-[#424242] rounded-xl gap-1.5 items-center pb-2`}
+              className={`p-[5px] flex flex-col bg-[#424242] rounded-xl gap-1.5 items-center pb-2`}
             >
-              <div className={`aspect-square rounded-lg overflow-hidden`}>
+              <div
+                className={`overflow-hidden aspect-square`}
+                style={{ borderRadius: "11px" }}
+              >
                 <img
                   src={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${result.resultId}.png`}
-                  className="rounded-lg"
                 />
               </div>
               <div className="h-[12px]">

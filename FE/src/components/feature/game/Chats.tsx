@@ -97,18 +97,20 @@ const Chats = ({
       PERSONALITIES[personality as keyof typeof PERSONALITIES],
     ];
     return (
-      <div className="fixed top-0 left-0 w-dvw h-dvh flex justify-center backdrop-blur text-[#F8F8F8] items-center z-10 text-2xl font-semibold">
+      <div className="fixed top-0 left-0 w-dvw h-dvh flex justify-center backdrop-blur text-[#D0D0D0] items-center z-10 text-xl font-semibold">
         <div className="flex flex-col items-center -translate-y-2 gap-11 w-full">
           <Loading />
           <div className="flex flex-col items-center mt-2">
             <div>
-              <span className="font-DungGeunMo text-2xl">{systemName}</span>
+              <span className="font-DungGeunMo text-2xl text-[#F8F8F8]">
+                {systemName}
+              </span>
               님과의
             </div>
-            <div className="font-DungGeunMo text-2xl">
+            <div className="font-DungGeunMo text-2xl text-[#F8F8F8]">
               {SITUATIONS[situation as keyof typeof SITUATIONS]}
             </div>
-            <div>대화를 로딩중입니다</div>
+            <div>대화를 준비중입니다</div>
           </div>
           <div className="border border-current rounded-full py-3 text-lg mt-7 w-1/2 text-center h-[54px] overflow-y-clip">
             <TextTransition

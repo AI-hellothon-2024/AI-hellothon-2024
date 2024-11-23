@@ -15,7 +15,7 @@ const Page = ({
   };
 }) => {
   const userId = useAtomValue(userIdAtom);
-  const { data, isLoading } = useCollectionDetail({ userId, resultId });
+  const { data } = useCollectionDetail({ userId, resultId });
   const router = useRouter();
   return (
     <div className="flex flex-col">

@@ -25,7 +25,7 @@ const ChatDialog = () => {
             <div
               key={chat.id}
               className={twMerge(
-                "p-6 w-full text-[#F8F8F8] rounded-b-2xl backdrop-blur-sm break-all whitespace-break-spaces",
+                "px-6 py-4 w-full text-[#F8F8F8] rounded-b-2xl backdrop-blur-sm break-all whitespace-break-spaces flex flex-col gap-1",
                 twJoin(
                   chat.sender === "bot"
                     ? "bg-[rgba(0,0,0,0.8)] rounded-tr-2xl"

@@ -9,12 +9,12 @@ import GalleryButton from "@/components/feature/main/GalleryButton";
 import { getRandomNumber } from "@/lib/utils";
 
 export default function Home() {
-  const [bg, setBg] = useState(getRandomNumber(1, 26));
+  const [bg, setBg] = useState(getRandomNumber(1, 20));
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setBg(getRandomNumber(1, 26));
-    }, 8000);
+      setBg(getRandomNumber(1, 20));
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 

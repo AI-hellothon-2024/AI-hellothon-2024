@@ -86,8 +86,9 @@ const Form = () => {
           step3={({ history }) => (
             <Job onNext={(job) => history.push("step4", { job: job })} />
           )}
-          step4={({ history }) => (
+          step4={({ history, context }) => (
             <Situation
+              context={context}
               onNext={(situation) => history.push("done", { situation })}
             />
           )}

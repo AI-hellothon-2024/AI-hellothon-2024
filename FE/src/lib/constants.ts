@@ -5,9 +5,11 @@ export const JOBS = {
 } as const;
 
 export const SITUATIONS = {
+  codeReview: "내 코드를 비난하는 동료",
+  bubbles: "밤새운 기획이 물거품되다",
+  nastyClient: "구린 미감의 클라이언트",
   love: "사수의 고백공격",
-  angry: "부정적인 피드백에 대처하기",
-  daily: "어색한 동료와의 퇴근길",
+  passWork: "자신의 업무를 떠넘기는 상사",
 } as const;
 
 export const GENDER = {

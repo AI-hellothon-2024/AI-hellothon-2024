@@ -1,15 +1,24 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import type { InfoForm } from "./Form";
+import type { InfoForm, InfoFormStep } from "./Form";
 import { useForm, Controller } from "react-hook-form";
-import { SITUATIONS } from "@/lib/constants";
+import { JOBS, SITUATIONS } from "@/lib/constants";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { toSelectOptions } from "@/lib/utils";
 
 interface Props {
+  context: InfoFormStep<"step4">;
   onNext: (job: keyof typeof SITUATIONS) => void;
 }
-const Situation = ({ onNext }: Props) => {
+const situationMapper: {
+  [key in keyof typeof JOBS]: (keyof typeof SITUATIONS)[];
+} = {
+  developer: ["codeReview", "love", "passWork"],
+  designer: ["nastyClient", "love", "passWork"],
+  productManager: ["bubbles", "love", "passWork"],
+};
+
+const Situation = ({ onNext, context }: Props) => {
   const {
     control,
     formState: { isValid },
@@ -44,15 +53,21 @@ const Situation = ({ onNext }: Props) => {
                 onChange(value);
               }}
             >
-              {toSelectOptions(SITUATIONS).map(({ value, name }) => (
-                <ToggleGroupItem
-                  key={value}
-                  value={value}
-                  className="w-full rounded-full border border-[#D0D0D0] data-[state=on]:border-transparent text-xl py-3 h-auto rounded-tr-none data-[state=on]:bg-gradient-to-bl from-[#FF751D] to-[#FF8A3F]"
-                >
-                  {name}
-                </ToggleGroupItem>
-              ))}
+              {toSelectOptions(SITUATIONS).map(({ value, name }) => {
+                if (!situationMapper[context.job].includes(value)) {
+                  return null;
+                }
+
+                return (
+                  <ToggleGroupItem
+                    key={value}
+                    value={value}
+                    className="w-full rounded-full border border-[#D0D0D0] data-[state=on]:border-transparent text-xl py-3 h-auto rounded-tr-none data-[state=on]:bg-gradient-to-bl from-[#FF751D] to-[#FF8A3F]"
+                  >
+                    {name}
+                  </ToggleGroupItem>
+                );
+              })}
             </ToggleGroup>
           )}
         />

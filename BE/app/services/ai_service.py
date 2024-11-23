@@ -119,7 +119,7 @@ async def image_create(content, gender, situation):
 
     prompt = (
         # f"A highly detailed illustration of a {system_gender} anime character, age 20s-30s, with a mature and beautiful or handsome appearance, drawn in half body focus."
-        f"A highly detailed illustration of a {system_gender} age 40s-50s, with a mature and drawn in half body focus."
+        f"A highly detailed illustration of a {system_gender} anime character, no hansome and no beautiful, age 40s-50s, with a mature and drawn in half body focus."
         f"Concept: {situation}"
         f"Dialogue: {content}"
         f"Do *not* include any text in the image."
@@ -225,7 +225,7 @@ async def result_image_create(flow_evaluation, gender):
 
     prompt = (
         # f"A highly detailed illustration of a {system_gender} anime character, age 20s-30s, with a mature and beautiful/handsome appearance, drawn in full body focus. "
-        f"A highly detailed illustration of a {system_gender} age 40s-50s, with a mature and drawn in full body focus. ***NO ANIAML EAR***"
+        f"A highly detailed illustration of a {system_gender} anime character, no hansome and no beautiful, age 40s-50s, with a mature and drawn in full body focus. ***NO ANIAML EAR***"
         f"Ensure the character is drawn in such a way that fills the frame, but without making the composition feel "
         f"overly cramped, allowing some breathing room around the character."
         f"background: {background} "

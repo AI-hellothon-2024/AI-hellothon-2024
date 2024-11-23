@@ -10,6 +10,12 @@ const pretendard = localFont({
   weight: "45 920",
   variable: "--font-pretendard",
 });
+const dungGeunMo = localFont({
+  src: "./fonts/DungGeunMo.woff2",
+  display: "swap",
+  weight: "45 920",
+  variable: "--font-dungGeunMo",
+});
 
 export const metadata: Metadata = {
   title: "AImigo",
@@ -26,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${pretendard.variable}`}>
+    <html lang="ko" className={`${pretendard.variable} ${dungGeunMo.variable}`}>
       <body className={`${pretendard.className} antialiased`}>
         <QueryProvider>
           <main className="max-w-[600px] mx-auto h-dvh shadow-lg max-h-dvh flex flex-col">

@@ -130,7 +130,7 @@ const ChatInput = ({
     >
       <TextareaAutosize
         className={
-          "flex w-full border border-input text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 md:text-sm backdrop-blur-sm bg-[rgba(31,31,31,0.7)] py-3 px-5 pr-3 disabled:cursor-not-allowed rounded-[28px] rounded-tr-none resize-none h-auto"
+          "flex w-full border border-input text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 md:text-sm backdrop-blur-sm bg-[rgba(31,31,31,0.7)] py-3 px-5 disabled:cursor-not-allowed rounded-[28px] rounded-tr-none resize-none h-auto pr-12"
         }
         disabled={isPending || isLoading}
         onKeyDown={(e) => {

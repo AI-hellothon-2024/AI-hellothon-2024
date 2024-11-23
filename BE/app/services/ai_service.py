@@ -37,15 +37,20 @@ async def generate_request(url, payload, headers):
         return f"요청 실패: {response.status_code} - {response.text}"
 
 
-async def llm_scenario_create(job, situation, gender, before_scenario_content, scenario_step, user_id, before_settings,
-                              personalitie):
+async def llm_scenario_create(job, situation, gender, before_scenario_content,
+                              scenario_step, user_id,
+                              personalitie, userName, systemName):
     url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
 
     logger.info("situation: " + situation)
     # 상황
     selected_situation = await db["situations"].find_one({"name": situation})
-    situation_description = str(selected_situation.get("description", "기본값")) if selected_situation else "기본값"
-    logger.info("situation_description: " + situation_description)
+    if selected_situation:
+        raw_description = selected_situation.get("description", "기본값")
+        situation_description = raw_description.format(systemName=systemName, userName=userName)
+    else:
+        situation_description = "기본값"
+    logger.info("situation_description:::: " + situation_description)
 
     # 성격
     selected_personalities = await db["personalities"].find_one({"trait": {"$regex": personalitie, "$options": "i"}})
@@ -66,9 +71,9 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content, s
         f"step::: (대화의 회차를 작성하는 부분)\n"
         f"start::: (너의 대사를 작성하는 부분)\n\n"
         f"#Role\n"
+        f"- 역활: {situation_description}\n"
         f"- 직업: {job}\n"
         f"- 성별: {system_gender}\n"
-        f"- 역활: {situation_description}\n"
         f"- 성격: {personalities}\n\n"
         f"#Order\n"
         f"1. 부여된 Role에 맞춰 user에게 대화를 건다.\n"

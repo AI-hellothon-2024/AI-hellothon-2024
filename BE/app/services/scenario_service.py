@@ -66,8 +66,9 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "",
         "1",
         request.userId,
-        "",
-        request.personality
+        request.personality,
+        request.userName,
+        request.systemName
     )
 
     llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)
@@ -145,10 +146,11 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
     before_situation = ""
     before_settings = ""
     before_personality = ""
-    before_systemName = ""
+    before_system_name = ""
+    before_user_name = ""
 
     async def process_previous_scenarios(prev_scenarios, answered_scenario_data):
-        nonlocal job, gender, before_situation, before_settings, before_personality, before_systemName
+        nonlocal job, gender, before_situation, before_settings, before_personality, before_system_name, before_user_name
 
         for scenario in prev_scenarios:
             answer = await db["answers"].find_one({"answeredScenarioId": str(scenario["_id"])})
@@ -166,7 +168,8 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
                 before_personality = scenario["personality"]
                 before_situation = user_data.get("situation", "")
                 before_settings = scenario["settings"]
-                before_systemName = scenario["systemName"]
+                before_system_name = scenario["systemName"]
+                before_user_name = user_data["userName"]
 
         answered_scenarios.append({
             "scenarioContent": answered_scenario_data["scenarioContent"],
@@ -192,8 +195,8 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             next_step = "end"
         else:
             content = await llm_scenario_create(
-                job, before_situation, gender, create_before_script, next_step, request.userId, before_settings,
-                before_personality
+                job, before_situation, gender, create_before_script, next_step,
+                request.userId, before_personality, before_system_name, before_user_name
             )
 
             llm_result, is_end_match = parse_llm_content(content)
@@ -217,7 +220,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         before_situation = user_data.get("situation", "")
         before_settings = answered_scenario_data["settings"]
         before_personality = answered_scenario_data["personality"]
-        before_systemName = answered_scenario_data["systemName"]
+        before_system_name = answered_scenario_data["systemName"]
 
         create_before_script = create_script(answered_scenarios)
 
@@ -252,7 +255,7 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         "scenarioImage": encode_image,
         "settings": before_settings,
         "personality": before_personality,
-        "systemName": before_systemName,
+        "systemName": before_system_name,
     }
     next_scenario_insert = await db["scenarios"].insert_one(scenario_data)
     next_scenario_id = str(next_scenario_insert.inserted_id)

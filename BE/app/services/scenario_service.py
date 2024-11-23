@@ -339,13 +339,13 @@ async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResult
         "scenarios": answered_scenarios,
         "create_date": settings.CURRENT_DATETIME,
         "resultImage": encode_image,
+        "job": user_data["job"],
+        "situation": user_data["situation"],
         "scenarioIds": request.scenarioIds
     }
 
     result_id = await db["results"].insert_one(result_data)
     result_data["resultId"] = str(result_id.inserted_id)
-    result_data["job"] = user_data["job"]
-    result_data["situation"] = user_data["situation"]
     result_data["userName"] = user_data["userName"]
     result_data["gender"] = user_data["gender"]
     result_data["systemName"] = before_scenario_data["systemName"]

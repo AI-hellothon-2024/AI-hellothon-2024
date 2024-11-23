@@ -15,3 +15,7 @@ export function toSelectOptions<T extends object>(kObj: T): SelectOption<T>[] {
     ([value, name]) => ({ value, name } as SelectOption<T>)
   );
 }
+
+export function getRandomNumber(start: number, end: number) {
+  return Math.floor(Math.random() * (end - start + 1)) + start;
+}

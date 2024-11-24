@@ -3,7 +3,7 @@ import { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "에이미고",
-    description: "IT업계 신입사원을 위한 AI 시뮬레이션",
+    description: "신입사원의 빠른 온보딩과 대화 스킬 학습을 위한 AI 파트너",
     display: "standalone",
     start_url: "/",
     theme_color: "#1E1E1E",

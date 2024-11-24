@@ -126,7 +126,7 @@ const Page = () => {
             </div>
           )}
         </div>
-        <div className="w-full sticky bottom-[calc(env(safe-area-inset-bottom)+16px)] px-4">
+        <div className="w-full sticky bottom-0 px-4 bg-gradient-to-b from-transparent to-[rgba(0,0,0,0.74)] h-[240px] flex items-end pb-[calc(env(safe-area-inset-bottom)+16px)]">
           <Button
             asChild
             className="rounded-2xl text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold  w-full"

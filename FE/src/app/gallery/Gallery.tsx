@@ -18,7 +18,7 @@ const Gallery = () => {
   const { data, isLoading } = useCollection({ userId });
   return (
     <>
-      <header className="h-[60px] sticky top-0 flex items-center font-semibold text-lg z-10 px-4">
+      <header className="h-[60px] sticky top-0 flex items-center font-semibold text-lg z-10 px-4 bg-[#1E1E1E]">
         <div className="relative w-full flex items-center">
           <button onClick={() => router.back()}>
             <ChevronLeft />

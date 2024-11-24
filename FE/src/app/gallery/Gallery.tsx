@@ -11,6 +11,7 @@ import { ChevronLeft } from "lucide-react";
 import { groupBy } from "@/lib/utils";
 import { twJoin, twMerge } from "tailwind-merge";
 import Image from "next/image";
+import SituationIcon from "@/components/common/SituationIcon";
 
 const Gallery = () => {
   const userId = useAtomValue(userIdAtom);
@@ -18,7 +19,7 @@ const Gallery = () => {
   const { data, isLoading } = useCollection({ userId });
   return (
     <>
-      <header className="h-[60px] sticky top-0 flex items-center font-semibold text-lg z-10 px-4">
+      <header className="h-[60px] sticky top-0 flex items-center font-semibold text-lg z-10 px-4 bg-[#1E1E1E]">
         <div className="relative w-full flex items-center">
           <button onClick={() => router.back()}>
             <ChevronLeft />
@@ -32,12 +33,18 @@ const Gallery = () => {
           </h1>
         </div>
       </header>
-      <div className="flex flex-col px-4 gap-9">
+      <div className="flex flex-col px-4 gap-9 py-10">
         {data
           ? Object.entries(groupBy(data.result, (data) => data.situation)).map(
               ([situation, results]) => (
                 <div key={situation} className="flex flex-col gap-4">
-                  <h2 className="text-white font-DungGeunMo w">
+                  <h2 className="text-white font-DungGeunMo w flex gap-1 items-center">
+                    <div className="w-[14px] aspect-square">
+                      <SituationIcon
+                        fill="white"
+                        situation={situation as keyof typeof SITUATIONS}
+                      />
+                    </div>
                     {SITUATIONS[situation as keyof typeof SITUATIONS]}
                   </h2>
                   <div className="grid grid-cols-3 gap-1">

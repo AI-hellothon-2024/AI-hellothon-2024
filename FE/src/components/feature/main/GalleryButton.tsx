@@ -25,7 +25,7 @@ const GalleryButton = () => {
         )
       )}
     >
-      <Link href={"/gallery"}>갤러리</Link>
+      <Link href={"/gallery"}>결과 모아보기</Link>
     </Button>
   );
 };

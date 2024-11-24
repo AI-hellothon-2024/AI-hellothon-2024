@@ -108,7 +108,7 @@ const Detail = ({ resultId }: Props) => {
           <div className="mb-20">
             <KakaoShare
               imgUrl={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${data.resultId}.png`}
-              className="flex gap-2 items-center rounded-full bg-[#F8F8F8]"
+              className="flex gap-2 items-center rounded-full bg-[#FAE100] text-[#1E1E1E] hover:bg-[#ddc700]"
             >
               <svg
                 width="18"
@@ -130,7 +130,7 @@ const Detail = ({ resultId }: Props) => {
         )}
       </div>
 
-      <div className="w-full sticky bottom-[calc(env(safe-area-inset-bottom)+16px)] px-4">
+      <div className="w-full sticky bottom-0 px-4 bg-gradient-to-b from-transparent to-[rgba(0,0,0,0.74)] h-[240px] flex items-end pb-[calc(env(safe-area-inset-bottom)+16px)]">
         <Button
           asChild
           className="rounded-2xl text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold  w-full"

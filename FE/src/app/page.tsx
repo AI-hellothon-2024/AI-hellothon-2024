@@ -28,7 +28,7 @@ export default function Home() {
       <div className="row-span-2" />
 
       <div className="bg-gradient-to-b to-[#1E1E1E] from-transparent h-full px-9 flex flex-col justify-end pb-[74px] gap-14 row-span-3 via-60% via-[#1E1E1E]">
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-1">
           <MotionDiv
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -36,7 +36,7 @@ export default function Home() {
               delay: 0.5,
             }}
           >
-            사회초년생을 위한
+            신입사원을 위한 대화파트너
           </MotionDiv>
           <MotionDiv
             initial={{ opacity: 0, y: -20 }}

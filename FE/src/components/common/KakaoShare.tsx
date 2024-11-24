@@ -22,7 +22,8 @@ const KakaoShare = ({ imgUrl, children, ...props }: KakaoShareProps) => {
           objectType: "feed",
           content: {
             title: "AImigo",
-            description: "IT업계 신입사원을 위한 AI 시뮬레이션",
+            description:
+              "신입사원의 빠른 온보딩과 대화 스킬 학습을 위한 AI 파트너",
             imageUrl: imgUrl,
             link: {
               mobileWebUrl: process.env.NEXT_PUBLIC_HOST,

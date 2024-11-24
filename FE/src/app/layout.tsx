@@ -21,7 +21,7 @@ const minSans = localFont({
 
 export const metadata: Metadata = {
   title: "AImigo",
-  description: "IT업계 신입사원을 위한 시뮬레이션",
+  description: "신입사원의 빠른 온보딩과 대화 스킬 학습을 위한 AI 파트너",
 };
 export const viewport: Viewport = {
   themeColor: "#1E1E1E",

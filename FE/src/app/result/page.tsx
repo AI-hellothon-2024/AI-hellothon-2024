@@ -105,7 +105,7 @@ const Page = () => {
             <div className="mb-20">
               <KakaoShare
                 imgUrl={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${data.resultId}.png`}
-                className="flex gap-2 items-center rounded-full bg-[#F8F8F8]"
+                className="flex gap-2 items-center rounded-full bg-[#FAE100] text-[#1E1E1E]"
               >
                 <svg
                   width="18"

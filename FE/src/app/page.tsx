@@ -9,12 +9,12 @@ import GalleryButton from "@/components/feature/main/GalleryButton";
 import { getRandomNumber } from "@/lib/utils";
 
 export default function Home() {
-  const [bg, setBg] = useState(getRandomNumber(1, 26));
+  const [bg, setBg] = useState(getRandomNumber(1, 20));
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setBg(getRandomNumber(1, 26));
-    }, 8000);
+      setBg(getRandomNumber(1, 20));
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -32,12 +32,18 @@ export default function Home() {
           <MotionDiv
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
+            transition={{
+              delay: 0.5,
+            }}
           >
             사회초년생을 위한
           </MotionDiv>
           <MotionDiv
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
+            transition={{
+              delay: 0.5,
+            }}
           >
             <Image src="/logo.png" width={129} height={40} alt="AImigo" />
           </MotionDiv>

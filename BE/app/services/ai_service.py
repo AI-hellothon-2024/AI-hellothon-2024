@@ -365,39 +365,39 @@ async def get_korean_name(user_id, gender):
 
 
 async def toxic_check(content):
-    return False
+    # return False
 
-    # url = "https://api-cloud-function.elice.io/cf3b3742-4bf5-433b-9042-bc8c563c25cc/predict"
-    #
-    # headers = {
-    #     "accept": "application/json",
-    #     "content-type": "application/json",
-    #     "Authorization": f"Bearer {settings.ML_API_KEY}"
-    # }
-    #
-    # # 요청 데이터
-    # payload = {"text": [content]}
-    #
-    # try:
-    #     # POST 요청
-    #     response = requests.post(url, headers=headers, json=payload)
-    #
-    #     # 응답 성공 여부 확인
-    #     if response.status_code == 200:
-    #         result = response.json()
-    #         if isinstance(result, list) and result:  # 응답이 리스트이고 비어 있지 않을 때
-    #             first_item = result[0]
-    #             is_toxic = first_item.get("is_toxic", False)
-    #             score = first_item.get("score", 0)
-    #
-    #             # 조건 확인
-    #             if is_toxic and score >= 0.9:
-    #                 return True
-    #         return False
-    #     else:
-    #         return f"요청 실패: {response.status_code} - {response.text}"
-    # except Exception as e:
-    #     return f"응답 처리 중 에러 발생: {str(e)}"
+    url = "https://api-cloud-function.elice.io/cf3b3742-4bf5-433b-9042-bc8c563c25cc/predict"
+
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "Authorization": f"Bearer {settings.ML_API_KEY}"
+    }
+
+    # 요청 데이터
+    payload = {"text": [content]}
+
+    try:
+        # POST 요청
+        response = requests.post(url, headers=headers, json=payload)
+
+        # 응답 성공 여부 확인
+        if response.status_code == 200:
+            result = response.json()
+            if isinstance(result, list) and result:  # 응답이 리스트이고 비어 있지 않을 때
+                first_item = result[0]
+                is_toxic = first_item.get("is_toxic", False)
+                score = first_item.get("score", 0)
+
+                # 조건 확인
+                if is_toxic and score >= 0.9:
+                    return True
+            return False
+        else:
+            return f"요청 실패: {response.status_code} - {response.text}"
+    except Exception as e:
+        return f"응답 처리 중 에러 발생: {str(e)}"
 
 
 async def one_line_result(result_one, result_two, result_three, user_id):

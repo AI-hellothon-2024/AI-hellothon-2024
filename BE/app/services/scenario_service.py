@@ -395,17 +395,35 @@ def create_script(answered_scenarios):
 
 
 def parse_llm_content(content):
-    llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)
-    # setting_match = re.search(r"setting:::\s*(.*?)\n", content, re.DOTALL)
+
+    llm_result_match = ""
+    content = re.sub(r"<step>.*?</step>", "", content, flags=re.DOTALL)
     is_end_match = re.search(r"\bend\b", content, re.IGNORECASE)
 
+    if re.search(r"<start>\s*(.*)", content, re.DOTALL):
+        llm_result_match = re.search(r"<start>\s*(.*)", content, re.DOTALL)
+        content = re.sub(r"</start>", "", content, flags=re.DOTALL)
+    elif re.search(r"start:::\s*(.*)", content, re.DOTALL):
+        llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)
+
+
+
     # step::: end 이란 단어가 있으면 이부분만 삭제하고 content로 사용
-    if (re.search(r"step::: end", content)):
-        content = re.sub(r"step::: end", "", content)
+    if re.sub(r"step:::\s*end", "", content, flags=re.IGNORECASE):
+        content = re.sub(r"step:::\s*end", "", content, flags=re.IGNORECASE)
+
+
+
+    # if (re.search(r"step::: end", content)):
+    #     content = re.sub(r"step::: end", "", content)
 
     llm_result = llm_result_match.group(1) if llm_result_match else content
     # setting = setting_match.group(1) if setting_match else "설정값 없음"
     is_end_match = "end" if is_end_match else ""
+
+    if is_end_match:
+        if content.strip() == "":
+            content = "대화가 종료되었습니다"
 
     # if not setting:
     #     raise HTTPException(

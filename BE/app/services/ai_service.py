@@ -220,7 +220,7 @@ async def llm_result_create(before_scenario_content, user_id):
         f"#응답형식\n"
         f"종합평가::: (good or normal or bad)\n"
         f"대화의흐름설명::: ( user가 어떤 부분이 잘못되었는지 설명하고 잘되는 예시도 들어서 설명)\n"
-        f"대답경향성::: ( user의 대답경향성에 대한 평가내용)\n"
+        f"잘한점&개선점::: ( user의 잘한점과 개선점에 대한 평가내용)\n"
         f"대화목표달성도::: (대화에서 user가 어떤 목표를 달성했는가)\n\n"
         f"#Role\n"
         f"- 위 평가기준을 기반으로 user의 answer만 *비판적으로* 그리고 상세하게 *레포트형식*으로 작성해\n"
@@ -465,21 +465,33 @@ async def test_image_create():
 
     # 분위기와 인원 수 무작위 선택
     selected_mood = random.choice(moods)
-    num_characters = random.randint(1, 10)  # 1명에서 10명 사이
+    num_characters = random.randint(1, 4)  # 1명에서 10명 사이
 
     # 프롬프트 생성
+    # prompt = (
+    #     f"Concept: * {selected_mood} company life *."
+    #     f"Illustrate {num_characters} anime character(s) in their 20s-30s, *pretty, hansome* Tall and well-proportioned characters interacting in an office setting. "
+    #     f"The characters should be engaged in a {selected_mood} interaction, "
+    #     f"showing mature, stylish, and approachable appearances, with visible signs of their current mood. "
+    #     f"The background should depict a vibrant and modern office environment that matches the mood. "
+    #     f"Do *not* include empty spaces or text in the image. Focus on creating a detailed and dynamic composition."
+    # )
+
     prompt = (
-        f"Concept: * {selected_mood} company life *."
-        f"Illustrate {num_characters} anime character(s) in their 20s-30s, *pretty, hansome* interacting in an office setting. "
-        f"The characters should be engaged in a {selected_mood} interaction, "
-        f"showing mature, stylish, and approachable appearances, with visible signs of their current mood. "
-        f"The background should depict a vibrant and modern office environment that matches the mood. "
-        f"Do *not* include empty spaces or text in the image. Focus on creating a detailed and dynamic composition."
+        f"Concept: *Company life* with a mood of **{selected_mood}**. "
+        f"Illustrate **{num_characters}** anime characters in their 20s to 30s, **tall and well-proportioned**, "
+        f"with strikingly beautiful and handsome features, exuding elegance and charisma. "
+        f"The characters should be depicted in a vibrant modern office setting, rendered in the aesthetic of watercolor art. "
+        f"Use soft, flowing strokes and delicate color gradients to create a dreamy and visually captivating effect. "
+        f"The characters should reflect a **{selected_mood}** interaction through expressive poses, natural gestures, and subtle facial expressions. "
+        f"The background should depict a stylish office environment with watercolor elements, including light washes of color, soft textures, "
+        f"and gently blended tones to evoke warmth and depth. "
+        f"Ensure a harmonious composition with no empty spaces or text, blending the vibrant energy of modern company life with the artistic charm of watercolor painting."
     )
 
     payload = {
         "prompt": prompt,
-        "style": "3d_animation",
+        "style": "watercolor",
         "width": 512,
         "height": 1024,
         "steps": 4,

@@ -102,7 +102,7 @@ const Page = () => {
           </div>
 
           {data && (
-            <div className="mb-20">
+            <div className="mb-20 flex flex-col gap-4">
               <KakaoShare
                 imgUrl={`${process.env.NEXT_PUBLIC_API_HOST}/static/result_${data.resultId}.png`}
                 className="flex gap-2 items-center rounded-full bg-[#ddc700] text-[#1E1E1E] hover:bg-[#ddc700]"
@@ -123,6 +123,26 @@ const Page = () => {
                 </svg>
                 카카오톡 공유하기
               </KakaoShare>
+              <Button
+                className="flex items-center rounded-full text-foreground"
+                asChild
+              >
+                <Link href="/gallery" className="flex items-center">
+                  <svg
+                    width="18"
+                    height="14"
+                    viewBox="0 0 18 14"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M15.6667 2.00016H9L7.33333 0.333496H2.33333C1.41666 0.333496 0.666664 1.0835 0.666664 2.00016V12.0002C0.666664 12.9168 1.41666 13.6668 2.33333 13.6668H15.6667C16.5833 13.6668 17.3333 12.9168 17.3333 12.0002V3.66683C17.3333 2.75016 16.5833 2.00016 15.6667 2.00016Z"
+                      fill="white"
+                    />
+                  </svg>
+                  결과 모아보기
+                </Link>
+              </Button>
             </div>
           )}
         </div>

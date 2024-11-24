@@ -220,7 +220,7 @@ async def llm_result_create(before_scenario_content, user_id):
         f"#응답형식\n"
         f"종합평가::: (good or normal or bad)\n"
         f"대화의흐름설명::: ( user가 어떤 부분이 잘못되었는지 설명하고 잘되는 예시도 들어서 설명)\n"
-        f"잘한점&개선점::: ( user의 잘한점과 개선점에 대한 평가내용)\n"
+        f"대답경향성::: ( user의 잘한점과 아쉬운점에 대한 평가내용)\n"
         f"대화목표달성도::: (대화에서 user가 어떤 목표를 달성했는가)\n\n"
         f"#Role\n"
         f"- 위 평가기준을 기반으로 user의 answer만 *비판적으로* 그리고 상세하게 *레포트형식*으로 작성해\n"

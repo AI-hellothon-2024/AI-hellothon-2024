@@ -37,7 +37,7 @@ const Done = ({ context }: Props) => {
       <div className="flex flex-col gap-14 items-center px-5">
         <div className="flex flex-col gap-10 items-center">
           <div className="text-2xl">{SITUATIONS[context.situation]}</div>
-          <div className="w-[100px] aspect-square">
+          <div className="w-[100px] aspect-square animate-pulse">
             <SituationIcon situation={context.situation} />
           </div>
         </div>

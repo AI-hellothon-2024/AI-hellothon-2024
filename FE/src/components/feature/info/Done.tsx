@@ -17,6 +17,7 @@ const Done = ({ context }: Props) => {
 
   const handleStartGame = () => {
     if (!userId) {
+      if (typeof window === "undefined") return;
       const userId = window.crypto.randomUUID();
       setUserId(userId);
       const qs = new URLSearchParams({

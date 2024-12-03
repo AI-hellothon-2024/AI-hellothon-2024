@@ -20,6 +20,7 @@ export function getRandomNumber(start: number, end: number) {
   return Math.floor(Math.random() * (end - start + 1)) + start;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const groupBy = <T, K extends keyof any>(arr: T[], key: (i: T) => K) =>
   arr.reduce((groups, item) => {
     (groups[key(item)] ||= []).push(item);

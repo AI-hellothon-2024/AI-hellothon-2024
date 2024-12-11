@@ -28,14 +28,14 @@ def log_data_without_image(data: dict, context: str = "General"):
     logger.info(f"[{context}] Data (without encode_image): {data_without_image}")
 
 
-def save_image(encoded_image: str, scenario_id: str, is_result=False):
+async def save_image(encoded_image: str, image_id: str, is_result=False):
     image_dir = os.path.join(os.getcwd(), "images")
     os.makedirs(image_dir, exist_ok=True)
 
     if is_result:
-        image_path = os.path.join(image_dir, f"result_{scenario_id}.png")
+        image_path = os.path.join(image_dir, f"result_{image_id}.png")
     else:
-        image_path = os.path.join(image_dir, f"{scenario_id}.png")
+        image_path = os.path.join(image_dir, f"{image_id}.png")
 
     with open(image_path, "wb") as image_file:
         image_file.write(base64.b64decode(encoded_image))
@@ -66,17 +66,18 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
         "",
         "1",
         request.userId,
-        "",
-        request.personality
+        request.personality,
+        request.userName,
+        request.systemName
     )
 
     llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)
-    setting_match = re.search(r"setting:::\s*(.*?)\n", content, re.DOTALL)
 
-    llm_result = llm_result_match.group(1) if llm_result_match else "대화 시작 없음"
-    setting = setting_match.group(1) if setting_match else "설정값 없음"
+    llm_result = llm_result_match.group(1) if llm_result_match else content
+    setting_search = await db["situations"].find_one({"name": request.situation})
+    setting = str(setting_search.get("description", "기본값")) if setting_search else "기본값"
 
-    if not setting or not llm_result:
+    if not llm_result:
         raise HTTPException(
             status_code=500,
             detail="LLM 정확한 응답값 생성에 실패했습니다. 다시 시도해주세요."
@@ -100,7 +101,7 @@ async def create_scenario(request: ScenarioCreateRequest, client_request: Reques
     insert_scenario = await db["scenarios"].insert_one(scenario_data)
     scenario_id = str(insert_scenario.inserted_id)
 
-    save_image(encode_image, scenario_id)
+    await save_image(encode_image, scenario_id)
 
     await db["users"].update_one({"_id": ObjectId(user_key)}, {"$set": {"first_scenario_id": scenario_id}})
 
@@ -119,12 +120,10 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
     logger.info(
         f"[save_answer] Saving answer for userId: {request.userId}, answerScenarioId: {request.answerScenarioId}")
 
-    before_setting = ""
     job = ""
     gender = ""
 
     is_toxic = await toxic_check(request.answer)
-    logger.info(f"[save_answer] Toxic check result::::::::::::::::::::::::::::::::::::: {is_toxic}")
 
     answered_scenario_data = await db["scenarios"].find_one({"_id": ObjectId(request.answerScenarioId)})
     if answered_scenario_data is None:
@@ -147,9 +146,11 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
     before_situation = ""
     before_settings = ""
     before_personality = ""
+    before_system_name = ""
+    before_user_name = ""
 
     async def process_previous_scenarios(prev_scenarios, answered_scenario_data):
-        nonlocal before_setting, job, gender, before_situation, before_settings, before_personality
+        nonlocal job, gender, before_situation, before_settings, before_personality, before_system_name, before_user_name
 
         for scenario in prev_scenarios:
             answer = await db["answers"].find_one({"answeredScenarioId": str(scenario["_id"])})
@@ -161,14 +162,14 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             })
 
             if scenario["scenarioStep"] == "1":
-                before_setting = scenario["settings"]
-                before_personality = scenario["personality"]
-
                 user_data = await db["users"].find_one({"first_scenario_id": str(scenario["_id"])})
                 job = user_data.get("job", "")
                 gender = user_data.get("gender", "")
+                before_personality = scenario["personality"]
                 before_situation = user_data.get("situation", "")
                 before_settings = scenario["settings"]
+                before_system_name = scenario["systemName"]
+                before_user_name = user_data["userName"]
 
         answered_scenarios.append({
             "scenarioContent": answered_scenario_data["scenarioContent"],
@@ -194,11 +195,11 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             next_step = "end"
         else:
             content = await llm_scenario_create(
-                job, before_situation, gender, create_before_script, next_step, request.userId, before_setting,
-                before_personality
+                job, before_situation, gender, create_before_script, next_step,
+                request.userId, before_personality, before_system_name, before_user_name
             )
 
-            llm_result, setting, is_end_match = parse_llm_content(content)
+            llm_result, is_end_match = parse_llm_content(content)
 
             if is_end_match == "end":
                 next_step = "end"
@@ -219,6 +220,8 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         before_situation = user_data.get("situation", "")
         before_settings = answered_scenario_data["settings"]
         before_personality = answered_scenario_data["personality"]
+        before_system_name = answered_scenario_data["systemName"]
+        before_user_name = user_data["userName"]
 
         create_before_script = create_script(answered_scenarios)
 
@@ -229,15 +232,16 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
             create_before_script,
             next_step,
             request.userId,
-            answered_scenario_data.get("settings", ""),
-            before_personality
+            before_personality,
+            before_user_name,
+            before_system_name
         )
 
         if is_toxic:
             llm_result = "사용자의 입력이 부적절하여 대화를 종료합니다."
             next_step = "end"
         else:
-            llm_result, setting, is_end_match = parse_llm_content(content)
+            llm_result, is_end_match = parse_llm_content(content)
             if is_end_match == "end":
                 next_step = "end"
 
@@ -252,10 +256,13 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
         "scenarioContent": llm_result,
         "scenarioImage": encode_image,
         "settings": before_settings,
-        "personality": before_personality
+        "personality": before_personality,
+        "systemName": before_system_name,
     }
     next_scenario_insert = await db["scenarios"].insert_one(scenario_data)
     next_scenario_id = str(next_scenario_insert.inserted_id)
+
+    await save_image(encode_image, next_scenario_id, is_result=False)
 
     next_scenario_data = {
         "userId": request.userId,
@@ -271,27 +278,30 @@ async def save_answer(request: ScenarioAnswerRequest, client_request: Request) -
 
 async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResultResponse:
     existing_result = await db["results"].find_one({
-        # "userId": request.userId,
+        "userId": request.userId,
         "scenarioIds": {"$all": request.scenarioIds},
-        # "$and": [
-        #     {"flowEvaluation": {"$regex": "error", "$options": "i"}},
-        #     {"oneLineResult": {"$regex": "error", "$options": "i"}},
-        #     {"flowExplanation": {"$regex": "error", "$options": "i"}},
-        #     {"responseTendency": {"$regex": "error", "$options": "i"}},
-        #     {"goalAchievement": {"$regex": "error", "$options": "i"}},
-        #     {"resultImage": {"$regex": "error", "$options": "i"}},
-        #     {"flowEvaluation": {"$ne": ""}},
-        #     {"oneLineResult": {"$ne": ""}},
-        #     {"flowExplanation": {"$ne": ""}},
-        #     {"responseTendency": {"$ne": ""}},
-        #     {"goalAchievement": {"$ne": ""}},
-        #     {"resultImage": {"$ne": ""}},
-        # ],
+    })
+
+    object_id_list = [ObjectId(id_str) for id_str in request.scenarioIds]
+    before_scenario_data = await db["scenarios"].find_one({
+        "_id": {"$in": object_id_list},
+        "scenarioStep": "1"
+    })
+
+    user_data = await db["users"].find_one({
+        "first_scenario_id": str(before_scenario_data["_id"])
     })
 
     if existing_result:
         existing_result["resultId"] = str(existing_result["_id"])
         del existing_result["_id"]
+        existing_result["userId"] = request.userId
+        existing_result["job"] = user_data["job"]
+        existing_result["situation"] = user_data["situation"]
+        existing_result["userName"] = user_data["userName"]
+        existing_result["gender"] = user_data["gender"]
+        existing_result["systemName"] = before_scenario_data["systemName"]
+        existing_result["personality"] = before_scenario_data["personality"]
         return ScenarioResultResponse(**existing_result)
 
     gender = ""
@@ -314,7 +324,7 @@ async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResult
             user_data = await db["users"].find_one({"first_scenario_id": str(scenario["_id"])})
             gender = user_data.get("gender", "")
 
-    prev_scenarios_script = create_script(prev_scenarios)
+    prev_scenarios_script = create_script(answered_scenarios)
 
     llm_result = await llm_result_create(prev_scenarios_script, request.userId)
 
@@ -334,12 +344,18 @@ async def get_scenario_results(request: ScenarioResultRequest) -> ScenarioResult
         "scenarios": answered_scenarios,
         "create_date": settings.CURRENT_DATETIME,
         "resultImage": encode_image,
-        "scenarioIds": request.scenarioIds
+        "job": user_data["job"],
+        "situation": user_data["situation"],
+        "scenarioIds": request.scenarioIds,
+        "systemName": before_scenario_data["systemName"],
+        "personality": before_scenario_data["personality"],
+        "userName": user_data["userName"],
+        "gender": user_data["gender"]
     }
-
     result_id = await db["results"].insert_one(result_data)
     result_data["resultId"] = str(result_id.inserted_id)
-    save_image(encode_image, str(result_id.inserted_id), is_result=True)
+
+    await save_image(encode_image, str(result_id.inserted_id), is_result=True)
 
     return ScenarioResultResponse(**result_data)
 
@@ -379,17 +395,35 @@ def create_script(answered_scenarios):
 
 
 def parse_llm_content(content):
-    llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)
-    setting_match = re.search(r"setting:::\s*(.*?)\n", content, re.DOTALL)
+
+    llm_result_match = ""
+    content = re.sub(r"<step>.*?</step>", "", content, flags=re.DOTALL)
     is_end_match = re.search(r"\bend\b", content, re.IGNORECASE)
 
+    if re.search(r"<start>\s*(.*)", content, re.DOTALL):
+        llm_result_match = re.search(r"<start>\s*(.*)", content, re.DOTALL)
+        content = re.sub(r"</start>", "", content, flags=re.DOTALL)
+    elif re.search(r"start:::\s*(.*)", content, re.DOTALL):
+        llm_result_match = re.search(r"start:::\s*(.*)", content, re.DOTALL)
+
+
+
     # step::: end 이란 단어가 있으면 이부분만 삭제하고 content로 사용
-    if (re.search(r"step::: end", content)):
-        content = re.sub(r"step::: end", "", content)
+    if re.sub(r"step:::\s*end", "", content, flags=re.IGNORECASE):
+        content = re.sub(r"step:::\s*end", "", content, flags=re.IGNORECASE)
+
+
+
+    # if (re.search(r"step::: end", content)):
+    #     content = re.sub(r"step::: end", "", content)
 
     llm_result = llm_result_match.group(1) if llm_result_match else content
-    setting = setting_match.group(1) if setting_match else "설정값 없음"
+    # setting = setting_match.group(1) if setting_match else "설정값 없음"
     is_end_match = "end" if is_end_match else ""
+
+    if is_end_match:
+        if content.strip() == "":
+            content = "대화가 종료되었습니다"
 
     # if not setting:
     #     raise HTTPException(
@@ -397,7 +431,7 @@ def parse_llm_content(content):
     #         detail="LLM 정확한 응답값 생성에 실패했습니다. 다시 시도해주세요."
     #     )
 
-    return llm_result, setting, is_end_match
+    return llm_result, is_end_match
 
 
 def result_llm_content(content):

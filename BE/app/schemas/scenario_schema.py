@@ -46,6 +46,12 @@ class ScenarioResultRequest(BaseModel):
 
 class ScenarioResultResponse(BaseModel):
     resultId: str
+    job: str
+    situation: str
+    userName: str
+    gender: str
+    systemName: str
+    personality: str
     userId: str
     oneLineResult: str
     flowEvaluation: str
@@ -54,3 +60,4 @@ class ScenarioResultResponse(BaseModel):
     goalAchievement: str
     scenarios: List[dict]
     resultImage: str
+

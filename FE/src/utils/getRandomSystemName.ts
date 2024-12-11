@@ -7,10 +7,14 @@ const getRandomSystemName = (situation: keyof typeof SITUATIONS) => {
   switch (situation) {
     case "love":
       return `${randomLastName}팀장`;
-    case "angry":
-      return `${randomLastName}부장`;
-    case "daily":
+    case "codeReview":
       return `${randomLastName}사원`;
+    case "bubbles":
+      return `${randomLastName}대리`;
+    case "nastyClient":
+      return `${randomLastName}대리`;
+    case "passWork":
+      return `${randomLastName}주임`;
     default:
       return `${randomLastName}과장`;
   }

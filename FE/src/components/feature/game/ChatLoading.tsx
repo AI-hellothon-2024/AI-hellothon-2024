@@ -25,20 +25,23 @@ const Icon = ({ className, ...props }: SVGMotionProps<SVGElement>) => {
 };
 const ChatLoading = () => {
   return (
-    <div className="flex gap-2 justify-center min-g-6 items-center">
+    <div className="flex gap-3 justify-center min-g-6 items-center my-2 scale-[80%]">
       <Icon
+        className={"opacity-70"}
         animate={{
           y: [0, -4, 0],
         }}
         transition={{ duration: 1, repeat: Infinity }}
       />
       <Icon
+        className={"opacity-70"}
         animate={{
           y: [0, -4, 0],
         }}
         transition={{ duration: 1, repeat: Infinity, delay: 0.1 }}
       />
       <Icon
+        className={"opacity-70"}
         animate={{
           y: [0, -4, 0],
         }}

@@ -65,6 +65,9 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      fontFamily: {
+        DungGeunMo: ["var(--font-dungGeunMo)", "sans-serif"],
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

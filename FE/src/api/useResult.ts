@@ -37,12 +37,20 @@ export const useResult = ({
   scenarioIds: string[];
 }) => {
   const setResults = useSetAtom(resultAtom);
-  setResults((prev) => {
-    return [...prev, { userId, scenarioIds }];
-  });
+
   return useQuery({
     queryKey: ["result", { userId, scenarioIds }],
-    queryFn: () => getResult({ userId, scenarioIds }),
+    queryFn: async () => {
+      const result = await getResult({ userId, scenarioIds });
+      setResults((prev) => [
+        ...prev,
+        {
+          userId: result.userId,
+          resultId: result.resultId,
+        },
+      ]);
+      return result;
+    },
     enabled: scenarioIds.length > 0,
   });
 };

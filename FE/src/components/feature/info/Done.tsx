@@ -5,6 +5,7 @@ import { SITUATIONS, GENDER, JOBS } from "@/lib/constants";
 import { userIdAtom } from "@/app/store/userAtom";
 import { Button } from "@/components/ui/button";
 import type { InfoForm } from "./Form";
+import SituationIcon from "@/components/common/SituationIcon";
 
 interface Props {
   context: InfoForm;
@@ -16,6 +17,7 @@ const Done = ({ context }: Props) => {
 
   const handleStartGame = () => {
     if (!userId) {
+      if (typeof window === "undefined") return;
       const userId = window.crypto.randomUUID();
       setUserId(userId);
       const qs = new URLSearchParams({
@@ -34,7 +36,13 @@ const Done = ({ context }: Props) => {
   return (
     <div className="flex justify-between flex-col h-full">
       <div className="flex flex-col gap-14 items-center px-5">
-        <div className="text-2xl">{SITUATIONS[context.situation]}</div>
+        <div className="flex flex-col gap-10 items-center">
+          <div className="text-2xl">{SITUATIONS[context.situation]}</div>
+          <div className="w-[100px] aspect-square animate-pulse">
+            <SituationIcon situation={context.situation} />
+          </div>
+        </div>
+
         <div className="flex flex-col gap-4 w-full">
           {[
             {

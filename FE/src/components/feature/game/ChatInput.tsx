@@ -112,14 +112,10 @@ const ChatInput = ({
   if (lastChat?.scenarioStep === "end") {
     return (
       <Button
-        className="rounded text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold"
+        className="rounded-2xl text-xl py-3 h-auto disabled:opacity-100 disabled:bg-[#737373] text-white font-semibold"
         asChild
       >
-        <Link
-          href={`/result/${situation}?systemName=${systemName}&personality=${personality}`}
-        >
-          결과보기
-        </Link>
+        <Link href={`/result`}>결과보기</Link>
       </Button>
     );
   }
@@ -130,7 +126,7 @@ const ChatInput = ({
     >
       <TextareaAutosize
         className={
-          "flex w-full border border-input text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 md:text-sm backdrop-blur-sm bg-[rgba(31,31,31,0.7)] py-3 px-5 pr-3 disabled:cursor-not-allowed rounded-[28px] rounded-tr-none resize-none h-auto"
+          "flex w-full border border-input text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 md:text-sm backdrop-blur-sm bg-[rgba(31,31,31,0.7)] py-3 px-5 disabled:cursor-not-allowed rounded-[28px] rounded-tr-none resize-none h-auto pr-12"
         }
         disabled={isPending || isLoading}
         onKeyDown={(e) => {
@@ -144,15 +140,6 @@ const ChatInput = ({
           required: true,
         })}
       />
-      {/* <Input
-        {...register("answer", {
-          required: true,
-        })}
-        disabled={isPending || isLoading}
-        placeholder="답변을 입력해주세요."
-        className="backdrop-blur-sm rounded-full rounded-tr-none bg-[rgba(31,31,31,0.7)] py-3 h-auto px-5 pr-14 disabled:cursor-not-allowed"
-      /> */}
-
       <SendButton
         type="submit"
         disabled={!isValid || isPending}

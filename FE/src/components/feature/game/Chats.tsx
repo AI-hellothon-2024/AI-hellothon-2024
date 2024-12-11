@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import TextTransition, { presets } from "react-text-transition";
+import getRandomPersonality from "@/utils/getRandomPersonality";
 import type { Dispatch, SetStateAction, ComponentProps } from "react";
 import { twMerge, twJoin } from "tailwind-merge";
 import { SITUATIONS, JOBS, GENDER, PERSONALITIES } from "@/lib/constants";
@@ -33,6 +35,7 @@ const Chats = ({
   personality,
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [index, setIndex] = useState(0);
   const { data, isLoading } = useScenario({
     userId,
     username,
@@ -44,6 +47,18 @@ const Chats = ({
   });
   const [chats, setChats] = useAtom(chatAtom);
   const setScenario = useSetAtom(scenarioAtom);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setIndex((index) => {
+        if (index === 8) {
+          return 8;
+        }
+        return index + 1;
+      });
+    }, 200);
+    return () => clearTimeout(intervalId);
+  }, []);
 
   useEffect(() => {
     if (data) {
@@ -70,18 +85,40 @@ const Chats = ({
   }, [chats, setHasScroll]);
 
   if (isLoading) {
+    const TEXTS = [
+      PERSONALITIES[getRandomPersonality()],
+      PERSONALITIES[getRandomPersonality()],
+      PERSONALITIES[getRandomPersonality()],
+      PERSONALITIES[getRandomPersonality()],
+      PERSONALITIES[getRandomPersonality()],
+      PERSONALITIES[getRandomPersonality()],
+      PERSONALITIES[getRandomPersonality()],
+      PERSONALITIES[getRandomPersonality()],
+      PERSONALITIES[personality as keyof typeof PERSONALITIES],
+    ];
     return (
-      <div className="fixed top-0 left-0 w-dvw h-dvh flex justify-center backdrop-blur text-[#F8F8F8] items-center z-10 text-2xl font-semibold">
-        <div className="flex flex-col items-center gap-14 -translate-y-2">
+      <div className="fixed top-0 left-0 w-dvw h-dvh flex justify-center backdrop-blur text-[#D0D0D0] items-center z-10 text-xl font-semibold">
+        <div className="flex flex-col items-center -translate-y-2 gap-11 w-full">
           <Loading />
           <div className="flex flex-col items-center mt-2">
-            <div>{systemName}님과의</div>
-            <div>{SITUATIONS[situation as keyof typeof SITUATIONS]}</div>
-            <div>대화를 로딩중입니다</div>
+            <div>
+              <span className="font-DungGeunMo text-2xl text-[#F8F8F8]">
+                {systemName}
+              </span>
+              님과의
+            </div>
+            <div className="font-DungGeunMo text-2xl text-[#F8F8F8]">
+              {SITUATIONS[situation as keyof typeof SITUATIONS]}
+            </div>
+            <div>대화를 준비중입니다</div>
           </div>
-
-          <div className="border border-current rounded-full px-[60px] py-3 text-lg">
-            {PERSONALITIES[personality as keyof typeof PERSONALITIES]}
+          <div className="border border-current rounded-full py-3 text-lg mt-7 w-1/2 text-center h-[54px] overflow-y-clip">
+            <TextTransition
+              springConfig={presets.stiff}
+              className="text-center flex-grow justify-center"
+            >
+              {TEXTS[index]}
+            </TextTransition>
           </div>
         </div>
       </div>
@@ -92,15 +129,15 @@ const Chats = ({
       className="flex flex-col overflow-y-auto gap-2 scroll-smooth"
       ref={containerRef}
     >
-      {chats.map((chat) => (
+      {chats.map(({ id, sender, loading, message }) => (
         <MotionDiv
-          key={chat.id}
+          key={id}
           className={twMerge(
-            "p-6 w-full text-[#F8F8F8] rounded-b-2xl backdrop-blur-sm break-all whitespace-break-spaces",
+            "px-6 py-4 w-full text-[#F8F8F8] rounded-b-[28px] backdrop-blur-sm break-all whitespace-break-spaces flex flex-col gap-1",
             twJoin(
-              chat.sender === "bot"
-                ? "bg-[rgba(0,0,0,0.8)] rounded-tr-2xl"
-                : "bg-[rgba(31,31,31,0.7)] rounded-tl-2xl border border-primary box-border"
+              sender === "bot"
+                ? "bg-[rgba(0,0,0,0.8)] rounded-tr-[28px]"
+                : "bg-[rgba(31,31,31,0.7)] rounded-tl-[28px] border border-primary box-border"
             )
           )}
           initial={{
@@ -112,7 +149,12 @@ const Chats = ({
             once: true,
           }}
         >
-          {chat.loading ? <ChatLoading /> : chat.message}
+          {!loading && sender === "bot" && (
+            <span className="text-primary font-DungGeunMo text-xs">
+              {systemName}
+            </span>
+          )}
+          {loading ? <ChatLoading /> : message}
         </MotionDiv>
       ))}
     </div>

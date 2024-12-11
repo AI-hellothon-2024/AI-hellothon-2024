@@ -7,6 +7,10 @@ class CollectionListRequest(BaseModel):
 
 
 class ListItem(BaseModel):
+    job: str
+    situation: str
+    systemName: str
+    personality: str
     resultId: str
     flowEvaluation: str
     resultImage: str
@@ -28,12 +32,20 @@ class CollectionDetailResponse(BaseModel):
     resultId: str
     userId: str
     createDate: str
+    oneLineResult: str
     flowEvaluation: str
     flowExplanation: str
     responseTendency: str
     goalAchievement: str
+    job: str
+    situation: str
+    userName: str
+    gender: str
+    systemName: str
+    personality: str
     scenarios: List[ScenarioItem]
     resultImage: str
+
 
 
 class CollectionDetailRequest(BaseModel):

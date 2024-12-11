@@ -7,7 +7,7 @@ interface Props extends PropsWithChildren {
 }
 
 const Layout = ({ children }: Props) => {
-  return <>{children}</>;
+  return <div className="h-dvh">{children}</div>;
 };
 
 export default Layout;

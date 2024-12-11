@@ -1,3 +1,5 @@
+import logging
+
 from app.schemas.collection_schema import CollectionListRequest, CollectionListResponse, ListItem, \
     CollectionDetailRequest, CollectionDetailResponse, ScenarioItem
 from app.db.session import get_database
@@ -6,6 +8,10 @@ from bson import ObjectId
 from datetime import datetime
 
 db = get_database()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 async def collection_list(request: CollectionListRequest) -> CollectionListResponse:
     # userId로 조회하는데, 이제 error문자열을 곁들이지 않은.. image 생성에 실패한 row...
@@ -21,21 +27,34 @@ async def collection_list(request: CollectionListRequest) -> CollectionListRespo
             resultId=str(result["_id"]),
             flowEvaluation=result["flowEvaluation"],
             resultImage=result["resultImage"],
+            job=result["job"],
+            situation=result["situation"],
+            systemName=result["systemName"],
+            personality=result["personality"]
         )
         for result in results
     ]
 
-    # CollectionListResponse 반환
     return CollectionListResponse(
         userId=request.userId,
         result=result_list
     )
 
+
 async def collection_detail(request: CollectionDetailRequest) -> CollectionDetailResponse:
-    # MongoDB에서 resultId를 기반으로 데이터 조회
     result = await db["results"].find_one({
         "userId": request.userId,
         "_id": ObjectId(request.resultId)
+    })
+
+    object_id_list = [ObjectId(id_str) for id_str in result["scenarioIds"]]
+    before_scenario_data = await db["scenarios"].find_one({
+        "_id": {"$in": object_id_list},
+        "scenarioStep": "1"
+    })
+
+    user_data = await db["users"].find_one({
+        "first_scenario_id": str(before_scenario_data["_id"])
     })
 
     # result가 없을 경우 예외 처리
@@ -80,10 +99,17 @@ async def collection_detail(request: CollectionDetailRequest) -> CollectionDetai
         resultId=str(result["_id"]),
         userId=result["userId"],
         createDate=result["create_date"],
+        oneLineResult=result["oneLineResult"],
         flowEvaluation=result["flowEvaluation"],
         flowExplanation=result["flowExplanation"],
         responseTendency=result["responseTendency"],
         goalAchievement=result["goalAchievement"],
+        job=user_data["job"],
+        situation=user_data["situation"],
+        userName=user_data["userName"],
+        gender=user_data["gender"],
+        systemName=before_scenario_data["systemName"],
+        personality=before_scenario_data["personality"],
         scenarios=scenario_items,
         resultImage=result["resultImage"],
     )

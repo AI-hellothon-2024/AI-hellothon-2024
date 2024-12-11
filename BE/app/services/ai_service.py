@@ -4,6 +4,7 @@ import os
 import requests
 import logging
 import random
+import openai
 from fastapi import HTTPException
 from app.core.config import settings
 from app.db.session import get_database
@@ -25,6 +26,8 @@ if not logger.handlers:
 
 db = get_database()
 
+openai.api_key = settings.ML_API_KEY
+
 
 async def generate_request(url, payload, headers):
     response = requests.post(url, json=payload, headers=headers)
@@ -40,8 +43,6 @@ async def generate_request(url, payload, headers):
 async def llm_scenario_create(job, situation, gender, before_scenario_content,
                               scenario_step, user_id,
                               personalitie, userName, systemName):
-    url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
-
     logger.info("situation: " + situation)
     # 상황
     selected_situation = await db["situations"].find_one({"name": situation})
@@ -97,28 +98,24 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content,
 
     logger.info(f"LLM 생성 prompt: {messages}")
 
-    payload = {
-        "model": "helpy-pro",
-        "sess_id": user_id,
-        "messages": messages,
-    }
-    headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "authorization": f"Bearer {settings.ML_API_KEY}"
-    }
+    try:
+        response = await openai.ChatCompletion.acreate(
+            model="gpt-4o",
 
-    response = await generate_request(url, payload, headers)
-    if isinstance(response, dict):
-        content = response.get("choices", [])[0].get("message", {}).get("content", "")
+            messages=messages,
+            max_tokens=300,
+            temperature=0.7,
+        )
+
+        content = response["choices"][0]["message"]["content"]
         logger.info(f"LLM 생성 응답값: {content}")
         return content
-    return response
+    except Exception as e:
+        logger.error(f"OpenAI API 호출 중 오류: {str(e)}")
+        raise HTTPException(status_code=500, detail="LLM 생성 중 오류가 발생했습니다.")
 
 
 async def image_create(content, gender, situation):
-    url = "https://api-cloud-function.elice.io/0133c2f7-9f3f-44b6-a3d6-c24ba8ef4510/generate"
-
     system_gender = "male" if gender == "female" else "female"
     logger.info("system_gender: " + system_gender)
 
@@ -129,31 +126,24 @@ async def image_create(content, gender, situation):
         f"Dialogue: {content}"
         f"Do *not* include any text in the image."
         f"Based on the concept and dialogue, create the character's pose, facial expression, and details in a realistic and elaborate style."
+
     )
 
-    payload = {
-        "prompt": prompt,
-        "style": "watercolor",
-        "width": 472,
-        "height": 1024,
-        "steps": 4,
-        "num": 1
-    }
-    headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "Authorization": f"Bearer {settings.ML_API_KEY}"
-    }
-
-    response = await generate_request(url, payload, headers)
-    if isinstance(response, dict):
-        return response.get("predictions", "Image generation failed")  # Return image URL or failure message
-    return response
+    try:
+        response = await openai.Image.acreate(
+            prompt=prompt,
+            n=1,  # 생성할 이미지 수
+            size="472x1024"  # 이미지 크기
+        )
+        image_url = response["data"][0]["url"]
+        logger.info(f"DALL·E 이미지 생성 URL: {image_url}")
+        return image_url
+    except Exception as e:
+        logger.error(f"DALL·E 이미지 생성 중 오류: {str(e)}")
+        raise HTTPException(status_code=500, detail="이미지 생성 중 오류가 발생했습니다.")
 
 
 async def llm_result_create(before_scenario_content, user_id):
-    url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
-
     # 프롬프트 생성
     prompt = (
         # 언어적 표현 분석
@@ -240,28 +230,22 @@ async def llm_result_create(before_scenario_content, user_id):
 
     logger.info(f"LLM 생성 prompt: {messages}")
 
-    payload = {
-        "model": "helpy-pro",
-        "sess_id": "hello-thon-team5-communication-teacher1",
-        "messages": messages,
-    }
-    headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "authorization": f"Bearer {settings.ML_API_KEY}"
-    }
-
-    response = await generate_request(url, payload, headers)
-    if isinstance(response, dict):
-        content = response.get("choices", [])[0].get("message", {}).get("content", "")
-        logger.info(f"LLM result 생성 응답값: {content}")
+    try:
+        response = await openai.ChatCompletion.acreate(
+            model="gpt-4o",
+            messages=messages,
+            max_tokens=700,
+            temperature=0.7,
+        )
+        content = response["choices"][0]["message"]["content"]
+        logger.info(f"LLM 평가 응답값: {content}")
         return content
-    return response
+    except Exception as e:
+        logger.error(f"OpenAI API 호출 중 오류: {str(e)}")
+        raise HTTPException(status_code=500, detail="LLM 평가 중 오류가 발생했습니다.")
 
 
 async def result_image_create(flow_evaluation, gender):
-    url = "https://api-cloud-function.elice.io/0133c2f7-9f3f-44b6-a3d6-c24ba8ef4510/generate"
-
     system_gender = "male" if gender == "female" else "female"
     logger.info("system_gender: " + system_gender)
 
@@ -311,24 +295,18 @@ async def result_image_create(flow_evaluation, gender):
         f"descriptions provided."
     )
 
-    payload = {
-        "prompt": prompt,
-        "style": "watercolor",
-        "width": 1024,
-        "height": 1024,
-        "steps": 4,
-        "num": 1
-    }
-    headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "Authorization": f"Bearer {settings.ML_API_KEY}"
-    }
-
-    response = await generate_request(url, payload, headers)
-    if isinstance(response, dict):
-        return response.get("predictions", "Image generation failed")
-    return response
+    try:
+        response = await openai.Image.acreate(
+            prompt=prompt,
+            n=1,  # 생성할 이미지 수
+            size="512x512"  # 이미지 크기
+        )
+        image_url = response["data"][0]["url"]
+        logger.info(f"DALL·E 이미지 생성 URL: {image_url}")
+        return image_url
+    except Exception as e:
+        logger.error(f"DALL·E 이미지 생성 중 오류: {str(e)}")
+        raise HTTPException(status_code=500, detail="이미지 생성 중 오류가 발생했습니다.")
 
 
 async def get_korean_name(user_id, gender):
@@ -365,44 +343,42 @@ async def get_korean_name(user_id, gender):
 
 
 async def toxic_check(content):
-    # return False
-
-    url = "https://api-cloud-function.elice.io/cf3b3742-4bf5-433b-9042-bc8c563c25cc/predict"
-
-    headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "Authorization": f"Bearer {settings.ML_API_KEY}"
-    }
-
-    # 요청 데이터
-    payload = {"text": [content]}
-
-    try:
-        # POST 요청
-        response = requests.post(url, headers=headers, json=payload)
-
-        # 응답 성공 여부 확인
-        if response.status_code == 200:
-            result = response.json()
-            if isinstance(result, list) and result:  # 응답이 리스트이고 비어 있지 않을 때
-                first_item = result[0]
-                is_toxic = first_item.get("is_toxic", False)
-                score = first_item.get("score", 0)
-
-                # 조건 확인
-                if is_toxic and score >= 0.9:
-                    return True
-            return False
-        else:
-            return f"요청 실패: {response.status_code} - {response.text}"
-    except Exception as e:
-        return f"응답 처리 중 에러 발생: {str(e)}"
+    return False
+    #
+    # url = "https://api-cloud-function.elice.io/cf3b3742-4bf5-433b-9042-bc8c563c25cc/predict"
+    #
+    # headers = {
+    #     "accept": "application/json",
+    #     "content-type": "application/json",
+    #     "Authorization": f"Bearer {settings.ML_API_KEY}"
+    # }
+    #
+    # # 요청 데이터
+    # payload = {"text": [content]}
+    #
+    # try:
+    #     # POST 요청
+    #     response = requests.post(url, headers=headers, json=payload)
+    #
+    #     # 응답 성공 여부 확인
+    #     if response.status_code == 200:
+    #         result = response.json()
+    #         if isinstance(result, list) and result:  # 응답이 리스트이고 비어 있지 않을 때
+    #             first_item = result[0]
+    #             is_toxic = first_item.get("is_toxic", False)
+    #             score = first_item.get("score", 0)
+    #
+    #             # 조건 확인
+    #             if is_toxic and score >= 0.8:
+    #                 return True
+    #         return False
+    #     else:
+    #         return f"요청 실패: {response.status_code} - {response.text}"
+    # except Exception as e:
+    #     return f"응답 처리 중 에러 발생: {str(e)}"
 
 
 async def one_line_result(result_one, result_two, result_three, user_id):
-    url = "https://api-cloud-function.elice.io/5a327f26-cc55-45c5-92b7-e909c2df0ba4/v1/chat/completions"
-
     # 프롬프트 생성
     prompt = (
         f"{result_one}\n"
@@ -414,26 +390,22 @@ async def one_line_result(result_one, result_two, result_three, user_id):
 
     messages = [{"role": "system", "content": prompt}]
 
-    payload = {
-        "model": "helpy-pro",
-        "sess_id": "team-5-one-line-result",
-        "messages": messages,
-    }
-    headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "authorization": f"Bearer {settings.ML_API_KEY}"
-    }
+    try:
+        response = await openai.ChatCompletion.acreate(
+            model="gpt-4o",
 
-    response = await generate_request(url, payload, headers)
-    if isinstance(response, dict):
-        content = response.get("choices", [])[0].get("message", {}).get("content", "")
-        logger.info(f"LLM result 생성 응답값: {content}")
+            messages=messages,
+            max_tokens=50,  # 한 줄 요약에 충분한 토큰 설정
+            temperature=0.7,  # 적절히 창의적인 응답을 유도
+
+        )
+
+        content = response["choices"][0]["message"]["content"]
+        logger.info(f"LLM 한 줄 요약 응답값: {content}")
         return content
-    return response
-
-
-
+    except Exception as e:
+        logger.error(f"OpenAI API 호출 중 오류: {str(e)}")
+        raise HTTPException(status_code=500, detail="LLM 한 줄 요약 중 오류가 발생했습니다.")
 
 
 async def test_image_create():
@@ -441,26 +413,26 @@ async def test_image_create():
 
     # 분위기를 랜덤하게 설정하기 위한 키워드 리스트
     moods = [
-        "cheerful and lively",           # 활기차고 즐거운
-        "calm and focused",              # 차분하고 집중된
-        "funny and lighthearted",        # 재미있고 유쾌한
-        "friendly and casual",           # 친근하고 캐주얼한
-        "professional and inspiring",    # 전문적이고 영감을 주는
-        "relaxed and collaborative",     # 편안하고 협력적인
-        "exciting and adventurous",      # 신나고 모험적인
-        "serene and peaceful",           # 고요하고 평화로운
-        "energetic and productive",      # 에너제틱하고 생산적인
-        "motivational and supportive",   # 동기부여적이고 지지적인
-        "creative and innovative",       # 창의적이고 혁신적인
-        "playful and humorous",          # 장난스럽고 유머러스한
-        "intense and competitive",       # 강렬하고 경쟁적인
-        "welcoming and inclusive",       # 환영받는 느낌이고 포용적인
-        "dynamic and fast-paced",        # 역동적이고 빠른 템포의
-        "optimistic and forward-thinking", # 낙관적이고 미래지향적인
-        "warm and comforting",           # 따뜻하고 위로가 되는
-        "structured and organized",      # 구조적이고 조직적인
-        "casual and spontaneous",        # 캐주얼하고 즉흥적인
-        "focused and determined"         # 집중적이고 결단력 있는
+        "cheerful and lively",  # 활기차고 즐거운
+        "calm and focused",  # 차분하고 집중된
+        "funny and lighthearted",  # 재미있고 유쾌한
+        "friendly and casual",  # 친근하고 캐주얼한
+        "professional and inspiring",  # 전문적이고 영감을 주는
+        "relaxed and collaborative",  # 편안하고 협력적인
+        "exciting and adventurous",  # 신나고 모험적인
+        "serene and peaceful",  # 고요하고 평화로운
+        "energetic and productive",  # 에너제틱하고 생산적인
+        "motivational and supportive",  # 동기부여적이고 지지적인
+        "creative and innovative",  # 창의적이고 혁신적인
+        "playful and humorous",  # 장난스럽고 유머러스한
+        "intense and competitive",  # 강렬하고 경쟁적인
+        "welcoming and inclusive",  # 환영받는 느낌이고 포용적인
+        "dynamic and fast-paced",  # 역동적이고 빠른 템포의
+        "optimistic and forward-thinking",  # 낙관적이고 미래지향적인
+        "warm and comforting",  # 따뜻하고 위로가 되는
+        "structured and organized",  # 구조적이고 조직적인
+        "casual and spontaneous",  # 캐주얼하고 즉흥적인
+        "focused and determined"  # 집중적이고 결단력 있는
     ]
 
     # 분위기와 인원 수 무작위 선택

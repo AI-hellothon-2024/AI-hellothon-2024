@@ -42,7 +42,7 @@ async def generate_request(url, payload, headers):
 
 async def llm_scenario_create(job, situation, gender, before_scenario_content,
                               scenario_step, user_id,
-                              personalitie, userName, systemName):
+                              personality, userName, systemName):
     logger.info("situation: " + situation)
     # 상황
     selected_situation = await db["situations"].find_one({"name": situation})
@@ -54,7 +54,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content,
     logger.info("situation_description:::: " + situation_description)
 
     # 성격
-    selected_personalities = await db["personalities"].find_one({"trait": {"$regex": personalitie, "$options": "i"}})
+    selected_personalities = await db["personalities"].find_one({"name": {"$regex": personality, "$options": "i"}})
     personalities = selected_personalities["trait"] if selected_personalities else ""
     logger.info("personalities:::: " + personalities)
     if personalities == "":
@@ -99,9 +99,8 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content,
     logger.info(f"LLM 생성 prompt: {messages}")
 
     try:
-        response = await openai.ChatCompletion.acreate(
+        response = await openai.ChatCompletion.create(
             model="gpt-4o",
-
             messages=messages,
             max_tokens=300,
             temperature=0.7,

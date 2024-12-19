@@ -1,10 +1,10 @@
 import base64
 import os
 
+from openai import OpenAI
 import requests
 import logging
 import random
-import openai
 from fastapi import HTTPException
 from app.core.config import settings
 from app.db.session import get_database
@@ -26,7 +26,9 @@ if not logger.handlers:
 
 db = get_database()
 
-openai.api_key = settings.ML_API_KEY
+# client.api_key = settings.ML_API_KEY
+
+client = OpenAI(api_key=settings.ML_API_KEY)
 
 
 async def generate_request(url, payload, headers):
@@ -58,10 +60,12 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content,
     personalities = selected_personalities["trait"] if selected_personalities else ""
     logger.info("personalities:::: " + personalities)
     if personalities == "":
-        raise HTTPException(
-            status_code=400,
-            detail="성격 값이 잘못되었습니다ㅠㅠ 다시........"
-        )
+        personalities = "생각이나 배려가 부족해 남의 비위를 뒤집음;신경질적"
+        logger.info("성격이 제대로 안돼서 기본값으로 설정 :::: " + personalities)
+        # raise HTTPException(
+        #     status_code=400,
+        #     detail="성격 값이 잘못되었습니다ㅠㅠ 다시........"
+        # )
 
     system_gender = "male" if gender == "female" else "female"
     logger.info("system_gender: " + system_gender)
@@ -99,11 +103,9 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content,
     logger.info(f"LLM 생성 prompt: {messages}")
 
     try:
-        response = await openai.ChatCompletion.create(
-            model="gpt-4o",
+        response = client.chat.completions.create(
             messages=messages,
-            max_tokens=300,
-            temperature=0.7,
+            model="o1-mini",
         )
 
         content = response["choices"][0]["message"]["content"]
@@ -129,7 +131,7 @@ async def image_create(content, gender, situation):
     )
 
     try:
-        response = await openai.Image.acreate(
+        response = await client.Image.create(
             prompt=prompt,
             n=1,  # 생성할 이미지 수
             size="472x1024"  # 이미지 크기
@@ -230,7 +232,7 @@ async def llm_result_create(before_scenario_content, user_id):
     logger.info(f"LLM 생성 prompt: {messages}")
 
     try:
-        response = await openai.ChatCompletion.acreate(
+        response = await client.chat.completions.create(
             model="gpt-4o",
             messages=messages,
             max_tokens=700,
@@ -295,7 +297,7 @@ async def result_image_create(flow_evaluation, gender):
     )
 
     try:
-        response = await openai.Image.acreate(
+        response = await client.Image.create(
             prompt=prompt,
             n=1,  # 생성할 이미지 수
             size="512x512"  # 이미지 크기
@@ -390,7 +392,7 @@ async def one_line_result(result_one, result_two, result_three, user_id):
     messages = [{"role": "system", "content": prompt}]
 
     try:
-        response = await openai.ChatCompletion.acreate(
+        response = await client.chat.completions.create(
             model="gpt-4o",
 
             messages=messages,

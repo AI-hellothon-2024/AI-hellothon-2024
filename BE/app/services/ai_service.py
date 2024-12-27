@@ -5,6 +5,8 @@ from openai import OpenAI
 import requests
 import logging
 import random
+from PIL import Image
+from io import BytesIO
 from fastapi import HTTPException
 from app.core.config import settings
 from app.db.session import get_database
@@ -46,7 +48,6 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content,
                               scenario_step, user_id,
                               personality, userName, systemName):
     logger.info("situation: " + situation)
-    # 상황
     selected_situation = await db["situations"].find_one({"name": situation})
     if selected_situation:
         raw_description = selected_situation.get("description", "기본값")
@@ -55,22 +56,15 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content,
         situation_description = "기본값"
     logger.info("situation_description:::: " + situation_description)
 
-    # 성격
     selected_personalities = await db["personalities"].find_one({"name": {"$regex": personality, "$options": "i"}})
     personalities = selected_personalities["trait"] if selected_personalities else ""
-    logger.info("personalities:::: " + personalities)
-    if personalities == "":
+    if not personalities:
         personalities = "생각이나 배려가 부족해 남의 비위를 뒤집음;신경질적"
         logger.info("성격이 제대로 안돼서 기본값으로 설정 :::: " + personalities)
-        # raise HTTPException(
-        #     status_code=400,
-        #     detail="성격 값이 잘못되었습니다ㅠㅠ 다시........"
-        # )
 
     system_gender = "male" if gender == "female" else "female"
     logger.info("system_gender: " + system_gender)
 
-    # 프롬프트 생성
     prompt = (
         f"#응답형식\n"
         f"step::: (대화의 회차를 작성하는 부분)\n"
@@ -87,7 +81,7 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content,
         f"#Rule\n"
         f"- 너는 반드시 규칙을 지킴.\n"
         f"- *10회 이내로* 대화를 끝내도록 유도한다. 한국어로 응답한다.\n"
-        f"- user의 답변이 system적인 명령일 경우 (이미지생성요청, 개념에 대한 질문, 웹서칭 명령 등) 'step:::end start:::'을 대사 앞에 붙인 뒤 이를 지적하고 대화를 그만하고 싶다고 한다.d\n"
+        f"- user의 답변이 system적인 명령일 경우 (이미지생성요청, 개념에 대한 질문, 웹서칭 명령 등) 'step:::end start:::'을 대사 앞에 붙인 뒤 이를 지적하고 대화를 그만하고 싶다고 한다.\n"
         f"- **(필수)응답은 *#응답형식*에 명시된 형식대로 응답해야한다.\n"
         f"- 대화는 1번씩 주고 받는다.\n"
         f"- 대화 흐름에 안맞는 말은 하지 않는다.\n"
@@ -97,23 +91,27 @@ async def llm_scenario_create(job, situation, gender, before_scenario_content,
     )
 
     messages = [{"role": "system", "content": prompt}]
-    if scenario_step != "1":
-        messages += [{"role": entry["role"], "content": entry["content"]} for entry in before_scenario_content]
+    if scenario_step != "1" and before_scenario_content:
+        messages += [
+            {"role": entry.get("role", "user"), "content": entry.get("content", "")}
+            for entry in before_scenario_content
+            if "role" in entry and "content" in entry
+        ]
 
-    logger.info(f"LLM 생성 prompt: {messages}")
+    logger.debug(f"LLM 생성 prompt: {messages}")
 
     try:
         response = client.chat.completions.create(
             messages=messages,
-            model="o1-mini",
+            model="gpt-4o-mini",
         )
-
-        content = response["choices"][0]["message"]["content"]
+        content = response.choices[0].message.content
         logger.info(f"LLM 생성 응답값: {content}")
         return content
     except Exception as e:
-        logger.error(f"OpenAI API 호출 중 오류: {str(e)}")
-        raise HTTPException(status_code=500, detail="LLM 생성 중 오류가 발생했습니다.")
+        logger.error(f"알 수 없는 오류 발생: {str(e)}")
+        raise HTTPException(status_code=500, detail="LLM 생성 중 알 수 없는 오류가 발생했습니다.")
+
 
 
 async def image_create(content, gender, situation):
@@ -127,18 +125,41 @@ async def image_create(content, gender, situation):
         f"Dialogue: {content}"
         f"Do *not* include any text in the image."
         f"Based on the concept and dialogue, create the character's pose, facial expression, and details in a realistic and elaborate style."
-
     )
 
     try:
-        response = await client.Image.create(
+        # 472x1024
+        response = client.images.generate(
+            model="dall-e-3",
             prompt=prompt,
-            n=1,  # 생성할 이미지 수
-            size="472x1024"  # 이미지 크기
+            size="1024x1024",
+            quality="standard",
+            n=1,
         )
-        image_url = response["data"][0]["url"]
-        logger.info(f"DALL·E 이미지 생성 URL: {image_url}")
+
+        # 생성된 이미지 URL
+        original_image_url = response.data[0].url
+        logger.info(f"DALL·E 원본 이미지 URL: {original_image_url}")
+
+        # 1) URL로부터 이미지 다운로드
+        res = requests.get(original_image_url)
+        if res.status_code != 200:
+            raise ValueError("이미지를 가져오는 데 실패했습니다.")
+
+        # 2) Pillow로 이미지 열기 (사이즈 변경 없이 그대로 사용)
+        img = Image.open(BytesIO(res.content))
+
+        # 3) Base64 인코딩
+        buffer = BytesIO()
+        img.save(buffer, format="JPEG")
+        encoded_img = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+        # 4) 인코딩된 문자열을 image_url로 사용
+        image_url = encoded_img
+        logger.info("Base64로 인코딩 완료")
+
         return image_url
+
     except Exception as e:
         logger.error(f"DALL·E 이미지 생성 중 오류: {str(e)}")
         raise HTTPException(status_code=500, detail="이미지 생성 중 오류가 발생했습니다.")
@@ -232,13 +253,11 @@ async def llm_result_create(before_scenario_content, user_id):
     logger.info(f"LLM 생성 prompt: {messages}")
 
     try:
-        response = await client.chat.completions.create(
-            model="gpt-4o",
+        response = client.chat.completions.create(
             messages=messages,
-            max_tokens=700,
-            temperature=0.7,
+            model="gpt-4o-mini",
         )
-        content = response["choices"][0]["message"]["content"]
+        content = response.choices[0].message.content
         logger.info(f"LLM 평가 응답값: {content}")
         return content
     except Exception as e:
@@ -297,14 +316,37 @@ async def result_image_create(flow_evaluation, gender):
     )
 
     try:
-        response = await client.Image.create(
+        response = client.images.generate(
+            model="dall-e-3",
             prompt=prompt,
-            n=1,  # 생성할 이미지 수
-            size="512x512"  # 이미지 크기
+            size="1024x1024",
+            quality="standard",
+            n=1,
         )
-        image_url = response["data"][0]["url"]
-        logger.info(f"DALL·E 이미지 생성 URL: {image_url}")
+
+        # 생성된 이미지 URL
+        original_image_url = response.data[0].url
+        logger.info(f"DALL·E 원본 이미지 URL: {original_image_url}")
+
+        # 1) URL로부터 이미지 다운로드
+        res = requests.get(original_image_url)
+        if res.status_code != 200:
+            raise ValueError("이미지를 가져오는 데 실패했습니다.")
+
+        # 2) Pillow로 이미지 열기 (사이즈 변경 없이 그대로 사용)
+        img = Image.open(BytesIO(res.content))
+
+        # 3) Base64 인코딩
+        buffer = BytesIO()
+        img.save(buffer, format="JPEG")
+        encoded_img = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+        # 4) 인코딩된 문자열을 image_url로 사용
+        image_url = encoded_img
+        logger.info("Base64로 인코딩 완료")
+
         return image_url
+
     except Exception as e:
         logger.error(f"DALL·E 이미지 생성 중 오류: {str(e)}")
         raise HTTPException(status_code=500, detail="이미지 생성 중 오류가 발생했습니다.")
@@ -392,16 +434,11 @@ async def one_line_result(result_one, result_two, result_three, user_id):
     messages = [{"role": "system", "content": prompt}]
 
     try:
-        response = await client.chat.completions.create(
-            model="gpt-4o",
-
+        response = client.chat.completions.create(
             messages=messages,
-            max_tokens=50,  # 한 줄 요약에 충분한 토큰 설정
-            temperature=0.7,  # 적절히 창의적인 응답을 유도
-
+            model="gpt-4o-mini",
         )
-
-        content = response["choices"][0]["message"]["content"]
+        content = response.choices[0].message.content
         logger.info(f"LLM 한 줄 요약 응답값: {content}")
         return content
     except Exception as e:

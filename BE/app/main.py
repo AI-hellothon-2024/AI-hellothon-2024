@@ -133,6 +133,16 @@ app.include_router(collection.router, prefix="/collection", tags=["collection"])
 app.include_router(test.router, prefix="/test", tags=["test"])
 
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def root():
-    return RedirectResponse(url="/docs")
+    return """
+    <html>
+        <head>
+            <title>Home</title>
+        </head>
+        <body>
+            <h1>Welcome!</h1>
+            <p><a href="/docs">DOCS</a></p>
+        </body>
+    </html>
+    """

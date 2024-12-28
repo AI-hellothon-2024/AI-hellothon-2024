@@ -19,6 +19,7 @@ const getResult = async ({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ userId, scenarioIds }),
+      credentials: "omit",
     }
   );
 

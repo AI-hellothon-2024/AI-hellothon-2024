@@ -14,6 +14,7 @@ const getCollection = async ({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ userId }),
+      credentials: "omit",
     }
   );
 

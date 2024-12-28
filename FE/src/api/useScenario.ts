@@ -33,6 +33,7 @@ const getScenario = async ({
       systemName,
       personality,
     }),
+    credentials: "omit",
   });
 
   if (!res.ok) {

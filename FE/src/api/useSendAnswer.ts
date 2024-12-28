@@ -27,6 +27,7 @@ const postAnswerScenario = async ({
         scenarioIds,
         answer,
       }),
+      credentials: "omit",
     }
   );
 
